@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EHealthMonitoringSystemBackend.Api", "EHealthMonitoringSystemBackend.Api\EHealthMonitoringSystemBackend.Api.csproj", "{BFDC4CAE-9A51-4C3F-A59B-AAF1A1F61238}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EHealthMonitoringSystemBackend.Core", "EHealthMonitoringSystemBackend.Core\EHealthMonitoringSystemBackend.Core.csproj", "{65CA75D1-E22D-4EB3-95A1-72244AE6C727}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EHealthMonitoringSystemBackend.Data", "EHealthMonitoringSystemBackend.Data\EHealthMonitoringSystemBackend.Data.csproj", "{707592D8-AAEE-454A-B9C1-4E3A301B65B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{BFDC4CAE-9A51-4C3F-A59B-AAF1A1F61238}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BFDC4CAE-9A51-4C3F-A59B-AAF1A1F61238}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BFDC4CAE-9A51-4C3F-A59B-AAF1A1F61238}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65CA75D1-E22D-4EB3-95A1-72244AE6C727}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65CA75D1-E22D-4EB3-95A1-72244AE6C727}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65CA75D1-E22D-4EB3-95A1-72244AE6C727}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65CA75D1-E22D-4EB3-95A1-72244AE6C727}.Release|Any CPU.Build.0 = Release|Any CPU
+		{707592D8-AAEE-454A-B9C1-4E3A301B65B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{707592D8-AAEE-454A-B9C1-4E3A301B65B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{707592D8-AAEE-454A-B9C1-4E3A301B65B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{707592D8-AAEE-454A-B9C1-4E3A301B65B1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
