@@ -3,10 +3,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EHealthMonitoringSystemBackend.Data;
 
-public class AppDbContext : IdentityDbContext
+public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext(options)
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-    {
-        
-    }
 }
