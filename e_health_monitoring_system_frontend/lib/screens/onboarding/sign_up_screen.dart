@@ -36,13 +36,11 @@ class _SignUpState extends State<SignUp> {
                       email: emailController.text,
                       passwd: passwdController.text,
                     );
-                    var resp = await http
-                        .post(
-                          headers: {"Content-Type": "application/json"},
-                          Uri.parse("http://10.0.2.2:5200/api/PatientRegister"),
-                          body: jsonEncode(newPatient.toJson()),
-                        )
-                        .timeout(Duration(seconds: 10));
+                    var resp = await http.post(
+                      headers: {"Content-Type": "application/json"},
+                      Uri.parse("http://10.0.2.2:5200/api/PatientRegister"),
+                      body: jsonEncode(newPatient.toJson()),
+                    ).timeout(Duration(seconds: 10));
                     print("error ${resp.statusCode} ${resp.body}");
                   },
                   child: Text("Sign up"),
@@ -56,11 +54,10 @@ class _SignUpState extends State<SignUp> {
                     TextSpan(
                       text: "Sign in!",
                       style: TextStyle(color: theme.colorScheme.primary),
-                      recognizer:
-                          TapGestureRecognizer()
-                            ..onTap = () {
-                              Navigator.of(context).pop();
-                            },
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Navigator.of(context).pop();
+                        },
                     ),
                   ],
                 ),

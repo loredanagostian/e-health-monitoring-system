@@ -1,3 +1,4 @@
+import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -11,8 +12,14 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: if user is logged in diplay other page
-    return const MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(body: SafeArea(child: OnboardingScreen())));
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        useMaterial3: true,
+        primaryColor: ColorsHelper.mainWhite,
+        colorScheme: ColorScheme.fromSeed(seedColor: ColorsHelper.mainWhite),
+      ),
+      home: Scaffold(body: SafeArea(child: OnboardingScreen())),
+    );
   }
 }
