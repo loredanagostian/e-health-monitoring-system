@@ -1,4 +1,5 @@
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -19,6 +20,8 @@ class MainApp extends StatelessWidget {
         primaryColor: ColorsHelper.mainWhite,
         colorScheme: ColorScheme.fromSeed(seedColor: ColorsHelper.mainWhite),
       ),
+      navigatorKey: navigatorKey,
+      scaffoldMessengerKey: rootScaffoldMessengerKey,
       home: Scaffold(body: SafeArea(child: OnboardingScreen())),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:e_health_monitoring_system_frontend/helpers/assets_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/sign_in_screen.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
@@ -56,8 +57,7 @@ class OnboardingScreen extends StatelessWidget {
                           text: StringsHelper.getStarted,
                           icon: Icons.arrow_forward_ios,
                           onPressed: () {
-                            Navigator.push(
-                              context,
+                            navigator.pushReplacement(
                               MaterialPageRoute(
                                 builder: (context) => const SignInScreen(),
                               ),

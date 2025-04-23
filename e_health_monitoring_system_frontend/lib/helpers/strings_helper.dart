@@ -12,10 +12,13 @@ class StringsHelper {
   static const String forgotPassword = "Forgot password?";
   static const String notUserYet = "Not user yet?";
   static const String signUp = "Sign Up";
+  static const String invalidEmail = "Invalid email";
 
   /// Sign Up
   static const String confirmPassword = "Confirm your password";
   static const String alreadyUser = "Already user?";
+  static const String allFieldsMustBeCompleted = "All fields must be completed";
+  static const String invalidCredentials = "Invalid credentials";
 
   /// Complete Profile
   static const String enterFirstName = "Enter your first name";

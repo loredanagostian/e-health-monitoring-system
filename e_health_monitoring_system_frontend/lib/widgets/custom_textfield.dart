@@ -14,8 +14,13 @@ enum TextFieldType {
 
 class CustomTextField extends StatefulWidget {
   final TextFieldType textFieldType;
+  final TextEditingController controller;
 
-  const CustomTextField({super.key, required this.textFieldType});
+  const CustomTextField({
+    super.key,
+    required this.textFieldType,
+    required this.controller,
+  });
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -46,6 +51,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           border: Border.all(color: ColorsHelper.mediumGray),
         ),
         child: TextField(
+          controller: widget.controller,
           obscureText: isPasswordField ? isVisible : false,
           textAlignVertical: TextAlignVertical.center,
           decoration: InputDecoration(
@@ -135,8 +141,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
     switch (widget.textFieldType) {
       case TextFieldType.password || TextFieldType.confirmPassword:
         return isVisible
-            ? Icons.visibility_off_outlined
-            : Icons.visibility_outlined;
+            ? Icons.visibility_outlined
+            : Icons.visibility_off_outlined;
       default:
         return null;
     }
