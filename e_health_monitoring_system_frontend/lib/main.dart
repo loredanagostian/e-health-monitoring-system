@@ -12,7 +12,8 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO: if user is logged in diplay other page
     return const MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(body: SafeArea(child: OnboardingScreen())));
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(body: SafeArea(child: OnboardingScreen())),
+    );
   }
 }

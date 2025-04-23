@@ -33,10 +33,7 @@ class OnboardingScreen extends StatelessWidget {
                 SizedBox(height: 20),
                 Text(
                   StringsHelper.onboardingMessage,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: ColorsHelper.lightGray,
-                  ),
+                  style: TextStyle(fontSize: 16, color: ColorsHelper.lightGray),
                   textAlign: TextAlign.center,
                 ),
               ],

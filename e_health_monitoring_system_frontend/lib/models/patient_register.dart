@@ -1,10 +1,12 @@
+import 'dart:convert';
+
 class PatientRegister {
   final String email;
   final String passwd;
 
   PatientRegister({required this.email, required this.passwd});
 
-  Map<String, dynamic> toJson() {
-    return {"email": email, "passwd": passwd};
+  String toJson() {
+    return jsonEncode({"email": email, "passwd": passwd});
   }
 }
