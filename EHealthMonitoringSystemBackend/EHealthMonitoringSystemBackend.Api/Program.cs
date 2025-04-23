@@ -1,5 +1,7 @@
+using EHealthMonitoringSystemBackend.Api.Services;
 using EHealthMonitoringSystemBackend.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -7,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var configuration = builder.Configuration;
 
+services.AddControllers();
 services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "E-Health Monitoring System", Version = "V1'"} );
@@ -30,7 +33,7 @@ services.AddSwaggerGen(options =>
                     Id="Bearer"
                 }
             },
-            new string[]{}
+            Array.Empty<string>()
         }
     });
 });
@@ -63,6 +66,9 @@ services.AddDbContext<AppDbContext>(options => {
         x.MigrationsAssembly("EHealthMonitoringSystemBackend.Data");
     });
 });
+
+services.AddTransient<IEmailSender, EmailSender>();
+services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 
 var app = builder.Build();
 
