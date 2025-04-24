@@ -81,6 +81,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     : null,
           ),
           keyboardType: getKeyboardType(),
+          textInputAction: getTextInputAction(),
         ),
       ),
     );
@@ -146,6 +147,15 @@ class _CustomTextFieldState extends State<CustomTextField> {
             : Icons.visibility_off_outlined;
       default:
         return null;
+    }
+  }
+
+  TextInputAction getTextInputAction() {
+    switch (widget.textFieldType) {
+      case TextFieldType.confirmPassword || TextFieldType.cnp:
+        return TextInputAction.done;
+      default:
+        return TextInputAction.next;
     }
   }
 }

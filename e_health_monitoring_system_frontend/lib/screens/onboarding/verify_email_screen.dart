@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:e_health_monitoring_system_frontend/helpers/assets_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
+import 'package:e_health_monitoring_system_frontend/screens/onboarding/complete_profile_screen.dart';
 import 'package:e_health_monitoring_system_frontend/services/register_service.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
@@ -152,7 +154,12 @@ class VerifyEmailScreen extends StatelessWidget {
           child: CustomButton(
             text: StringsHelper.continueText,
             icon: Icons.arrow_forward_ios,
-            // onPressed: () => navigator.pushReplacement(MaterialPageRoute(builder: (context) => CompleteProfileScreen())),
+            onPressed:
+                () => navigator.pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => CompleteProfileScreen(),
+                  ),
+                ),
           ),
         ),
       ],

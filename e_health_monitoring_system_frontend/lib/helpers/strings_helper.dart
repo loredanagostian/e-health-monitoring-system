@@ -44,8 +44,10 @@ class StringsHelper {
   static const String continueText = "Continue";
 
   /// Complete Profile
+  static const String completeProfile = "Complete Profile";
   static const String enterFirstName = "Enter your first name";
   static const String enterLastName = "Enter your last name";
   static const String enterPhoneNumber = "Enter your phone number";
   static const String enterCnp = "Enter your CNP";
+  static const String finish = "Finish";
 }
