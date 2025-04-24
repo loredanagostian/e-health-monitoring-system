@@ -139,14 +139,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-  // String validatePassword(String password, String confirmPassword) {
-  //   if (password.isEmpty || confirmPassword.isEmpty) return false;
-  //   if (password != confirmPassword) return false;
-  //   if (password.length < 6 || confirmPassword.length < 6) return false;
-  //   if (password.)
+  String validatePassword(String password) {
+    if (password.isEmpty) return StringsHelper.allFieldsMustBeCompleted;
+    if (password.length < 6) return StringsHelper.passwordShouldBeAtLeast6Chars;
 
-  //   return "";
-  // }
+    var chars = password.characters;
+    var hasNumbers = chars.any((c) => num.tryParse(c) != null);
+    if (!hasNumbers) {
+      return StringsHelper.passwordShouldContain1Digit;
+    }
+
+    var hasUppercase = password.characters.any((c) => c.toUpperCase() == c);
+    if (!hasUppercase) {
+      return StringsHelper.passwordShouldContain1Upper;
+    }
+
+    var isAlphanumeric = RegExp("^[a-zA-Z0-9]+\$").hasMatch(password);
+    if (isAlphanumeric) {
+      return StringsHelper.passwordShouldContain1NonAlphaNum;
+    }
+
+    return "";
+  }
 
   Future<String> validateFields(
     String email,
@@ -156,7 +170,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (email.isNotEmpty &&
         password.isNotEmpty &&
         confirmPassword.isNotEmpty &&
-        password == confirmPassword) {
+        password == confirmPassword &&
+        validatePassword(password).isEmpty) {
       singUp();
     } else {
       if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
@@ -164,9 +179,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
           message: StringsHelper.allFieldsMustBeCompleted,
         );
       } else {
-        WidgetsHelper.showCustomSnackBar(
-          message: StringsHelper.invalidCredentials,
-        );
+        if (password != confirmPassword) {
+          WidgetsHelper.showCustomSnackBar(
+            message: StringsHelper.passwordsShouldMatch,
+          );
+        } else {
+          var passwordValidationMessage = validatePassword(password);
+          if (passwordValidationMessage.isNotEmpty) {
+            WidgetsHelper.showCustomSnackBar(
+              message: passwordValidationMessage,
+            );
+          } else {
+            WidgetsHelper.showCustomSnackBar(
+              message: StringsHelper.invalidCredentials,
+            );
+          }
+        }
       }
     }
     return '';
