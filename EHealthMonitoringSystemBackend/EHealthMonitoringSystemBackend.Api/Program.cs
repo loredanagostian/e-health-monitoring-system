@@ -8,6 +8,7 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var configuration = builder.Configuration;
+builder.WebHost.UseUrls("http://0.0.0.0:5200", "http://localhost:5200");
 
 services.AddControllers();
 services.AddSwaggerGen(options =>
