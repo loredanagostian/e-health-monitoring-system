@@ -1,5 +1,5 @@
-import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
+import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_textfield.dart';
 import 'package:flutter/material.dart';
@@ -20,18 +20,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        title: Text(
-          StringsHelper.completeProfile,
-          style: TextStyle(
-            fontSize: 20,
-            color: ColorsHelper.mainDark,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+      appBar: CustomAppbar(appBarTitle: StringsHelper.completeProfile),
       body: SingleChildScrollView(
         child: SafeArea(
           child: Padding(
