@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 class RegisterService {
   // TODO: add local env var for ip
-  final String endpoint = "http://10.0.2.2:5200/api/Register";
+  final String endpoint = "http://192.168.100.123:5200/api/Register";
   const RegisterService();
 
   Future<http.Response> signUpPatient(PatientRegister patient) async {

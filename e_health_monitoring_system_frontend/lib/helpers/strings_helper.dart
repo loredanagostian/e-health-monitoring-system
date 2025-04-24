@@ -29,9 +29,25 @@ class StringsHelper {
   static const String passwordShouldContain1NonAlphaNum =
       "Password should contain at least one non alphanumeric character";
 
+  /// Verify Email
+  static const String verifyEmail = "Verify Email";
+  static const String verifyEmailMessage =
+      "We've sent you a verification email on";
+  static const String verifyingEmail = "Verifying email...";
+  static const String resend = "Re-send";
+  static const String emailVerified = "Email verified";
+  static const String emailVerifiedMessage =
+      "Your email has been successfully verified.";
+  static const String emailCouldntBeVerified = "Email couldn't be verified";
+  static const String emailCouldntBeVerifiedMessage =
+      "Please re-try the process.";
+  static const String continueText = "Continue";
+
   /// Complete Profile
+  static const String completeProfile = "Complete Profile";
   static const String enterFirstName = "Enter your first name";
   static const String enterLastName = "Enter your last name";
   static const String enterPhoneNumber = "Enter your phone number";
   static const String enterCnp = "Enter your CNP";
+  static const String finish = "Finish";
 }
