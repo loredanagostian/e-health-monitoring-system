@@ -28,6 +28,7 @@ class StringsHelper {
       "Password should contain at least one uppercase character";
   static const String passwordShouldContain1NonAlphaNum =
       "Password should contain at least one non alphanumeric character";
+  static const String emailFormatIsNotValid = "Email format is not valid";
 
   /// Verify Email
   static const String verifyEmail = "Verify Email";
@@ -50,4 +51,12 @@ class StringsHelper {
   static const String enterPhoneNumber = "Enter your phone number";
   static const String enterCnp = "Enter your CNP";
   static const String finish = "Finish";
+
+  /// Forgot Password
+  static const String forgotPasswordTitle = "Forgot Password";
+  static const String enterEmailBelow =
+      "Enter your email below to reset your password.";
+  static const String resetPassword = "Reset password";
+  static const String checkYourInbox = "Check your inbox on";
+  static const String emailSentSuccessfully = "Email sent successfully";
 }

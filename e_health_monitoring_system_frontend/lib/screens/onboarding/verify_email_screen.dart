@@ -6,6 +6,7 @@ import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/complete_profile_screen.dart';
 import 'package:e_health_monitoring_system_frontend/services/register_service.dart';
+import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -71,18 +72,7 @@ class VerifyEmailScreen extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => ConfirmEmailNotifier(userId),
       child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          automaticallyImplyLeading: false,
-          title: Text(
-            StringsHelper.verifyEmail,
-            style: TextStyle(
-              fontSize: 20,
-              color: ColorsHelper.mainDark,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
+        appBar: CustomAppbar(appBarTitle: StringsHelper.verifyEmail),
         body: SafeArea(
           child: Padding(
             padding: EdgeInsets.all(25),
@@ -92,7 +82,7 @@ class VerifyEmailScreen extends StatelessWidget {
               children: [
                 Text(
                   StringsHelper.verifyEmailMessage,
-                  style: TextStyle(color: ColorsHelper.mainDark, fontSize: 16),
+                  style: TextStyle(color: ColorsHelper.darkGray, fontSize: 16),
                 ),
                 Text(
                   userEmail,

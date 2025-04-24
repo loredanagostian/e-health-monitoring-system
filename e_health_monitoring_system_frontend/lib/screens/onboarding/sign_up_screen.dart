@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:e_health_monitoring_system_frontend/helpers/assets_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/fields_validation_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/widgets_helper.dart';
@@ -146,64 +147,41 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-  String validatePassword(String password) {
-    if (password.isEmpty) return StringsHelper.allFieldsMustBeCompleted;
-    if (password.length < 6) return StringsHelper.passwordShouldBeAtLeast6Chars;
-
-    var chars = password.characters;
-    var hasNumbers = chars.any((c) => num.tryParse(c) != null);
-    if (!hasNumbers) {
-      return StringsHelper.passwordShouldContain1Digit;
-    }
-
-    var hasUppercase = password.characters.any((c) => c.toUpperCase() == c);
-    if (!hasUppercase) {
-      return StringsHelper.passwordShouldContain1Upper;
-    }
-
-    var isAlphanumeric = RegExp("^[a-zA-Z0-9]+\$").hasMatch(password);
-    if (isAlphanumeric) {
-      return StringsHelper.passwordShouldContain1NonAlphaNum;
-    }
-
-    return "";
-  }
-
   Future<String> validateFields(
     String email,
     String password,
     String confirmPassword,
   ) async {
+    var isEmailValid = FieldsValidationHelper.validateEmail(email);
+    var passwordValidationMessage = FieldsValidationHelper.validatePassword(
+      password,
+    );
+
     if (email.isNotEmpty &&
+        isEmailValid &&
         password.isNotEmpty &&
         confirmPassword.isNotEmpty &&
         password == confirmPassword &&
-        validatePassword(password).isEmpty) {
+        passwordValidationMessage.isEmpty) {
       singUp();
     } else {
+      String errorMessage = "";
+
       if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
-        WidgetsHelper.showCustomSnackBar(
-          message: StringsHelper.allFieldsMustBeCompleted,
-        );
+        errorMessage = StringsHelper.allFieldsMustBeCompleted;
+      } else if (password != confirmPassword) {
+        errorMessage = StringsHelper.passwordsShouldMatch;
+      } else if (passwordValidationMessage.isNotEmpty) {
+        errorMessage = passwordValidationMessage;
+      } else if (!isEmailValid) {
+        errorMessage = StringsHelper.emailFormatIsNotValid;
       } else {
-        if (password != confirmPassword) {
-          WidgetsHelper.showCustomSnackBar(
-            message: StringsHelper.passwordsShouldMatch,
-          );
-        } else {
-          var passwordValidationMessage = validatePassword(password);
-          if (passwordValidationMessage.isNotEmpty) {
-            WidgetsHelper.showCustomSnackBar(
-              message: passwordValidationMessage,
-            );
-          } else {
-            WidgetsHelper.showCustomSnackBar(
-              message: StringsHelper.invalidCredentials,
-            );
-          }
-        }
+        errorMessage = StringsHelper.invalidCredentials;
       }
+
+      WidgetsHelper.showCustomSnackBar(message: errorMessage);
     }
+
     return '';
   }
 }
