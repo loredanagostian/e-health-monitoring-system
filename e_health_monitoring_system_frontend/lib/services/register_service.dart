@@ -4,8 +4,8 @@ import 'package:e_health_monitoring_system_frontend/models/patient_register.dart
 import 'package:http/http.dart' as http;
 
 class RegisterService {
-  // TODO: change local IP
-  final String endpoint = "http://192.168.100.123:5200/api/Register";
+  // TODO: add local env var for ip
+  final String endpoint = "http://10.0.0.2/api/Register";
   const RegisterService();
 
   Future<http.Response> signUpPatient(PatientRegister patient) async {
