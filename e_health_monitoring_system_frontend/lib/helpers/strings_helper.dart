@@ -19,6 +19,15 @@ class StringsHelper {
   static const String alreadyUser = "Already user?";
   static const String allFieldsMustBeCompleted = "All fields must be completed";
   static const String invalidCredentials = "Invalid credentials";
+  static const String passwordsShouldMatch = "Passwords should match";
+  static const String passwordShouldBeAtLeast6Chars =
+      "Password should be at least 6 characters";
+  static const String passwordShouldContain1Digit =
+      "Password should contain at least one digit";
+  static const String passwordShouldContain1Upper =
+      "Password should contain at least one uppercase character";
+  static const String passwordShouldContain1NonAlphaNum =
+      "Password should contain at least one non alphanumeric character";
 
   /// Complete Profile
   static const String enterFirstName = "Enter your first name";
