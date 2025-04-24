@@ -6,8 +6,8 @@ import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/widgets_helper.dart';
 import 'package:e_health_monitoring_system_frontend/models/patient_register.dart';
-import 'package:e_health_monitoring_system_frontend/screens/onboarding/confirm_email.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/sign_in_screen.dart';
+import 'package:e_health_monitoring_system_frontend/screens/onboarding/verify_email_screen.dart';
 import 'package:e_health_monitoring_system_frontend/services/register_service.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_textfield.dart';
@@ -135,7 +135,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
     } else {
       String userId = jsonDecode(resp.body)['userId'];
       navigator.push(
-        MaterialPageRoute(builder: (_) => ConfirmEmailScreen(userId)),
+        MaterialPageRoute(
+          builder:
+              (_) => VerifyEmailScreen(
+                userId: userId,
+                userEmail: emailController.text,
+              ),
+        ),
       );
     }
   }
