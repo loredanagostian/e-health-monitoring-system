@@ -139,32 +139,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
+  // String validatePassword(String password, String confirmPassword) {
+  //   if (password.isEmpty || confirmPassword.isEmpty) return false;
+  //   if (password != confirmPassword) return false;
+  //   if (password.length < 6 || confirmPassword.length < 6) return false;
+  //   if (password.)
+
+  //   return "";
+  // }
+
   Future<String> validateFields(
     String email,
     String password,
     String confirmPassword,
   ) async {
-    Map<String, String> message;
     if (email.isNotEmpty &&
         password.isNotEmpty &&
         confirmPassword.isNotEmpty &&
         password == confirmPassword) {
       singUp();
-      // message = "";
-      // if (message.values.first == '') {
-      //   return message.keys.first;
-      // } else {
-      //   if (mounted) {
-      //     ScaffoldMessenger.of(context).showSnackBar(
-      //       SnackBar(
-      //         content: CustomSnackbarContent(
-      //           snackBarMessage: message.values.first,
-      //         ),
-      //         backgroundColor: ColorsHelper.mainRed,
-      //       ),
-      //     );
-      //   }
-      // }
     } else {
       if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
         WidgetsHelper.showCustomSnackBar(
