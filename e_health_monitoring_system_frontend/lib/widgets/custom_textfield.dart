@@ -54,6 +54,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           controller: widget.controller,
           obscureText: isPasswordField ? isVisible : false,
           textAlignVertical: TextAlignVertical.center,
+          style: TextStyle(color: ColorsHelper.mainDark, fontSize: 14),
           decoration: InputDecoration(
             hintText: getPlaceholderText(),
             hintStyle: TextStyle(

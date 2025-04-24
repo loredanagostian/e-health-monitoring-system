@@ -128,6 +128,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         passwd: passwordController.text,
       ),
     );
+
     if (resp.statusCode != 201) {
       var body = jsonDecode(resp.body);
       WidgetsHelper.showCustomSnackBar(message: body['msg']);
