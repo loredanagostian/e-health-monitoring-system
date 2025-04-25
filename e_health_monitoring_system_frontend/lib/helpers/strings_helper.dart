@@ -59,4 +59,17 @@ class StringsHelper {
   static const String resetPassword = "Reset password";
   static const String checkYourInbox = "Check your inbox on";
   static const String emailSentSuccessfully = "Email sent successfully";
+
+  /// Home Screen
+  static const String hi = "Hi";
+  static const String viewAll = "View all";
+  static const String upcomingAppointments = "Upcoming appointments";
+  static const String recentVisits = "Recent visits";
+  static const String medicalReports = "Medical reports";
+  static const String examinations = "Examinations";
+  static const String analysis = "Analysis";
+
+  /// Analysis Reports
+  static const String analysisReports = "Analysis Reports";
+  static const String testReport = "Test report";
 }
