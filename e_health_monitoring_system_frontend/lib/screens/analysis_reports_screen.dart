@@ -4,8 +4,8 @@ import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_row_icon_string.dart';
 import 'package:flutter/material.dart';
 
-class AnalysisReportScreen extends StatelessWidget {
-  const AnalysisReportScreen({super.key});
+class AnalysisReportsScreen extends StatelessWidget {
+  const AnalysisReportsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

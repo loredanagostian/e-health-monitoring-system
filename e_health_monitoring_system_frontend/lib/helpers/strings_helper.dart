@@ -72,4 +72,7 @@ class StringsHelper {
   /// Analysis Reports
   static const String analysisReports = "Analysis Reports";
   static const String testReport = "Test report";
+
+  /// Examinations Reports
+  static const String examinationReports = "Examination Reports";
 }

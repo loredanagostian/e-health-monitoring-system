@@ -2,7 +2,8 @@ import 'package:e_health_monitoring_system_frontend/helpers/assets_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
-import 'package:e_health_monitoring_system_frontend/screens/analysis_report_screen.dart';
+import 'package:e_health_monitoring_system_frontend/screens/analysis_reports_screen.dart';
+import 'package:e_health_monitoring_system_frontend/screens/examination_reports_screen.dart';
 import 'package:flutter/material.dart';
 
 enum MedicalReportType { examinations, analysis }
@@ -15,14 +16,15 @@ class MedicalReport extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap:
-          () =>
-              medicalReportType == MedicalReportType.examinations
-                  ? ()
-                  : navigator.push(
-                    MaterialPageRoute(
-                      builder: (context) => AnalysisReportScreen(),
-                    ),
-                  ),
+          () => navigator.push(
+            MaterialPageRoute(
+              builder:
+                  (context) =>
+                      medicalReportType == MedicalReportType.analysis
+                          ? AnalysisReportsScreen()
+                          : ExaminationReportsScreen(),
+            ),
+          ),
       child: Container(
         height: 140,
         width: 115,
