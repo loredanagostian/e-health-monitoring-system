@@ -3,6 +3,7 @@ import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart'
 import 'package:e_health_monitoring_system_frontend/widgets/custom_row_icon_string.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/doctor_card.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/medical_report.dart';
+import 'package:e_health_monitoring_system_frontend/widgets/upcoming_appointment.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -121,10 +122,39 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget getUpcomingAppointments() {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         getSectionTitle(
           StringsHelper.upcomingAppointments,
           isViewAllButtonVisible: true,
+        ),
+        SizedBox(height: 20),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: EdgeInsets.only(left: 25),
+          child: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 15),
+                child: UpcomingAppointment(
+                  doctorName: "Dr. Lorem Ipsum",
+                  appointmentName: "Dermatology consultation",
+                  date: "Saturday, 26 September",
+                  time: "09:00",
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 15),
+                child: UpcomingAppointment(
+                  doctorName: "Dr. Lorem Ipsum",
+                  appointmentName: "Dermatology consultation",
+                  date: "Saturday, 26 September",
+                  time: "09:00",
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -145,92 +175,97 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: EdgeInsets.only(left: 25),
           child: Row(
             children: [
-              DoctorCard(
-                doctorName: "Dr. Lorem Ipsum",
-                doctorSpecialization: "Dentist",
-                doctorPhotoPath: 'assets/images/mockup_doctor.png',
-                detailsList: [
-                  CustomRowIconText(
-                    icon: Icons.history,
-                    text: "26 July 2024, 12:00",
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                      backgroundColor: ColorsHelper.mainPurple,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 0,
-                      ),
+              Padding(
+                padding: const EdgeInsets.only(right: 15),
+                child: DoctorCard(
+                  doctorName: "Dr. Lorem Ipsum",
+                  doctorSpecialization: "Dentist",
+                  doctorPhotoPath: 'assets/images/mockup_doctor.png',
+                  detailsList: [
+                    CustomRowIconText(
+                      icon: Icons.history,
+                      text: "26 July 2024, 12:00",
                     ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.calendar_month_outlined,
-                          size: 14,
-                          color: ColorsHelper.mainWhite,
+                    TextButton(
+                      onPressed: () {},
+                      style: TextButton.styleFrom(
+                        backgroundColor: ColorsHelper.mainPurple,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        SizedBox(width: 5),
-                        Text(
-                          StringsHelper.bookNow,
-                          style: TextStyle(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 0,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.calendar_month_outlined,
+                            size: 20,
                             color: ColorsHelper.mainWhite,
-                            fontSize: 10,
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 5),
+                          Text(
+                            StringsHelper.bookNow,
+                            style: TextStyle(
+                              color: ColorsHelper.mainWhite,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-                width: 340,
-                hasVisibleIcons: true,
+                  ],
+                  width: 340,
+                  hasVisibleIcons: true,
+                ),
               ),
-              SizedBox(width: 20),
-              DoctorCard(
-                doctorName: "Dr. Lorem Ipsum",
-                doctorSpecialization: "Dentist",
-                doctorPhotoPath: 'assets/images/mockup_doctor.png',
-                detailsList: [
-                  CustomRowIconText(
-                    icon: Icons.history,
-                    text: "26 July 2024, 12:00",
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                      backgroundColor: ColorsHelper.mainPurple,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 0,
-                      ),
+              Padding(
+                padding: const EdgeInsets.only(right: 15),
+                child: DoctorCard(
+                  doctorName: "Dr. Lorem Ipsum",
+                  doctorSpecialization: "Dentist",
+                  doctorPhotoPath: 'assets/images/mockup_doctor.png',
+                  detailsList: [
+                    CustomRowIconText(
+                      icon: Icons.history,
+                      text: "26 July 2024, 12:00",
                     ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.calendar_month_outlined,
-                          size: 14,
-                          color: ColorsHelper.mainWhite,
+                    TextButton(
+                      onPressed: () {},
+                      style: TextButton.styleFrom(
+                        backgroundColor: ColorsHelper.mainPurple,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        SizedBox(width: 5),
-                        Text(
-                          StringsHelper.bookNow,
-                          style: TextStyle(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 0,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.calendar_month_outlined,
+                            size: 20,
                             color: ColorsHelper.mainWhite,
-                            fontSize: 10,
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 5),
+                          Text(
+                            StringsHelper.bookNow,
+                            style: TextStyle(
+                              color: ColorsHelper.mainWhite,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-                width: 340,
-                hasVisibleIcons: true,
+                  ],
+                  width: 340,
+                  hasVisibleIcons: true,
+                ),
               ),
             ],
           ),
