@@ -1,6 +1,7 @@
-import 'package:e_health_monitoring_system_frontend/helpers/assets_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
+import 'package:e_health_monitoring_system_frontend/widgets/custom_row_icon_string.dart';
+import 'package:e_health_monitoring_system_frontend/widgets/doctor_card.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/medical_report.dart';
 import 'package:flutter/material.dart';
 
@@ -20,19 +21,16 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: getAppBar(),
       body: SingleChildScrollView(
         child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 25),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                getUpcomingAppointments(),
-                SizedBox(height: 15),
-                getRecentVisits(),
-                SizedBox(height: 15),
-                getMedicalReports(),
-              ],
-            ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              getUpcomingAppointments(),
+              SizedBox(height: 30),
+              getRecentVisits(),
+              SizedBox(height: 30),
+              getMedicalReports(),
+            ],
           ),
         ),
       ),
@@ -134,10 +132,108 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget getRecentVisits() {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         getSectionTitle(
           StringsHelper.recentVisits,
           isViewAllButtonVisible: true,
+        ),
+        SizedBox(height: 20),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: EdgeInsets.only(left: 25),
+          child: Row(
+            children: [
+              DoctorCard(
+                doctorName: "Dr. Lorem Ipsum",
+                doctorSpecialization: "Dentist",
+                doctorPhotoPath: 'assets/images/mockup_doctor.png',
+                detailsList: [
+                  CustomRowIconText(
+                    icon: Icons.history,
+                    text: "26 July 2024, 12:00",
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    style: TextButton.styleFrom(
+                      backgroundColor: ColorsHelper.mainPurple,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 0,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_month_outlined,
+                          size: 14,
+                          color: ColorsHelper.mainWhite,
+                        ),
+                        SizedBox(width: 5),
+                        Text(
+                          StringsHelper.bookNow,
+                          style: TextStyle(
+                            color: ColorsHelper.mainWhite,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                width: 340,
+                hasVisibleIcons: true,
+              ),
+              SizedBox(width: 20),
+              DoctorCard(
+                doctorName: "Dr. Lorem Ipsum",
+                doctorSpecialization: "Dentist",
+                doctorPhotoPath: 'assets/images/mockup_doctor.png',
+                detailsList: [
+                  CustomRowIconText(
+                    icon: Icons.history,
+                    text: "26 July 2024, 12:00",
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    style: TextButton.styleFrom(
+                      backgroundColor: ColorsHelper.mainPurple,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 0,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_month_outlined,
+                          size: 14,
+                          color: ColorsHelper.mainWhite,
+                        ),
+                        SizedBox(width: 5),
+                        Text(
+                          StringsHelper.bookNow,
+                          style: TextStyle(
+                            color: ColorsHelper.mainWhite,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                width: 340,
+                hasVisibleIcons: true,
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -150,32 +246,38 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         getSectionTitle(StringsHelper.medicalReports),
         SizedBox(height: 20),
-        Row(
-          children: [
-            MedicalReport(medicalReportType: MedicalReportType.examinations),
-            SizedBox(width: 20),
-            MedicalReport(medicalReportType: MedicalReportType.analysis),
-          ],
+        Padding(
+          padding: const EdgeInsets.only(left: 25),
+          child: Row(
+            children: [
+              MedicalReport(medicalReportType: MedicalReportType.examinations),
+              SizedBox(width: 20),
+              MedicalReport(medicalReportType: MedicalReportType.analysis),
+            ],
+          ),
         ),
       ],
     );
   }
 
   Widget getSectionTitle(String title, {bool isViewAllButtonVisible = false}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(
-          title,
-          style: TextStyle(
-            color: ColorsHelper.mainDark,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 25),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              color: ColorsHelper.mainDark,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        Visibility(visible: isViewAllButtonVisible, child: viewAllButton()),
-      ],
+          Visibility(visible: isViewAllButtonVisible, child: viewAllButton()),
+        ],
+      ),
     );
   }
 

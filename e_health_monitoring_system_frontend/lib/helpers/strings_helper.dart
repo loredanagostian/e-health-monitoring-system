@@ -65,6 +65,7 @@ class StringsHelper {
   static const String viewAll = "View all";
   static const String upcomingAppointments = "Upcoming appointments";
   static const String recentVisits = "Recent visits";
+  static const String bookNow = "Book now";
   static const String medicalReports = "Medical reports";
   static const String examinations = "Examinations";
   static const String analysis = "Analysis";

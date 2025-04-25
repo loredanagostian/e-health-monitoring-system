@@ -6,6 +6,7 @@ class DoctorCard extends StatelessWidget {
   final String doctorSpecialization;
   final String doctorPhotoPath;
   final List<Widget> detailsList;
+  final double? width;
   final bool hasVisibleIcons;
   const DoctorCard({
     super.key,
@@ -13,6 +14,7 @@ class DoctorCard extends StatelessWidget {
     required this.doctorSpecialization,
     required this.detailsList,
     required this.doctorPhotoPath,
+    this.width,
     this.hasVisibleIcons = false,
   });
 
@@ -22,6 +24,7 @@ class DoctorCard extends StatelessWidget {
       // TODO: implement download
       onTap: () {},
       child: Container(
+        width: width,
         decoration: BoxDecoration(
           color: ColorsHelper.lightGray,
           borderRadius: BorderRadius.circular(15),
@@ -29,69 +32,74 @@ class DoctorCard extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(15),
-                    bottomLeft: Radius.circular(15),
+            IntrinsicHeight(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(15),
+                      bottomLeft: Radius.circular(15),
+                    ),
+                    child: Image.asset(doctorPhotoPath, fit: BoxFit.contain),
                   ),
-                  child: Image.asset(doctorPhotoPath, fit: BoxFit.cover),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 10,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        doctorName,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: ColorsHelper.mainDark,
-                          fontWeight: FontWeight.bold,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 10,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          doctorName,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: ColorsHelper.mainDark,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      Text(
-                        doctorSpecialization,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: ColorsHelper.darkGray,
-                          fontWeight: FontWeight.normal,
+                        Text(
+                          doctorSpecialization,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: ColorsHelper.darkGray,
+                            fontWeight: FontWeight.normal,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 15),
-                      ...detailsList,
-                    ],
+                        SizedBox(height: 15),
+                        ...detailsList,
+                      ],
+                    ),
                   ),
-                ),
-                Spacer(),
-                Visibility(
-                  visible: hasVisibleIcons,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 10, right: 15),
-                    child: GestureDetector(
-                      // TODO: implement download
-                      onTap: () {},
-                      child: Icon(
-                        Icons.file_download_outlined,
-                        size: 24,
-                        color: ColorsHelper.mainDark,
+                  Spacer(),
+                  Visibility(
+                    visible: hasVisibleIcons,
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 10, right: 15),
+                        child: GestureDetector(
+                          // TODO: implement download
+                          onTap: () {},
+                          child: Icon(
+                            Icons.file_download_outlined,
+                            size: 24,
+                            color: ColorsHelper.mainDark,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             Visibility(
               visible: hasVisibleIcons,
               child: Positioned(
-                bottom: 10,
+                bottom: 15,
                 right: 15,
                 child: GestureDetector(
                   // TODO: navigate to Appointment Details
