@@ -137,7 +137,6 @@ public class RegisterController(
             return StatusCode(StatusCodes.Status500InternalServerError, new { msg = MSG_501 });
         }
 
-        // TODO: this should return a nice page
         return Ok(new { message = "Email confirmed." });
     }
 
