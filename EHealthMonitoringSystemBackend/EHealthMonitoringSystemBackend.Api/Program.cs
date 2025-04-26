@@ -44,7 +44,11 @@ services.AddCors(options =>
     options.AddPolicy("EHealthMonitoringSystemPolicy", builder =>
     {
         builder
-            .WithOrigins("http://localhost:3000")
+            .WithOrigins(
+                "http://localhost:3000", 
+                // TODO: change local IP
+                "http://192.168.100.123:3000"
+            )            
             .AllowAnyMethod()
             .AllowAnyHeader();
     });
@@ -90,11 +94,10 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseRouting();
 app.UseCors("EHealthMonitoringSystemPolicy");
-
 app.UseAuthentication();
 app.UseAuthorization();
 
