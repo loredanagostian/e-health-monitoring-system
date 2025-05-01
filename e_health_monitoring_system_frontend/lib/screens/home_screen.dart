@@ -5,15 +5,16 @@ import 'package:e_health_monitoring_system_frontend/widgets/doctor_card.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/medical_report.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/upcoming_appointment.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool hasNotifications = true;
 
   @override
@@ -44,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Padding(
         padding: const EdgeInsets.only(left: 25, right: 25, top: 10),
         child: AppBar(
+          backgroundColor: ColorsHelper.mainWhite,
           leading: Container(
             height: 50,
             width: 50,

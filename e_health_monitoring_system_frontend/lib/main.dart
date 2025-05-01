@@ -1,11 +1,11 @@
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
-import 'package:e_health_monitoring_system_frontend/screens/home_screen.dart';
-import 'package:e_health_monitoring_system_frontend/screens/onboarding/onboarding_screen.dart';
+import 'package:e_health_monitoring_system_frontend/screens/main_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(ProviderScope(child: MainApp()));
 }
 
 class MainApp extends StatelessWidget {
@@ -17,13 +17,12 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        primaryColor: ColorsHelper.mainWhite,
-        colorScheme: ColorScheme.fromSeed(seedColor: ColorsHelper.mainWhite),
+        scaffoldBackgroundColor: ColorsHelper.mainWhite,
       ),
       navigatorKey: navigatorKey,
       scaffoldMessengerKey: rootScaffoldMessengerKey,
       // TODO: if user is logged in diplay HomeScreen, otherwise Onboarding
-      home: Scaffold(body: SafeArea(child: HomeScreen())),
+      home: Scaffold(body: SafeArea(child: MainScreen())),
     );
   }
 }

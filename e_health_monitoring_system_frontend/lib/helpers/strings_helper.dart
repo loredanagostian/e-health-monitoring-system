@@ -69,6 +69,9 @@ class StringsHelper {
   static const String medicalReports = "Medical Reports";
   static const String examinations = "Examinations";
   static const String analysis = "Analysis";
+  static const String support = "Support";
+  static const String home = "Home";
+  static const String appointments = "Appoinments";
 
   /// Analysis Reports
   static const String analysisReports = "Analysis Reports";
