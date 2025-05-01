@@ -61,8 +61,7 @@ public class RegisterController(
         var code = await _userManger.GenerateEmailConfirmationTokenAsync(newUser);
         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
         var callbackUrl = Url.Action("ConfirmEmail", "Register", new { userId, code }, protocol: Request.Scheme);
-        // TODO: !!!temp until hosted, requests from android use 10.0.0.2 ip
-        callbackUrl = $"http://localhost:5200/api/Register/ConfirmEmail?userId={userId}&code={code}";
+        callbackUrl = $"http://localhost:3000/confirm-email?userId={userId}&code={code}";
         await _emailSender.SendEmailAsync(
             newPatient.Email,
             "Confirm your email",
@@ -138,8 +137,7 @@ public class RegisterController(
             return StatusCode(StatusCodes.Status500InternalServerError, new { msg = MSG_501 });
         }
 
-        // TODO: this should return a nice page
-        return NoContent();
+        return Ok(new { message = "Email confirmed." });
     }
 
     [HttpPost]

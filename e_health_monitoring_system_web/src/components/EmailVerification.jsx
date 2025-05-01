@@ -1,19 +1,9 @@
-import React, { useState, useEffect } from "react";
 import Lottie from "lottie-react";
 import spinnerAnimation from "../assets/lotties/loading_spinner.json";
 import checkIcon from "../assets/checkIcon.png";
 import errorIcon from "../assets/errorIcon.png";
 
-const EmailVerification = () => {
-    const [status, setStatus] = useState("loading");
-  
-    useEffect(() => {
-      setTimeout(() => {
-        const result = Math.random() > 0.5 ? "success" : "error";
-        setStatus(result);
-      }, 3000);
-    }, []);
-  
+const EmailVerification = ({ status }) => {
     return (
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", width: "100%", maxWidth: "400px", margin: "0 auto" }}>
         {status === "loading" && (
@@ -44,6 +34,6 @@ const EmailVerification = () => {
         )}
       </div>
     );
-  };
+};
   
-  export default EmailVerification;
+export default EmailVerification;
