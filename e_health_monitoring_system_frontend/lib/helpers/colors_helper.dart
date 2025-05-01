@@ -10,4 +10,5 @@ class ColorsHelper {
   static const Color lightPurple = Color.fromARGB(255, 234, 237, 248);
   static const Color mainRed = Color.fromARGB(255, 221, 29, 26);
   static const Color mainWhite = Color.fromARGB(255, 255, 255, 255);
+  static const Color mainYellow = Color.fromARGB(255, 255, 189, 46);
 }

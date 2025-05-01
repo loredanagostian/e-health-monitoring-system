@@ -69,7 +69,7 @@ class DoctorCard extends StatelessWidget {
                             fontWeight: FontWeight.normal,
                           ),
                         ),
-                        SizedBox(height: 15),
+                        SizedBox(height: 10),
                         ...detailsList,
                       ],
                     ),

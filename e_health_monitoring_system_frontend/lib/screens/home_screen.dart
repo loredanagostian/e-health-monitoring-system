@@ -1,9 +1,12 @@
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
+import 'package:e_health_monitoring_system_frontend/widgets/book_now_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_row_icon_string.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/doctor_card.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/medical_report.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/upcoming_appointment.dart';
+import 'package:e_health_monitoring_system_frontend/widgets/view_all_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -188,36 +191,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       icon: Icons.history,
                       text: "26 July 2024, 12:00",
                     ),
-                    TextButton(
-                      onPressed: () {},
-                      style: TextButton.styleFrom(
-                        backgroundColor: ColorsHelper.mainPurple,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 0,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.calendar_month_outlined,
-                            size: 20,
-                            color: ColorsHelper.mainWhite,
-                          ),
-                          SizedBox(width: 5),
-                          Text(
-                            StringsHelper.bookNow,
-                            style: TextStyle(
-                              color: ColorsHelper.mainWhite,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    BookNowButton(onPressed: () {}),
                   ],
                   width: 340,
                   hasVisibleIcons: true,
@@ -234,36 +208,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       icon: Icons.history,
                       text: "26 July 2024, 12:00",
                     ),
-                    TextButton(
-                      onPressed: () {},
-                      style: TextButton.styleFrom(
-                        backgroundColor: ColorsHelper.mainPurple,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 0,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.calendar_month_outlined,
-                            size: 20,
-                            color: ColorsHelper.mainWhite,
-                          ),
-                          SizedBox(width: 5),
-                          Text(
-                            StringsHelper.bookNow,
-                            style: TextStyle(
-                              color: ColorsHelper.mainWhite,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    BookNowButton(onPressed: () {}),
                   ],
                   width: 340,
                   hasVisibleIcons: true,
@@ -304,42 +249,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              color: ColorsHelper.mainDark,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+          Text(title, style: StylesHelper.titleStyle),
+          Visibility(
+            visible: isViewAllButtonVisible,
+            child: ViewAllButton(onPressed: () {}), // TODO: add navigation
           ),
-          Visibility(visible: isViewAllButtonVisible, child: viewAllButton()),
         ],
-      ),
-    );
-  }
-
-  Widget viewAllButton() {
-    return GestureDetector(
-      // TODO: add navigation
-      onTap: () {},
-      child: Container(
-        width: 70,
-        height: 30,
-        decoration: BoxDecoration(
-          color: ColorsHelper.lightGray,
-          border: Border.all(color: ColorsHelper.mediumGray),
-          borderRadius: BorderRadius.circular(5),
-        ),
-        child: Center(
-          child: Text(
-            StringsHelper.viewAll,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.normal,
-              color: ColorsHelper.darkGray,
-            ),
-          ),
-        ),
       ),
     );
   }
