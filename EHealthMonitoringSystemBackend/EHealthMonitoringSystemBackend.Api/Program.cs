@@ -129,7 +129,7 @@ services.AddDbContext<AppDbContext>(options =>
 
 services.AddTransient<IEmailSender, EmailSender>();
 services.AddSingleton<IJWTManager, JWTManager>();
-services.AddSingleton<ITokenRepository, TokenRepository>();
+services.AddTransient<ITokenRepository, TokenRepository>();
 services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 
 var app = builder.Build();

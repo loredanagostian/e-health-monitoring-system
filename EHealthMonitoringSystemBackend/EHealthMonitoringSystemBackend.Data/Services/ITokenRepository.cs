@@ -4,9 +4,7 @@ namespace EHealthMonitoringSystemBackend.Data.Services;
 
 public interface ITokenRepository
 {
-    UserRefreshToken SetRefreshToken(User user, UserRefreshToken token);
+    Task<UserRefreshToken> SetRefreshToken(User user, UserRefreshToken refreshToken);
 
-    UserRefreshToken? GetRefreshToken(User user);
-
-    void DeleteRefreshToken(User user);
+    Task DeleteRefreshToken(User user);
 }

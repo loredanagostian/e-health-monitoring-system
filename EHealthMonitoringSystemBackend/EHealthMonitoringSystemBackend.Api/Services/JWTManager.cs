@@ -31,7 +31,7 @@ public class JWTManager(IConfiguration configuration) : IJWTManager
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity([new Claim(ClaimTypes.Name, userId)]),
-            Expires = DateTime.Now.AddMinutes(1),
+            Expires = DateTime.Now.AddMinutes(15),
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(tokenKey),
                 SecurityAlgorithms.HmacSha256Signature

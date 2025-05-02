@@ -4,19 +4,26 @@ using Microsoft.AspNetCore.Identity;
 
 namespace EHealthMonitoringSystemBackend.Data.Services;
 
-public class TokenRepository(IUserStore<User> userStore) : ITokenRepository
+public class TokenRepository(IUserStore<User> userStore, AppDbContext context) : ITokenRepository
 {
     private readonly IUserStore<User> _userStore = userStore;
+    private readonly AppDbContext _context = context;
 
-    public async void DeleteRefreshToken(User user)
+    public async Task DeleteRefreshToken(User user)
     {
-        user.RefreshToken = null;
-        await _userStore.UpdateAsync(user, CancellationToken.None);
+        if (user.RefreshToken is null)
+        {
+            return;
+        }
+        _context.UserRefreshTokens.Attach(user.RefreshToken);
+        _context.UserRefreshTokens.Remove(user.RefreshToken);
+        await _context.SaveChangesAsync();
     }
 
-    public UserRefreshToken SetRefreshToken(User user, UserRefreshToken token)
+    public async Task<UserRefreshToken> SetRefreshToken(User user, UserRefreshToken refreshToken)
     {
-        user.RefreshToken = token;
-        return token;
+        user.RefreshToken = refreshToken;
+        await _userStore.UpdateAsync(user, CancellationToken.None);
+        return refreshToken;
     }
 }

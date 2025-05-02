@@ -1,6 +1,4 @@
-using System.Buffers.Text;
 using System.Text;
-using System.Text.Encodings.Web;
 using EHealthMonitoringSystemBackend.Api.Models;
 using EHealthMonitoringSystemBackend.Api.Services;
 using EHealthMonitoringSystemBackend.Data.Models;
@@ -18,7 +16,7 @@ namespace EHealthMonitoringSystemBackend.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]")]
-[Authorize]
+[AllowAnonymous]
 public class RegisterController(
     SignInManager<User> signInManager,
     IEmailSender emailSender,
@@ -40,7 +38,6 @@ public class RegisterController(
     private const string MSG_501 = "Ooops! Something went wrong, please try again later.";
 
     [HttpPost]
-    [AllowAnonymous]
     public async Task<IActionResult> SignUpPatient(PatientRegister newPatient)
     {
         if (newPatient.Email is null || newPatient.Passwd is null)
@@ -89,15 +86,7 @@ public class RegisterController(
 
         _logger.LogInformation("Created new user");
 
-        var token = _jwtManager.GenerateToken(newUser.Id);
-
-        _tokenRepository.SetRefreshToken(
-            newUser,
-            new UserRefreshToken { RefreshToken = token.RefreshToken }
-        );
-        await _userStore.UpdateAsync(newUser, CancellationToken.None);
-
-        return CreatedAtAction(nameof(SignUpPatient), token);
+        return CreatedAtAction(nameof(SignUpPatient), new { });
     }
 
     [HttpPost]
@@ -119,10 +108,10 @@ public class RegisterController(
             return Unauthorized(new { msg = "Wrong username or password." });
         }
 
-        if (!await _userManger.IsEmailConfirmedAsync(user))
-        {
-            return Unauthorized(new { msg = "Please confirm your email address." });
-        }
+        // if (!await _userManger.IsEmailConfirmedAsync(user))
+        // {
+        //     return Unauthorized(new { msg = "Please confirm your email address." });
+        // }
 
         var result = await _signInManager.PasswordSignInAsync(
             patient.Email,
@@ -148,7 +137,15 @@ public class RegisterController(
             return Unauthorized(new { msg });
         }
 
-        return StatusCode(StatusCodes.Status200OK);
+        var token = _jwtManager.GenerateToken(user.Id);
+
+        await _tokenRepository.DeleteRefreshToken(user);
+        await _tokenRepository.SetRefreshToken(
+            user,
+            new UserRefreshToken { RefreshToken = token.RefreshToken }
+        );
+
+        return StatusCode(StatusCodes.Status200OK, token);
     }
 
     [HttpGet]
@@ -185,13 +182,60 @@ public class RegisterController(
         }
         _logger.LogInformation("Checking email for {}", userId);
 
-        var isEmailConfirmed = await _userManger.IsEmailConfirmedAsync(user);
-        return StatusCode(StatusCodes.Status200OK, new { isEmailConfirmed });
+        Token? token = null;
+        if (await _userManger.IsEmailConfirmedAsync(user))
+        {
+            token = _jwtManager.GenerateToken(user.Id);
+
+            await _tokenRepository.DeleteRefreshToken(user);
+            await _tokenRepository.SetRefreshToken(
+                user,
+                new UserRefreshToken { RefreshToken = token.RefreshToken }
+            );
+        }
+
+        return StatusCode(StatusCodes.Status200OK, new { token });
     }
 
-    [HttpGet]
-    [Authorize]
-    public async Task<IActionResult> WorksIt() {
-        return NoContent();
+    [HttpPost]
+    public async Task<IActionResult> RefreshToken(Token token)
+    {
+        if (token.AccessToken is null)
+        {
+            return Unauthorized(new { msg = "Invalid JWT token." });
+        }
+
+        var principal = _jwtManager.GetPrincipalFromExpiredToken(token.AccessToken);
+        var userId = principal.Identity?.Name;
+        if (userId is null)
+        {
+            return Unauthorized(new { msg = "User id not registered." });
+        }
+
+        var user = await _userStore.FindByIdAsync(userId, CancellationToken.None);
+        var otherUser = await _userManger.FindByIdAsync(userId);
+        if (user is null)
+        {
+            return Unauthorized(new { msg = "User is not registered." });
+        }
+
+        if (user.RefreshToken?.RefreshToken != token.RefreshToken)
+        {
+            return Unauthorized(new { msg = "Refresh tokens do not match." });
+        }
+
+        var newToken = _jwtManager.GenerateRefreshToken(userId);
+        if (newToken is null)
+        {
+            return Unauthorized(new { msg = "Failed to generate user token." });
+        }
+
+        await _tokenRepository.DeleteRefreshToken(user);
+        await _tokenRepository.SetRefreshToken(
+            user,
+            new UserRefreshToken { RefreshToken = newToken.RefreshToken! }
+        );
+
+        return Ok(newToken);
     }
 }
