@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/widgets_helper.dart';
@@ -21,7 +23,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   var lastNameController = TextEditingController();
   var phoneNumberController = TextEditingController();
   var cnpController = TextEditingController();
-  var _service = PatientService();
+  final _service = PatientService();
 
   @override
   Widget build(BuildContext context) {
@@ -56,25 +58,30 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     text: StringsHelper.finish,
                     icon: Icons.arrow_forward_ios,
                     onPressed: () async {
-                      var resp = await _service.completeProfile(
-                        PatientProfile(
-                          lastName: firstNameController.text,
-                          phoneNumber: phoneNumberController.text,
-                          cnp: cnpController.text,
-                          firstName: firstNameController.text,
-                        ),
-                      );
-
-                      if (resp.statusCode == 200) {
-                        navigator.pushReplacement(
-                          MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                      try {
+                        var resp = await _service.completeProfile(
+                          PatientProfile(
+                            lastName: firstNameController.text,
+                            phoneNumber: phoneNumberController.text,
+                            cnp: cnpController.text,
+                            firstName: firstNameController.text,
                           ),
                         );
-                      } else {
+                        if (resp.statusCode == 200) {
+                          navigator.pushReplacement(
+                            MaterialPageRoute(
+                              builder: (context) => const HomeScreen(),
+                            ),
+                          );
+                        } else {
+                          WidgetsHelper.showCustomSnackBar(
+                            message: StringsHelper.internalError,
+                          );
+                        }
+                      } on Exception catch (e) {
+                        log(e.toString());
                         WidgetsHelper.showCustomSnackBar(
-                          message:
-                              "Something went wrong, please try again later.",
+                          message: StringsHelper.internalError,
                         );
                       }
                     },

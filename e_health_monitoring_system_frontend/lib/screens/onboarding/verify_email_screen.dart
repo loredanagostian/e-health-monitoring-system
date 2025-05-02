@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:e_health_monitoring_system_frontend/helpers/assets_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/auth_manager.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/widgets_helper.dart';
 import 'package:e_health_monitoring_system_frontend/models/jwt_token.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/complete_profile_screen.dart';
 import 'package:e_health_monitoring_system_frontend/services/register_service.dart';
@@ -20,7 +22,7 @@ class ConfirmEmailNotifier extends ChangeNotifier {
   final String _userId;
   final AuthManager _manager = AuthManager();
 
-  final _service = const RegisterService();
+  final _service = RegisterService();
   EmailStatus status = EmailStatus.unconfirmed;
 
   void checkEmail() async {
@@ -106,7 +108,7 @@ class VerifyEmailScreen extends StatelessWidget {
                           notifier.checkEmail();
                           return defaultStatusWidget();
                         case EmailStatus.internalError:
-                          return errorStatusWidget();
+                          return errorStatusWidget(notifier);
                       }
                     },
                   ),
@@ -176,7 +178,7 @@ class VerifyEmailScreen extends StatelessWidget {
     );
   }
 
-  Widget errorStatusWidget() {
+  Widget errorStatusWidget(ConfirmEmailNotifier notifier) {
     return Column(
       children: [
         Image.asset(AssetsHelper.errorIcon, height: 100, fit: BoxFit.contain),
@@ -203,8 +205,18 @@ class VerifyEmailScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: CustomButton(
             text: StringsHelper.resend,
-            // TODO: integrate Re-send BE
-            onPressed: () {},
+            onPressed: () async {
+              var service = RegisterService();
+              var resp = await service.resendConfirmationEmail(userId);
+              if (resp.statusCode != 200) {
+                WidgetsHelper.showCustomSnackBar(
+                  message: StringsHelper.internalError,
+                );
+              } else {
+                notifier.status = EmailStatus.unconfirmed;
+                notifier.checkEmail();
+              }
+            },
           ),
         ),
       ],

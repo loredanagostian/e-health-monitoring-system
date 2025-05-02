@@ -68,27 +68,32 @@ public class RegisterController(
         }
 
         var userId = await _userManger.GetUserIdAsync(newUser);
+        await SendConfirmationEmail(newUser);
+
+        _logger.LogInformation("Created new user");
+
+        return CreatedAtAction(nameof(SignUpPatient), new { userId });
+    }
+
+    private async Task SendConfirmationEmail(User newUser)
+    {
         var code = await _userManger.GenerateEmailConfirmationTokenAsync(newUser);
         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
         var callbackUrl = Url.Action(
             "ConfirmEmail",
             "Register",
-            new { userId, code },
+            new { userId = newUser.Id, code },
             protocol: Request.Scheme
         );
         // TODO: !!!temp until hosted, requests from android use 10.0.0.2 ip
         callbackUrl =
-            $"http://localhost:5200/api/Register/ConfirmEmail?userId={userId}&code={code}";
+            $"http://localhost:5200/api/Register/ConfirmEmail?userId={newUser.Id}&code={code}";
         _logger.LogInformation(callbackUrl);
         // await _emailSender.SendEmailAsync(
         //     newPatient.Email,
         //     "Confirm your email",
         //     $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl!)}'>clicking here</a>."
         // );
-
-        _logger.LogInformation("Created new user");
-
-        return CreatedAtAction(nameof(SignUpPatient), new { userId });
     }
 
     [HttpPost]
@@ -147,7 +152,7 @@ public class RegisterController(
             new UserRefreshToken { RefreshToken = token.RefreshToken }
         );
 
-        return StatusCode(StatusCodes.Status200OK, token);
+        return StatusCode(StatusCodes.Status200OK, new { token });
     }
 
     [HttpGet]
@@ -196,6 +201,20 @@ public class RegisterController(
         }
 
         return StatusCode(StatusCodes.Status200OK, new { token });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ResendConfirmationEmail(string userId)
+    {
+        var user = await _userManger.FindByIdAsync(userId);
+        if (user is null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, new { msg = MSG_501 });
+        }
+
+        await SendConfirmationEmail(user);
+
+        return Ok();
     }
 
     [HttpPost]

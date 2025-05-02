@@ -35,7 +35,6 @@ public class PatientController(
                 break;
             }
         }
-        _logger.LogInformation(jwtToken);
 
         if (jwtToken is null)
         {

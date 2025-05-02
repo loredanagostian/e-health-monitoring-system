@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:jwt_decode/jwt_decode.dart';
+
 class JwtToken {
   final String accessToken;
   final String refreshToken;
@@ -15,5 +17,9 @@ class JwtToken {
       "accessToken": accessToken,
       "refreshToken": refreshToken,
     });
+  }
+
+  bool isExpired() {
+    return Jwt.isExpired(accessToken);
   }
 }

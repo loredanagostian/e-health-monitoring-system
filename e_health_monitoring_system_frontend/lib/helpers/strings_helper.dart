@@ -94,4 +94,7 @@ class StringsHelper {
   static const String surgery = "Surgery";
   static const String popularDoctors = "Popular Doctors";
   static const String doctorSearchPlaceholder = "Search for a doctor";
+
+  static const String internalError =
+      "Ooops! Something went wrong, please try again later.";
 }
