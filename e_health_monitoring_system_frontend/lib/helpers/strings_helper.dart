@@ -59,4 +59,39 @@ class StringsHelper {
   static const String resetPassword = "Reset password";
   static const String checkYourInbox = "Check your inbox on";
   static const String emailSentSuccessfully = "Email sent successfully";
+
+  /// Home Screen
+  static const String hi = "Hi";
+  static const String viewAll = "View all";
+  static const String upcomingAppointments = "Upcoming Appointments";
+  static const String recentVisits = "Recent Visits";
+  static const String bookNow = "Book now";
+  static const String medicalReports = "Medical Reports";
+  static const String examinations = "Examinations";
+  static const String analysis = "Analysis";
+  static const String support = "Support";
+  static const String home = "Home";
+  static const String appointments = "Appoinments";
+
+  /// Analysis Reports
+  static const String analysisReports = "Analysis Reports";
+  static const String testReport = "Test report";
+
+  /// Examinations Reports
+  static const String examinationReports = "Examination Reports";
+
+  /// Appoinments
+  static const String categories = "Categories";
+  static const String cardiology = "Cardiology";
+  static const String dentistry = "Dentistry";
+  static const String pediatrics = "Pediatrics";
+  static const String neurology = "Neurology";
+  static const String orthopedics = "Orthopedics";
+  static const String ophthalmology = "Ophthalmology";
+  static const String dermatology = "Dermatology";
+  static const String radiology = "Radiology";
+  static const String pharmacy = "Pharmacy";
+  static const String surgery = "Surgery";
+  static const String popularDoctors = "Popular Doctors";
+  static const String doctorSearchPlaceholder = "Search for a doctor";
 }

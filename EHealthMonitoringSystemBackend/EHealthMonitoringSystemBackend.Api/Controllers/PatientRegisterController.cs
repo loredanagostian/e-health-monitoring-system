@@ -78,11 +78,11 @@ public class RegisterController(
         // TODO: !!!temp until hosted, requests from android use 10.0.0.2 ip
         callbackUrl =
             $"http://localhost:5200/api/Register/ConfirmEmail?userId={userId}&code={code}";
-        // await _emailSender.SendEmailAsync(
-        //     newPatient.Email,
-        //     "Confirm your email",
-        //     $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl!)}'>clicking here</a>."
-        // );
+        await _emailSender.SendEmailAsync(
+            newPatient.Email,
+            "Confirm your email",
+            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl!)}'>clicking here</a>."
+        );
 
         _logger.LogInformation("Created new user");
 
@@ -168,8 +168,7 @@ public class RegisterController(
             return StatusCode(StatusCodes.Status500InternalServerError, new { msg = MSG_501 });
         }
 
-        // TODO: this should return a nice page
-        return NoContent();
+        return Ok(new { message = "Email confirmed." });
     }
 
     [HttpPost]

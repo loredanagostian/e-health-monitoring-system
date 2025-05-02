@@ -153,11 +153,10 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseRouting();
 app.UseCors("EHealthMonitoringSystemPolicy");
-
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
