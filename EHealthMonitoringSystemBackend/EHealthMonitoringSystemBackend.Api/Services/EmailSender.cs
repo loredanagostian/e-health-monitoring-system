@@ -5,36 +5,44 @@ using SendGrid.Helpers.Mail;
 
 namespace EHealthMonitoringSystemBackend.Api.Services;
 
-public class AuthMessageSenderOptions {
-    public string? SendGridKey {get; set;}
+public class AuthMessageSenderOptions
+{
+    public string? SendGridKey { get; set; }
 }
 
-public class EmailSender(IOptions<AuthMessageSenderOptions> options, ILogger<EmailSender> logger) : IEmailSender
+public class EmailSender(IOptions<AuthMessageSenderOptions> options, ILogger<EmailSender> logger)
+    : IEmailSender
 {
     private readonly ILogger _logger = logger;
 
     public AuthMessageSenderOptions Options { get; } = options.Value;
+
     public async Task SendEmailAsync(string toEmail, string subject, string message)
     {
-        if(string.IsNullOrEmpty(Options.SendGridKey)) {
+        if (string.IsNullOrEmpty(Options.SendGridKey))
+        {
             throw new Exception("Null SendGridKey");
         }
         await Execute(Options.SendGridKey, subject, message, toEmail);
     }
 
-    public async Task Execute(string apiKey, string subject, string message, string toEmail) {
+    public async Task Execute(string apiKey, string subject, string message, string toEmail)
+    {
         var client = new SendGridClient(apiKey);
-        var msg = new SendGridMessage() {
+        var msg = new SendGridMessage()
+        {
             From = new EmailAddress("smaproject25@gmail.com", "Account Verification"),
             Subject = subject,
             PlainTextContent = message,
-            HtmlContent = message
+            HtmlContent = message,
         };
         msg.AddTo(new EmailAddress(toEmail));
         msg.SetClickTracking(false, false);
         var response = await client.SendEmailAsync(msg);
-        _logger.LogInformation(response.IsSuccessStatusCode 
-                               ? $"Email to {toEmail} queued successfully!"
-                               : $"Failure Email to {toEmail}");
+        _logger.LogInformation(
+            response.IsSuccessStatusCode
+                ? $"Email to {toEmail} queued successfully!"
+                : $"Failure Email to {toEmail}"
+        );
     }
 }

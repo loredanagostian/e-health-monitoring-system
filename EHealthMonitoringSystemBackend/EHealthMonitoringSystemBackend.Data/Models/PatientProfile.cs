@@ -2,10 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace EHealthMonitoringSystemBackend.Data.Models;
 
-public class PatientInfo
+public class PatientProfile
 {
-    [Required]
-    public string? Id { get; set; }
+    [Key]
+    public int Id { get; set; }
 
     [Required]
     public string? FirstName { get; set; }

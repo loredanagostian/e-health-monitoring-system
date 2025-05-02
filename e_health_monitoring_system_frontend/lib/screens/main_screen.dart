@@ -1,5 +1,6 @@
 import 'package:e_health_monitoring_system_frontend/screens/appointments_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/home_screen.dart';
+import 'package:e_health_monitoring_system_frontend/screens/onboarding/onboarding_screen.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_bottom_tab_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,7 +18,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       case 0:
       // return ChatSupportScreen();
       case 1:
-        return HomeScreen();
+        return OnboardingScreen();
       case 2:
         return AppointmentsScreen();
     }

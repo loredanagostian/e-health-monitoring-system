@@ -123,6 +123,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void singUp() async {
+    // TODO: more error checking
     var resp = await SignUpScreen._registerService.signUpPatient(
       PatientRegister(
         email: emailController.text,

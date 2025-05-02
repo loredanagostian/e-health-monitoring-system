@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Encodings.Web;
 using EHealthMonitoringSystemBackend.Api.Models;
 using EHealthMonitoringSystemBackend.Api.Services;
 using EHealthMonitoringSystemBackend.Data.Models;
@@ -78,15 +79,16 @@ public class RegisterController(
         // TODO: !!!temp until hosted, requests from android use 10.0.0.2 ip
         callbackUrl =
             $"http://localhost:5200/api/Register/ConfirmEmail?userId={userId}&code={code}";
-        await _emailSender.SendEmailAsync(
-            newPatient.Email,
-            "Confirm your email",
-            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl!)}'>clicking here</a>."
-        );
+        _logger.LogInformation(callbackUrl);
+        // await _emailSender.SendEmailAsync(
+        //     newPatient.Email,
+        //     "Confirm your email",
+        //     $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl!)}'>clicking here</a>."
+        // );
 
         _logger.LogInformation("Created new user");
 
-        return CreatedAtAction(nameof(SignUpPatient), new { });
+        return CreatedAtAction(nameof(SignUpPatient), new { userId });
     }
 
     [HttpPost]
@@ -108,10 +110,10 @@ public class RegisterController(
             return Unauthorized(new { msg = "Wrong username or password." });
         }
 
-        // if (!await _userManger.IsEmailConfirmedAsync(user))
-        // {
-        //     return Unauthorized(new { msg = "Please confirm your email address." });
-        // }
+        if (!await _userManger.IsEmailConfirmedAsync(user))
+        {
+            return Unauthorized(new { msg = "Please confirm your email address." });
+        }
 
         var result = await _signInManager.PasswordSignInAsync(
             patient.Email,
@@ -204,7 +206,7 @@ public class RegisterController(
             return Unauthorized(new { msg = "Invalid JWT token." });
         }
 
-        var principal = _jwtManager.GetPrincipalFromExpiredToken(token.AccessToken);
+        var principal = _jwtManager.GetPrincipalFromToken(token.AccessToken);
         var userId = principal.Identity?.Name;
         if (userId is null)
         {
@@ -212,7 +214,6 @@ public class RegisterController(
         }
 
         var user = await _userStore.FindByIdAsync(userId, CancellationToken.None);
-        var otherUser = await _userManger.FindByIdAsync(userId);
         if (user is null)
         {
             return Unauthorized(new { msg = "User is not registered." });
@@ -235,6 +236,6 @@ public class RegisterController(
             new UserRefreshToken { RefreshToken = newToken.RefreshToken! }
         );
 
-        return Ok(newToken);
+        return Ok(new { token = newToken });
     }
 }

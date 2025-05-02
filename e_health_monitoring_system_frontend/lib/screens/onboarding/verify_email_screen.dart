@@ -4,6 +4,7 @@ import 'package:e_health_monitoring_system_frontend/helpers/assets_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
+import 'package:e_health_monitoring_system_frontend/models/jwt_token.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/complete_profile_screen.dart';
 import 'package:e_health_monitoring_system_frontend/services/register_service.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
@@ -17,6 +18,7 @@ enum EmailStatus { confirmed, unconfirmed, internalError }
 class ConfirmEmailNotifier extends ChangeNotifier {
   ConfirmEmailNotifier(this._userId);
   final String _userId;
+  final AuthManager _manager = AuthManager();
 
   final _service = const RegisterService();
   EmailStatus status = EmailStatus.unconfirmed;
@@ -41,8 +43,9 @@ class ConfirmEmailNotifier extends ChangeNotifier {
         var resp = await _service.checkEmailConfirmed(_userId);
         var body = jsonDecode(resp.body);
 
-        if (body case {"isEmailConfirmed": bool isConfirmed}) {
-          if (isConfirmed) {
+        if (body case {"token": Map<String, dynamic>? jwtToken}) {
+          if (jwtToken != null) {
+            await _manager.saveToken(JwtToken.fromJson(jwtToken));
             status = EmailStatus.confirmed;
           }
         } else {

@@ -3,6 +3,7 @@ import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/widgets_helper.dart';
+import 'package:e_health_monitoring_system_frontend/screens/home_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/forgot_password_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/sign_up_screen.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
@@ -90,14 +91,14 @@ class _SignInScreenState extends State<SignInScreen> {
                       );
 
                       if (shouldLogin) {
-                        // ref
-                        //     .read(bottomNavigatorIndex.notifier)
-                        //     .update((state) => 1);
+                        ref
+                            .read(bottomNavigatorIndex.notifier)
+                            .update((state) => 1);
                         navigator.pushAndRemoveUntil(
                           MaterialPageRoute(
                             builder:
                                 (context) =>
-                                    const SignUpScreen(), // TODO: redirect to home page
+                                    const HomeScreen(), // TODO: redirect to home page
                           ),
                           (route) => false,
                         );

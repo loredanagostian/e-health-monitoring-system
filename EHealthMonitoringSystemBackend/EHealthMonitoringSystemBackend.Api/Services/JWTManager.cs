@@ -46,7 +46,7 @@ public class JWTManager(IConfiguration configuration) : IJWTManager
         };
     }
 
-    public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+    public ClaimsPrincipal GetPrincipalFromToken(string token)
     {
         var Key = Convert.FromBase64String(_configuration["JWT:Key"]!);
 
@@ -79,5 +79,10 @@ public class JWTManager(IConfiguration configuration) : IJWTManager
         }
 
         return principal;
+    }
+
+    ClaimsPrincipal IJWTManager.GetPrincipalFromToken(JwtSecurityToken token)
+    {
+        throw new NotImplementedException();
     }
 }
