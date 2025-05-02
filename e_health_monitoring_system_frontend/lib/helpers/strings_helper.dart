@@ -79,4 +79,19 @@ class StringsHelper {
 
   /// Examinations Reports
   static const String examinationReports = "Examination Reports";
+
+  /// Appoinments
+  static const String categories = "Categories";
+  static const String cardiology = "Cardiology";
+  static const String dentistry = "Dentistry";
+  static const String pediatrics = "Pediatrics";
+  static const String neurology = "Neurology";
+  static const String orthopedics = "Orthopedics";
+  static const String ophthalmology = "Ophthalmology";
+  static const String dermatology = "Dermatology";
+  static const String radiology = "Radiology";
+  static const String pharmacy = "Pharmacy";
+  static const String surgery = "Surgery";
+  static const String popularDoctors = "Popular Doctors";
+  static const String doctorSearchPlaceholder = "Search for a doctor";
 }
