@@ -4,7 +4,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EHealthMonitoringSystemBackend.Data;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext(options)
+public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<User>(options)
 {
-    public DbSet<PatientInfo> PatientInfos {get; set;}
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+        builder.Entity<User>().Navigation(e => e.RefreshToken).AutoInclude();
+    }
+
+    public virtual DbSet<PatientInfo> PatientInfos { get; set; }
+    public virtual DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
 }

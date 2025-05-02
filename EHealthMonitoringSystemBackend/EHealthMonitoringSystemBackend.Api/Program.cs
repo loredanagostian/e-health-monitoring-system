@@ -1,8 +1,14 @@
+using System.Text;
+using System.Transactions;
 using EHealthMonitoringSystemBackend.Api.Services;
 using EHealthMonitoringSystemBackend.Data;
+using EHealthMonitoringSystemBackend.Data.Models;
+using EHealthMonitoringSystemBackend.Data.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,66 +19,117 @@ builder.WebHost.UseUrls("http://0.0.0.0:5200", "http://localhost:5200");
 services.AddControllers();
 services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "E-Health Monitoring System", Version = "V1'"} );
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        In = ParameterLocation.Header,
-        Description = "Please enter into field the JWT token",
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        BearerFormat = "JWT",
-        Scheme = "Bearer"
-    });
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
+    options.SwaggerDoc(
+        "v1",
+        new OpenApiInfo { Title = "E-Health Monitoring System", Version = "V1'" }
+    );
+    options.AddSecurityDefinition(
+        "Bearer",
+        new OpenApiSecurityScheme
         {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type=ReferenceType.SecurityScheme,
-                    Id="Bearer"
-                }
-            },
-            Array.Empty<string>()
+            In = ParameterLocation.Header,
+            Description = "Please enter into field the JWT token",
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            BearerFormat = "JWT",
+            Scheme = "Bearer",
         }
-    });
+    );
+    options.AddSecurityRequirement(
+        new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer",
+                    },
+                },
+                Array.Empty<string>()
+            },
+        }
+    );
 });
 
 services.AddCors(options =>
 {
-    options.AddPolicy("EHealthMonitoringSystemPolicy", builder =>
-    {
-        builder
-            .WithOrigins(
-                "http://localhost:3000", 
-                // TODO: change local IP
-                "http://192.168.100.123:3000"
-            )            
-            .AllowAnyMethod()
-            .AllowAnyHeader();
-    });
+    options.AddPolicy(
+        "EHealthMonitoringSystemPolicy",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader();
+        }
+    );
 });
 
-services.AddDefaultIdentity<IdentityUser>()
-    .AddRoles<IdentityRole>()
+services
+    .AddIdentity<User, IdentityRole>(options =>
+    {
+        // make these true before deploy
+        options.Password.RequireDigit = false;
+        options.Password.RequiredLength = 6;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+    })
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+services
+    .AddAuthentication(x =>
+    {
+        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(o =>
+    {
+        var Key = Convert.FromBase64String(configuration["JWT:Key"]!);
+        o.SaveToken = true;
+        o.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false, // on production make it true
+            ValidateAudience = false, // on production make it true
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = configuration["JWT:Issuer"],
+            ValidAudience = configuration["JWT:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Key),
+            ClockSkew = TimeSpan.Zero,
+        };
+        o.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                {
+                    context.Response.Headers["IS-TOKEN-EXPIRED"] = "true";
+                }
+                return Task.CompletedTask;
+            },
+        };
+    });
+
 var connectionString = configuration.GetConnectionString("Default");
 
-services.AddDbContext<AppDbContext>(options => {
+services.AddDbContext<AppDbContext>(options =>
+{
     if (builder.Environment.IsDevelopment())
     {
         options.EnableSensitiveDataLogging();
     }
-    options.UseNpgsql(connectionString, x =>
-    {
-        x.MigrationsAssembly("EHealthMonitoringSystemBackend.Data");
-    });
+    options.UseNpgsql(
+        connectionString,
+        x =>
+        {
+            x.MigrationsAssembly("EHealthMonitoringSystemBackend.Data");
+        }
+    );
 });
 
 services.AddTransient<IEmailSender, EmailSender>();
+services.AddSingleton<IJWTManager, JWTManager>();
+services.AddTransient<ITokenRepository, TokenRepository>();
 services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 
 var app = builder.Build();
@@ -85,7 +142,9 @@ if (builder.Environment.IsDevelopment())
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 app.UseSwagger();
-app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "InventoryManagementBackend.Api v1"));
+app.UseSwaggerUI(c =>
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "InventoryManagementBackend.Api v1")
+);
 
 using (var scope = app.Services.CreateScope())
 {
@@ -100,15 +159,5 @@ app.UseRouting();
 app.UseCors("EHealthMonitoringSystemPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllerRoute(
-        name: "default",
-        pattern: "admin/{controller=Home}/{action=Index}/{id?}");
-    endpoints.MapRazorPages();
-});
-
-app.Run();
-
+app.MapControllers();
 app.Run();

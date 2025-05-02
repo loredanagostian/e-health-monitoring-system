@@ -1,7 +1,8 @@
-using System.Buffers.Text;
 using System.Text;
-using System.Text.Encodings.Web;
 using EHealthMonitoringSystemBackend.Api.Models;
+using EHealthMonitoringSystemBackend.Api.Services;
+using EHealthMonitoringSystemBackend.Data.Models;
+using EHealthMonitoringSystemBackend.Data.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -10,24 +11,29 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.VisualBasic;
 
 namespace EHealthMonitoringSystemBackend.Api.Controllers;
-// TODO: trash error checking, should be better 
+
+// TODO: trash error checking, should be better
 
 [ApiController]
 [Route("api/[controller]/[action]")]
 [AllowAnonymous]
 public class RegisterController(
-    SignInManager<IdentityUser> signInManager,
+    SignInManager<User> signInManager,
     IEmailSender emailSender,
-    UserManager<IdentityUser> userManger,
-    IUserStore<IdentityUser> userStore,
-    ILogger<PatientRegister> logger
+    UserManager<User> userManger,
+    IUserStore<User> userStore,
+    ILogger<PatientRegister> logger,
+    IJWTManager jwtManager,
+    ITokenRepository tokenRepository
 ) : ControllerBase
 {
-    private readonly SignInManager<IdentityUser> _signInManager = signInManager;
+    private readonly SignInManager<User> _signInManager = signInManager;
     private readonly IEmailSender _emailSender = emailSender;
-    private readonly UserManager<IdentityUser> _userManger = userManger;
-    private readonly IUserStore<IdentityUser> _userStore = userStore;
+    private readonly UserManager<User> _userManger = userManger;
+    private readonly IUserStore<User> _userStore = userStore;
     private readonly ILogger<PatientRegister> _logger = logger;
+    private readonly IJWTManager _jwtManager = jwtManager;
+    private readonly ITokenRepository _tokenRepository = tokenRepository;
 
     private const string MSG_501 = "Ooops! Something went wrong, please try again later.";
 
@@ -39,13 +45,13 @@ public class RegisterController(
             return BadRequest();
         }
 
-        var emailStore = (IUserEmailStore<IdentityUser>)_userStore;
+        var emailStore = (IUserEmailStore<User>)_userStore;
         var user = await _userManger.FindByEmailAsync(newPatient.Email);
         if (user != null)
         {
             return Conflict(new { msg = "Email is already taken." });
         }
-        var newUser = Activator.CreateInstance<IdentityUser>();
+        var newUser = Activator.CreateInstance<User>();
 
         await emailStore.SetEmailAsync(newUser, newPatient.Email, CancellationToken.None);
         await _userStore.SetUserNameAsync(newUser, newPatient.Email, CancellationToken.None);
@@ -53,24 +59,34 @@ public class RegisterController(
         var result = await _userManger.CreateAsync(newUser, newPatient.Passwd);
         if (!result.Succeeded)
         {
-            _logger.LogError("Failed to register user with errors {}", result.Errors.Select(e => e.Description));
+            _logger.LogError(
+                "Failed to register user with errors {}",
+                result.Errors.Select(e => e.Description)
+            );
             return StatusCode(StatusCodes.Status500InternalServerError, new { msg = MSG_501 });
         }
 
         var userId = await _userManger.GetUserIdAsync(newUser);
         var code = await _userManger.GenerateEmailConfirmationTokenAsync(newUser);
         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-        var callbackUrl = Url.Action("ConfirmEmail", "Register", new { userId, code }, protocol: Request.Scheme);
-        callbackUrl = $"http://localhost:3000/confirm-email?userId={userId}&code={code}";
+        var callbackUrl = Url.Action(
+            "ConfirmEmail",
+            "Register",
+            new { userId, code },
+            protocol: Request.Scheme
+        );
+        // TODO: !!!temp until hosted, requests from android use 10.0.0.2 ip
+        callbackUrl =
+            $"http://localhost:5200/api/Register/ConfirmEmail?userId={userId}&code={code}";
         await _emailSender.SendEmailAsync(
             newPatient.Email,
             "Confirm your email",
             $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl!)}'>clicking here</a>."
-            );
+        );
 
         _logger.LogInformation("Created new user");
 
-        return CreatedAtAction("Patient registered", new { userId });
+        return CreatedAtAction(nameof(SignUpPatient), new { });
     }
 
     [HttpPost]
@@ -92,12 +108,17 @@ public class RegisterController(
             return Unauthorized(new { msg = "Wrong username or password." });
         }
 
-        if (!await _userManger.IsEmailConfirmedAsync(user))
-        {
-            return Unauthorized(new { msg = "Please confirm your email address." });
-        }
+        // if (!await _userManger.IsEmailConfirmedAsync(user))
+        // {
+        //     return Unauthorized(new { msg = "Please confirm your email address." });
+        // }
 
-        var result = await _signInManager.PasswordSignInAsync(patient.Email, patient.Passwd, true, false);
+        var result = await _signInManager.PasswordSignInAsync(
+            patient.Email,
+            patient.Passwd,
+            true,
+            false
+        );
         if (!result.Succeeded)
         {
             string msg = "";
@@ -105,8 +126,7 @@ public class RegisterController(
             {
                 msg = "Your account is currently locked.";
             }
-            else
-            if (result.IsNotAllowed)
+            else if (result.IsNotAllowed)
             {
                 msg = "Your account is not allowed to sign in";
             }
@@ -117,7 +137,15 @@ public class RegisterController(
             return Unauthorized(new { msg });
         }
 
-        return StatusCode(StatusCodes.Status200OK);
+        var token = _jwtManager.GenerateToken(user.Id);
+
+        await _tokenRepository.DeleteRefreshToken(user);
+        await _tokenRepository.SetRefreshToken(
+            user,
+            new UserRefreshToken { RefreshToken = token.RefreshToken }
+        );
+
+        return StatusCode(StatusCodes.Status200OK, token);
     }
 
     [HttpGet]
@@ -133,7 +161,10 @@ public class RegisterController(
         var result = await _userManger.ConfirmEmailAsync(user, code);
         if (!result.Succeeded)
         {
-            _logger.LogError("Failed to confirm email with error {}", result.Errors.Select(e => e.Description));
+            _logger.LogError(
+                "Failed to confirm email with error {}",
+                result.Errors.Select(e => e.Description)
+            );
             return StatusCode(StatusCodes.Status500InternalServerError, new { msg = MSG_501 });
         }
 
@@ -150,8 +181,60 @@ public class RegisterController(
         }
         _logger.LogInformation("Checking email for {}", userId);
 
-        var isEmailConfirmed = await _userManger.IsEmailConfirmedAsync(user);
-        return StatusCode(StatusCodes.Status200OK, new { isEmailConfirmed });
+        Token? token = null;
+        if (await _userManger.IsEmailConfirmedAsync(user))
+        {
+            token = _jwtManager.GenerateToken(user.Id);
+
+            await _tokenRepository.DeleteRefreshToken(user);
+            await _tokenRepository.SetRefreshToken(
+                user,
+                new UserRefreshToken { RefreshToken = token.RefreshToken }
+            );
+        }
+
+        return StatusCode(StatusCodes.Status200OK, new { token });
     }
 
+    [HttpPost]
+    public async Task<IActionResult> RefreshToken(Token token)
+    {
+        if (token.AccessToken is null)
+        {
+            return Unauthorized(new { msg = "Invalid JWT token." });
+        }
+
+        var principal = _jwtManager.GetPrincipalFromExpiredToken(token.AccessToken);
+        var userId = principal.Identity?.Name;
+        if (userId is null)
+        {
+            return Unauthorized(new { msg = "User id not registered." });
+        }
+
+        var user = await _userStore.FindByIdAsync(userId, CancellationToken.None);
+        var otherUser = await _userManger.FindByIdAsync(userId);
+        if (user is null)
+        {
+            return Unauthorized(new { msg = "User is not registered." });
+        }
+
+        if (user.RefreshToken?.RefreshToken != token.RefreshToken)
+        {
+            return Unauthorized(new { msg = "Refresh tokens do not match." });
+        }
+
+        var newToken = _jwtManager.GenerateRefreshToken(userId);
+        if (newToken is null)
+        {
+            return Unauthorized(new { msg = "Failed to generate user token." });
+        }
+
+        await _tokenRepository.DeleteRefreshToken(user);
+        await _tokenRepository.SetRefreshToken(
+            user,
+            new UserRefreshToken { RefreshToken = newToken.RefreshToken! }
+        );
+
+        return Ok(newToken);
+    }
 }
