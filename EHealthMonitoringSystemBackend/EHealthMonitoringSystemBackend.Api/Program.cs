@@ -1,13 +1,14 @@
-using System.Text;
-using System.Transactions;
 using EHealthMonitoringSystemBackend.Api.Services;
+using EHealthMonitoringSystemBackend.Api.Services.Abstractions;
+using EHealthMonitoringSystemBackend.Core.Models;
 using EHealthMonitoringSystemBackend.Data;
-using EHealthMonitoringSystemBackend.Data.Models;
 using EHealthMonitoringSystemBackend.Data.Services;
+using EHealthMonitoringSystemBackend.Data.Services.Abstractions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -127,9 +128,14 @@ services.AddDbContext<AppDbContext>(options =>
     );
 });
 
-services.AddTransient<IEmailSender, EmailSender>();
 services.AddSingleton<IJWTManager, JWTManager>();
+services.AddTransient<IEmailSender, EmailSender>();
 services.AddTransient<ITokenRepository, TokenRepository>();
+services.AddTransient<IUploadManager, UploadManager>();
+services.AddTransient<IDoctorRepository, DoctorRepository>();
+services.AddTransient<ISpecializationRepository, SpecializationRepository>();
+services.AddTransient<IAppointmentTypeRepository, AppointmentTypeRepository>();
+services.AddTransient<IDoctorSpecializationsRepository, DoctorSpecializationRepository>();
 services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 
 var app = builder.Build();
@@ -153,8 +159,22 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 
-// app.UseHttpsRedirection();
+var contentDir = configuration["Content_Directory"];
+contentDir = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), contentDir));
+if (!Directory.Exists(contentDir))
+{
+    Console.WriteLine("Creating CONTENT_DIRECTORY: " + contentDir);
+    Directory.CreateDirectory(contentDir);
+}
 
+// app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(contentDir),
+    RequestPath = "/content",
+    ServeUnknownFileTypes = true
+});
 app.UseRouting();
 app.UseCors("EHealthMonitoringSystemPolicy");
 app.UseAuthentication();

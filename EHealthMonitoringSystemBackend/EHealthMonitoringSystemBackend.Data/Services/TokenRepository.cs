@@ -1,5 +1,5 @@
-using System.Threading.Tasks;
-using EHealthMonitoringSystemBackend.Data.Models;
+using EHealthMonitoringSystemBackend.Core.Models;
+using EHealthMonitoringSystemBackend.Data.Services.Abstractions;
 using Microsoft.AspNetCore.Identity;
 
 namespace EHealthMonitoringSystemBackend.Data.Services;

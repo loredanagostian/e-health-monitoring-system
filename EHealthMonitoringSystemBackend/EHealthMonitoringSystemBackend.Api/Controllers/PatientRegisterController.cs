@@ -1,15 +1,14 @@
 using System.Text;
 using System.Text.Encodings.Web;
 using EHealthMonitoringSystemBackend.Api.Models;
-using EHealthMonitoringSystemBackend.Api.Services;
-using EHealthMonitoringSystemBackend.Data.Models;
-using EHealthMonitoringSystemBackend.Data.Services;
+using EHealthMonitoringSystemBackend.Api.Services.Abstractions;
+using EHealthMonitoringSystemBackend.Core.Models;
+using EHealthMonitoringSystemBackend.Data.Services.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.VisualBasic;
 
 namespace EHealthMonitoringSystemBackend.Api.Controllers;
 

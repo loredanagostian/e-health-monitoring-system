@@ -1,8 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Text;
 using EHealthMonitoringSystemBackend.Api.Models;
+using EHealthMonitoringSystemBackend.Api.Services.Abstractions;
 using Microsoft.IdentityModel.Tokens;
 
 namespace EHealthMonitoringSystemBackend.Api.Services;
