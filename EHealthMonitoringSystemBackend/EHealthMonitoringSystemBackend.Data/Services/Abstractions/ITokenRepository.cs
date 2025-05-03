@@ -1,6 +1,6 @@
-using EHealthMonitoringSystemBackend.Data.Models;
+using EHealthMonitoringSystemBackend.Core.Models;
 
-namespace EHealthMonitoringSystemBackend.Data.Services;
+namespace EHealthMonitoringSystemBackend.Data.Services.Abstractions;
 
 public interface ITokenRepository
 {
