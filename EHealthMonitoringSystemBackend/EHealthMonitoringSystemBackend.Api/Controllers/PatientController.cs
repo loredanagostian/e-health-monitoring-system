@@ -1,12 +1,10 @@
-using System.IdentityModel.Tokens.Jwt;
 using EHealthMonitoringSystemBackend.Api.Models;
-using EHealthMonitoringSystemBackend.Api.Services;
-using EHealthMonitoringSystemBackend.Data;
+using EHealthMonitoringSystemBackend.Api.Services.Abstractions;
+using EHealthMonitoringSystemBackend.Core.Models;
 using EHealthMonitoringSystemBackend.Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace EHealthMonitoringSystemBackend.Api.Controllers;
 
