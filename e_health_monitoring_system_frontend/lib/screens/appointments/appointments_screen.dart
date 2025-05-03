@@ -1,11 +1,12 @@
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
+import 'package:e_health_monitoring_system_frontend/screens/appointments/doctor_profile_screen.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/book_now_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_searchbar.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/doctor_card.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/medical_category.dart';
-import 'package:e_health_monitoring_system_frontend/widgets/view_all_button.dart';
 import 'package:flutter/material.dart';
 
 class AppointmentsScreen extends StatefulWidget {
@@ -48,14 +49,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(StringsHelper.categories, style: StylesHelper.titleStyle),
-              ViewAllButton(onPressed: () {}),
-            ],
-          ),
+          child: Text(StringsHelper.categories, style: StylesHelper.titleStyle),
         ),
         SizedBox(height: 20),
         Padding(
@@ -160,6 +154,14 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
               BookNowButton(onPressed: () {}),
             ],
             doctorPhotoPath: 'assets/images/mockup_doctor.png',
+            onPressed:
+                () => navigator.push(
+                  MaterialPageRoute(
+                    builder:
+                        (context) =>
+                            DoctorProfileScreen(doctorName: "Dr. Lorem Ipsum"),
+                  ),
+                ),
           ),
           SizedBox(height: 20),
           DoctorCard(
@@ -179,6 +181,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
               BookNowButton(onPressed: () {}),
             ],
             doctorPhotoPath: 'assets/images/mockup_doctor.png',
+            onPressed: () {},
           ),
           SizedBox(height: 20),
           DoctorCard(
@@ -198,6 +201,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
               BookNowButton(onPressed: () {}),
             ],
             doctorPhotoPath: 'assets/images/mockup_doctor.png',
+            onPressed: () {},
           ),
         ],
       ),

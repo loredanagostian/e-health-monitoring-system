@@ -1,4 +1,4 @@
-import 'package:e_health_monitoring_system_frontend/screens/appointments_screen.dart';
+import 'package:e_health_monitoring_system_frontend/screens/appointments/appointments_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/home_screen.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_bottom_tab_navigator.dart';
 import 'package:flutter/material.dart';

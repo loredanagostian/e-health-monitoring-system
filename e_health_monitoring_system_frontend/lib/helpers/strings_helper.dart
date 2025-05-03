@@ -80,7 +80,7 @@ class StringsHelper {
   /// Examinations Reports
   static const String examinationReports = "Examination Reports";
 
-  /// Appoinments
+  /// Appointments
   static const String categories = "Categories";
   static const String cardiology = "Cardiology";
   static const String dentistry = "Dentistry";
@@ -94,4 +94,10 @@ class StringsHelper {
   static const String surgery = "Surgery";
   static const String popularDoctors = "Popular Doctors";
   static const String doctorSearchPlaceholder = "Search for a doctor";
+
+  /// Doctor's Profile
+  static const String specialist = "Specialist";
+  static const String reviews = "Reviews";
+  static const String prices = "Prices";
+  static const String bookAppointment = "Book appointment";
 }
