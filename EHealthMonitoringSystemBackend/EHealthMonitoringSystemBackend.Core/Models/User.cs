@@ -5,4 +5,5 @@ namespace EHealthMonitoringSystemBackend.Core.Models;
 public class User : IdentityUser
 {
     public UserRefreshToken? RefreshToken { get; set; }
+    public PatientProfile? PatientProfile { get; set; }
 }
