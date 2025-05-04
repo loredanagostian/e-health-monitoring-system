@@ -2,7 +2,9 @@ import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
+import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/info_tag.dart';
+import 'package:e_health_monitoring_system_frontend/widgets/price_tile.dart';
 import 'package:flutter/material.dart';
 
 class DoctorProfileScreen extends StatelessWidget {
@@ -40,6 +42,20 @@ class DoctorProfileScreen extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 15),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+          border: Border.all(color: ColorsHelper.lightGray),
+        ),
+        child: SizedBox(
+          width: double.infinity,
+          child: CustomButton(text: StringsHelper.bookAppointment),
         ),
       ),
     );
@@ -132,7 +148,23 @@ class DoctorProfileScreen extends StatelessWidget {
   Widget getPrices() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [Text(StringsHelper.prices, style: StylesHelper.titleStyle)],
+      children: [
+        Text(StringsHelper.prices, style: StylesHelper.titleStyle),
+        SizedBox(height: 15),
+        PriceTile(
+          consultationType: "Prosthetic Consultation",
+          price: "220 LEI",
+        ),
+        PriceTile(consultationType: "Prosthetic Check-up", price: "85 LEI"),
+        PriceTile(
+          consultationType: "Acrylic Temporary Crown in Office",
+          price: "120 LEI",
+        ),
+        PriceTile(
+          consultationType: "Acrylic Temporary Crown in Laboratory",
+          price: "290 LEI",
+        ),
+      ],
     );
   }
 }
