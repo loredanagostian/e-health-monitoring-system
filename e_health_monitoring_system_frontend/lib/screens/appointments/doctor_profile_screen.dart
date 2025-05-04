@@ -55,7 +55,10 @@ class DoctorProfileScreen extends StatelessWidget {
         ),
         child: SizedBox(
           width: double.infinity,
-          child: CustomButton(text: StringsHelper.bookAppointment),
+          child: CustomButton(
+            text: StringsHelper.bookAppointment,
+            icon: Icons.arrow_forward_ios,
+          ),
         ),
       ),
     );
