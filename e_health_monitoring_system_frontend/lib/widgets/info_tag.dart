@@ -5,11 +5,15 @@ import 'package:flutter/widgets.dart';
 class InfoTag extends StatelessWidget {
   final String infoText;
   final Function()? onPressed;
+  final bool? isSelected;
+  final bool? centerText;
 
   const InfoTag({
     super.key,
     this.infoText = StringsHelper.viewAll,
     this.onPressed,
+    this.isSelected = false,
+    this.centerText = false,
   });
 
   @override
@@ -17,9 +21,13 @@ class InfoTag extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
+        alignment: centerText != null && centerText! ? Alignment.center : null,
         padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(
-          color: ColorsHelper.lightGray,
+          color:
+              isSelected != null && isSelected!
+                  ? ColorsHelper.lightPurple
+                  : ColorsHelper.lightGray,
           border: Border.all(color: ColorsHelper.mediumGray),
           borderRadius: BorderRadius.circular(5),
         ),
@@ -28,7 +36,10 @@ class InfoTag extends StatelessWidget {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.normal,
-            color: ColorsHelper.darkGray,
+            color:
+                isSelected != null && isSelected!
+                    ? ColorsHelper.mainPurple
+                    : ColorsHelper.darkGray,
           ),
         ),
       ),

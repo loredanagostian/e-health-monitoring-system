@@ -8,7 +8,7 @@ class DoctorCard extends StatelessWidget {
   final List<Widget> detailsList;
   final double? width;
   final bool hasVisibleIcons;
-  final Function() onPressed;
+  final Function()? onPressed;
   const DoctorCard({
     super.key,
     required this.doctorName,
@@ -17,7 +17,7 @@ class DoctorCard extends StatelessWidget {
     required this.doctorPhotoPath,
     this.width,
     this.hasVisibleIcons = false,
-    required this.onPressed,
+    this.onPressed,
   });
 
   @override
