@@ -1,4 +1,4 @@
-using EHealthMonitoringSystemBackend.Data.Models;
+using EHealthMonitoringSystemBackend.Core.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,8 +10,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     {
         base.OnModelCreating(builder);
         builder.Entity<User>().Navigation(e => e.RefreshToken).AutoInclude();
+        builder.Entity<User>().Navigation(e => e.PatientProfile).AutoInclude();
     }
 
-    public virtual DbSet<PatientInfo> PatientInfos { get; set; }
+    public virtual DbSet<PatientProfile> PatientProfiles { get; set; }
     public virtual DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
+    public virtual DbSet<AppFile> AppFiles { get; set; }
+    public virtual DbSet<Doctor> Doctors { get; set; }
+    public virtual DbSet<Specialization> Specializations { get; set; }
+    public virtual DbSet<DoctorSpecialization> DoctorSpecializations { get; set; }
+    public virtual DbSet<AppointmentType> AppointmentTypes { get; set; }
 }

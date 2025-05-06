@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:e_health_monitoring_system_frontend/helpers/assets_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
@@ -15,8 +16,6 @@ import 'package:e_health_monitoring_system_frontend/widgets/custom_textfield.dar
 import 'package:flutter/material.dart';
 
 class SignUpScreen extends StatefulWidget {
-  static const _registerService = RegisterService();
-
   const SignUpScreen({super.key});
 
   @override
@@ -24,6 +23,7 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  var registerService = RegisterService();
   var emailController = TextEditingController();
   var passwordController = TextEditingController();
   var confirmPasswordController = TextEditingController();
@@ -123,7 +123,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void singUp() async {
-    var resp = await SignUpScreen._registerService.signUpPatient(
+    var resp = await registerService.signUpPatient(
       PatientRegister(
         email: emailController.text,
         passwd: passwordController.text,
@@ -157,16 +157,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
       password,
     );
 
+    var errorMessage = "";
     if (email.isNotEmpty &&
         isEmailValid &&
         password.isNotEmpty &&
         confirmPassword.isNotEmpty &&
         password == confirmPassword &&
         passwordValidationMessage.isEmpty) {
-      singUp();
+      try {
+        singUp();
+      } on Exception catch (e) {
+        log(e.toString());
+        WidgetsHelper.showCustomSnackBar(message: StringsHelper.internalError);
+      }
     } else {
-      String errorMessage = "";
-
       if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
         errorMessage = StringsHelper.allFieldsMustBeCompleted;
       } else if (password != confirmPassword) {

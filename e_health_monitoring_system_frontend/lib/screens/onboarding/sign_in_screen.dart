@@ -1,10 +1,18 @@
+import 'dart:convert';
+
 import 'package:e_health_monitoring_system_frontend/helpers/assets_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/auth_manager.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/fields_validation_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/widgets_helper.dart';
+import 'package:e_health_monitoring_system_frontend/models/jwt_token.dart';
+import 'package:e_health_monitoring_system_frontend/models/patient_register.dart';
+import 'package:e_health_monitoring_system_frontend/screens/home_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/forgot_password_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/sign_up_screen.dart';
+import 'package:e_health_monitoring_system_frontend/services/register_service.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_textfield.dart';
 import 'package:flutter/material.dart';
@@ -90,14 +98,9 @@ class _SignInScreenState extends State<SignInScreen> {
                       );
 
                       if (shouldLogin) {
-                        // ref
-                        //     .read(bottomNavigatorIndex.notifier)
-                        //     .update((state) => 1);
                         navigator.pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    const SignUpScreen(), // TODO: redirect to home page
+                            builder: (context) => const HomeScreen(),
                           ),
                           (route) => false,
                         );
@@ -148,28 +151,37 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   Future<bool> validateFields(String email, String password) async {
-    // AuthenticationManager authManager = AuthenticationManager();
-    String message = '';
-
-    if (email.isNotEmpty && password.isNotEmpty) {
-      if (RegExp(
-        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
-      ).hasMatch(email)) {
-        // message = await authManager.logInUser(email, password);
-        if (message == '') {
-          return true;
-        } else {
-          WidgetsHelper.showCustomSnackBar(message: message);
-        }
-      } else {
-        WidgetsHelper.showCustomSnackBar(message: StringsHelper.invalidEmail);
-      }
-    } else {
+    if (email.isEmpty || password.isEmpty) {
       WidgetsHelper.showCustomSnackBar(
         message: StringsHelper.allFieldsMustBeCompleted,
       );
+      return false;
     }
 
+    if (!FieldsValidationHelper.validateEmail(email)) {
+      WidgetsHelper.showCustomSnackBar(message: StringsHelper.invalidEmail);
+      return false;
+    }
+
+    var passwdErr = FieldsValidationHelper.validatePassword(password);
+    if (passwdErr.isNotEmpty) {
+      WidgetsHelper.showCustomSnackBar(message: passwdErr);
+      return false;
+    }
+
+    var service = RegisterService();
+    var authManger = AuthManager();
+    var resp = await service.singInPatient(
+      PatientRegister(email: email, passwd: password),
+    );
+
+    var body = jsonDecode(resp.body);
+    if (resp.statusCode == 200) {
+      await authManger.saveToken(JwtToken.fromJson(body['token']));
+      return true;
+    }
+
+    WidgetsHelper.showCustomSnackBar(message: body['msg']);
     return false;
   }
 }

@@ -111,4 +111,8 @@ class StringsHelper {
       "There was an error.\nPlease re-try the process.";
   static const String goToHomePage = "Go to Home Page";
   static const String cancel = "Cancel";
+
+  /// General Strings
+  static const String internalError =
+      "Ooops! Something went wrong, please try again later.";
 }

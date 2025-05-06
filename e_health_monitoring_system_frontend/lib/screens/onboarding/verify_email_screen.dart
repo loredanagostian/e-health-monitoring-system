@@ -1,9 +1,12 @@
 import 'dart:convert';
 
 import 'package:e_health_monitoring_system_frontend/helpers/assets_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/auth_manager.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/widgets_helper.dart';
+import 'package:e_health_monitoring_system_frontend/models/jwt_token.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/complete_profile_screen.dart';
 import 'package:e_health_monitoring_system_frontend/services/register_service.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
@@ -17,8 +20,9 @@ enum EmailStatus { confirmed, unconfirmed, internalError }
 class ConfirmEmailNotifier extends ChangeNotifier {
   ConfirmEmailNotifier(this._userId);
   final String _userId;
+  final AuthManager _manager = AuthManager();
 
-  final _service = const RegisterService();
+  final _service = RegisterService();
   EmailStatus status = EmailStatus.unconfirmed;
 
   void checkEmail() async {
@@ -41,8 +45,9 @@ class ConfirmEmailNotifier extends ChangeNotifier {
         var resp = await _service.checkEmailConfirmed(_userId);
         var body = jsonDecode(resp.body);
 
-        if (body case {"isEmailConfirmed": bool isConfirmed}) {
-          if (isConfirmed) {
+        if (body case {"token": Map<String, dynamic>? jwtToken}) {
+          if (jwtToken != null) {
+            await _manager.saveToken(JwtToken.fromJson(jwtToken));
             status = EmailStatus.confirmed;
           }
         } else {
@@ -103,7 +108,7 @@ class VerifyEmailScreen extends StatelessWidget {
                           notifier.checkEmail();
                           return defaultStatusWidget();
                         case EmailStatus.internalError:
-                          return errorStatusWidget();
+                          return errorStatusWidget(notifier);
                       }
                     },
                   ),
@@ -173,7 +178,7 @@ class VerifyEmailScreen extends StatelessWidget {
     );
   }
 
-  Widget errorStatusWidget() {
+  Widget errorStatusWidget(ConfirmEmailNotifier notifier) {
     return Column(
       children: [
         Image.asset(AssetsHelper.errorIcon, height: 100, fit: BoxFit.contain),
@@ -200,8 +205,18 @@ class VerifyEmailScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: CustomButton(
             text: StringsHelper.resend,
-            // TODO: integrate Re-send BE
-            onPressed: () {},
+            onPressed: () async {
+              var service = RegisterService();
+              var resp = await service.resendConfirmationEmail(userId);
+              if (resp.statusCode != 200) {
+                WidgetsHelper.showCustomSnackBar(
+                  message: StringsHelper.internalError,
+                );
+              } else {
+                notifier.status = EmailStatus.unconfirmed;
+                notifier.checkEmail();
+              }
+            },
           ),
         ),
       ],
