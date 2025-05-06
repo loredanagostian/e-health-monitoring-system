@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
-  const MainScreen({super.key});
+  final int? bottomNavigatorIndex;
+  const MainScreen({super.key, this.bottomNavigatorIndex});
 
   @override
   ConsumerState<MainScreen> createState() => _MainScreenState();
@@ -23,6 +24,18 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     }
 
     return HomeScreen();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.bottomNavigatorIndex != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(bottomNavigatorIndex.notifier).state =
+            widget.bottomNavigatorIndex!;
+      });
+    }
   }
 
   @override

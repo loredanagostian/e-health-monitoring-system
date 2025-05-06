@@ -100,4 +100,15 @@ class StringsHelper {
   static const String reviews = "Reviews";
   static const String prices = "Prices";
   static const String bookAppointment = "Book appointment";
+
+  /// Book Appointment
+  static const String searchReasonToVisit = "Search for reason to visit";
+  static const String reasonToVisit = "Reason to visit";
+  static const String totalCost = "Total cost";
+  static const String appointmentBookedSuccessfully =
+      "Appointment booked successfully";
+  static const String appointmentBookedError =
+      "There was an error.\nPlease re-try the process.";
+  static const String goToHomePage = "Go to Home Page";
+  static const String cancel = "Cancel";
 }

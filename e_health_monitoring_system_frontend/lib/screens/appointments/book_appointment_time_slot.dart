@@ -1,26 +1,32 @@
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
+import 'package:e_health_monitoring_system_frontend/screens/appointments/book_appoinment_final_details_screen.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/doctor_card.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/info_tag.dart';
 import 'package:flutter/material.dart';
 
-class BookAppointmentScreen extends StatefulWidget {
+class BookAppointmentTimeSlotScreen extends StatefulWidget {
   final String doctorName;
-  const BookAppointmentScreen({super.key, required this.doctorName});
+  const BookAppointmentTimeSlotScreen({super.key, required this.doctorName});
 
   @override
-  State<BookAppointmentScreen> createState() => _BookAppointmentScreenState();
+  State<BookAppointmentTimeSlotScreen> createState() =>
+      _BookAppointmentTimeSlotScreenState();
 }
 
-class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
+class _BookAppointmentTimeSlotScreenState
+    extends State<BookAppointmentTimeSlotScreen> {
   String? selectedTime;
+  String? selectedDay;
 
-  void onTimeSelected(String time) {
+  void onTimeSelected(String time, String day) {
     setState(() {
       selectedTime = time;
+      selectedDay = day;
     });
   }
 
@@ -95,11 +101,17 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                     ? ColorsHelper.mediumGray
                     : ColorsHelper.mainPurple,
             onPressed:
-                selectedTime != null
-                    ? () {
-                      // handle booking
-                      print("Booked time: $selectedTime");
-                    }
+                selectedTime != null && selectedDay != null
+                    ? () => navigator.push(
+                      MaterialPageRoute(
+                        builder:
+                            (context) => BookAppointmentFinalDetailsScreen(
+                              doctorName: widget.doctorName,
+                              date: selectedDay!,
+                              time: selectedTime!,
+                            ),
+                      ),
+                    )
                     : null, // disable button when no time selected
           ),
         ),
@@ -132,7 +144,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
           children:
               times.map((time) {
                 return GestureDetector(
-                  onTap: () => onTimeSelected(time),
+                  onTap: () => onTimeSelected(time, day),
                   child: InfoTag(
                     infoText: time,
                     isSelected: selectedTime == time,

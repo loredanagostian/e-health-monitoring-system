@@ -2,7 +2,7 @@ import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
-import 'package:e_health_monitoring_system_frontend/screens/appointments/book_appointment_screen.dart';
+import 'package:e_health_monitoring_system_frontend/screens/appointments/book_appointment_time_slot.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/info_tag.dart';
@@ -64,8 +64,9 @@ class DoctorProfileScreen extends StatelessWidget {
                 () => navigator.push(
                   MaterialPageRoute(
                     builder:
-                        (context) =>
-                            BookAppointmentScreen(doctorName: doctorName),
+                        (context) => BookAppointmentTimeSlotScreen(
+                          doctorName: doctorName,
+                        ),
                   ),
                 ),
           ),
