@@ -1,4 +1,5 @@
 using EHealthMonitoringSystemBackend.Core.Models;
+using EHealthMonitoringSystemBackend.Data.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
