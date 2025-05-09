@@ -7,4 +7,10 @@ class StylesHelper {
     fontSize: 24,
     fontWeight: FontWeight.bold,
   );
+
+  static const TextStyle appBarStyle = TextStyle(
+    fontSize: 20,
+    color: ColorsHelper.mainDark,
+    fontWeight: FontWeight.bold,
+  );
 }

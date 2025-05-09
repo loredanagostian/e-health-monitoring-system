@@ -8,6 +8,7 @@ class DoctorCard extends StatelessWidget {
   final List<Widget> detailsList;
   final double? width;
   final bool hasVisibleIcons;
+  final Function()? onPressed;
   const DoctorCard({
     super.key,
     required this.doctorName,
@@ -16,13 +17,13 @@ class DoctorCard extends StatelessWidget {
     required this.doctorPhotoPath,
     this.width,
     this.hasVisibleIcons = false,
+    this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      // TODO: implement download
-      onTap: () {},
+      onTap: onPressed,
       child: Container(
         width: width,
         decoration: BoxDecoration(
