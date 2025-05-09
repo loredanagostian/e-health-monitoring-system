@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace EHealthMonitoringSystemBackend.Core.Models;
+namespace EHealthMonitoringSystemBackend.Data.Models;
 
 public class PatientProfile
 {
