@@ -5,6 +5,7 @@ using EHealthMonitoringSystemBackend.Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace EHealthMonitoringSystemBackend.Api.Controllers;
 
@@ -58,4 +59,33 @@ public class PatientController(
 
         return Ok();
     }
+
+    [HttpGet]
+    public async Task<IActionResult> GetPatientProfileByEmail(string email)
+    {
+        var user = await _userManger.Users
+            .Include(u => u.PatientProfile)
+            .FirstOrDefaultAsync(u => u.Email == email);
+
+        if (user == null)
+        {
+            return NotFound($"No user found with email '{email}'.");
+        }
+
+        if (user.PatientProfile == null)
+        {
+            return NotFound($"User '{email}' does not have a completed profile.");
+        }
+
+        var profileDto = new PatientProfileDTO
+        {
+            FirstName = user.PatientProfile.FirstName,
+            LastName = user.PatientProfile.LastName,
+            Cnp = user.PatientProfile.Cnp,
+            PhoneNumber = user.PatientProfile.PhoneNumber,
+        };
+
+        return Ok(profileDto);
+    }
+
 }

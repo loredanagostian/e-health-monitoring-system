@@ -9,6 +9,7 @@ import 'package:e_health_monitoring_system_frontend/services/patient_service.dar
 import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_textfield.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
@@ -24,6 +25,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   var phoneNumberController = TextEditingController();
   var cnpController = TextEditingController();
   final _service = PatientService();
+  static final SharedPreferencesAsync _prefs = SharedPreferencesAsync();
 
   @override
   Widget build(BuildContext context) {
@@ -61,13 +63,15 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                       try {
                         var resp = await _service.completeProfile(
                           PatientProfile(
-                            lastName: firstNameController.text,
+                            lastName: lastNameController.text,
                             phoneNumber: phoneNumberController.text,
                             cnp: cnpController.text,
                             firstName: firstNameController.text,
                           ),
                         );
                         if (resp.statusCode == 200) {
+                          _prefs.setString("firstName", firstNameController.text);
+                          _prefs.setString("lastName", lastNameController.text);
                           navigator.pushReplacement(
                             MaterialPageRoute(
                               builder: (context) => const HomeScreen(),

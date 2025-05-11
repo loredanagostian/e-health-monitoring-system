@@ -13,8 +13,10 @@ import 'package:e_health_monitoring_system_frontend/screens/home_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/forgot_password_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/sign_up_screen.dart';
 import 'package:e_health_monitoring_system_frontend/services/register_service.dart';
+import 'package:e_health_monitoring_system_frontend/services/patient_service.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_textfield.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -27,6 +29,7 @@ class SignInScreen extends StatefulWidget {
 class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  static final SharedPreferencesAsync _prefs = SharedPreferencesAsync();
 
   @override
   Widget build(BuildContext context) {
@@ -178,6 +181,13 @@ class _SignInScreenState extends State<SignInScreen> {
     var body = jsonDecode(resp.body);
     if (resp.statusCode == 200) {
       await authManger.saveToken(JwtToken.fromJson(body['token']));
+
+      final profile = await PatientService().getPatientProfile(email);
+      if (profile != null) {
+        _prefs.setString("firstName", profile['firstName']);
+        _prefs.setString("lastName", profile['lastName']);
+      }
+
       return true;
     }
 
