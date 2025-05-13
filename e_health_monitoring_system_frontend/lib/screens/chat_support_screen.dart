@@ -2,226 +2,227 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
-
+import 'package:e_health_monitoring_system_frontend/models/chat_message.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatSupportScreen extends ConsumerStatefulWidget {
-  //final Account friendAccount;
-  //const ChatScreen({super.key, required this.friendAccount});
-
   @override
   ConsumerState<ChatSupportScreen> createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends ConsumerState<ChatSupportScreen> {
   final TextEditingController _messageController = TextEditingController();
-  //final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final ScrollController _scrollController = ScrollController();
+  List<ChatMessage> chatMessages = [
+    ChatMessage(message: "Hi, what can I help you with?", sender: SenderType.chatbot),
+    ChatMessage(message: "Hi, what can I help you with?", sender: SenderType.user)
+  ];
+  String? firstName;
+  String? lastName;
+  static final SharedPreferencesAsync _prefs = SharedPreferencesAsync();
 
-  // void sendMessage() async {
-  //   if (_messageController.text.isNotEmpty) {
-  //     await ChatManager.sendMessage(
-  //         widget.friendAccount.userId, _messageController.text);
-  //     _messageController.clear();
-  //   }
-  // }
+  @override
+  void initState() {
+    super.initState();
+    loadUserInfo();
+  }
 
-  // Widget _buildMessageList() {
-  //   return StreamBuilder(
-  //       stream: ChatManager.getMessages(widget.friendAccount.userId),
-  //       builder: (context, snapshot) {
-  //         if (snapshot.hasError) {
-  //           return Text('Error${snapshot.error}');
-  //         }
+  Future<void> loadUserInfo() async {
+    final _firstname = await _prefs.getString('firstName');
+    final _lastname = await _prefs.getString('lastName');
 
-  //         if (snapshot.connectionState == ConnectionState.waiting) {
-  //           return Center(child: CircularProgressIndicator());
-  //         }
+    setState(() {
+      firstName = _firstname;
+      lastName = _lastname;
+    });
+  }
 
-  //         return ListView(
-  //           children: snapshot.data!.docs
-  //               .map((document) => _buildListItem(document))
-  //               .toList(),
-  //         );
-  //       });
-  // }
+  Widget _buildMessageList() {
+    return ListView.builder(
+      controller: _scrollController,
+      itemCount: chatMessages.length,
+      itemBuilder: (context, index) {
+        return _buildListItem(chatMessages[index]);
+      },
+    );
+  }
 
-  // Widget _buildListItem(DocumentSnapshot document) {
-  //   Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-  //   bool isMessageSentByCurrentUser =
-  //       data["senderId"] == _firebaseAuth.currentUser!.uid;
+  Widget _buildListItem(ChatMessage message) {
+  bool isMessageSentByCurrentUser = message.sender == SenderType.user;
 
-  //   return Padding(
-  //     padding: EdgeInsets.only(bottom: AppSizes.smallDistance),
-  //     child: Row(
-  //       mainAxisAlignment: isMessageSentByCurrentUser
-  //           ? MainAxisAlignment.end
-  //           : MainAxisAlignment.start,
-  //       crossAxisAlignment: CrossAxisAlignment.end,
-  //       children: [
-  //         Visibility(
-  //             visible: !isMessageSentByCurrentUser,
-  //             child: SizedBox(
-  //                 height: 50,
-  //                 width: 50,
-  //                 child: widget.friendAccount.imageURL != null
-  //                     ? CircleAvatar(
-  //                         backgroundImage:
-  //                             NetworkImage(widget.friendAccount.imageURL!))
-  //                     : CircleAvatar(
-  //                         backgroundImage:
-  //                             AssetImage(AppPaths.defaultProfilePicture),
-  //                         backgroundColor: AppColors.white,
-  //                       ))),
-  //         Visibility(
-  //             visible: !isMessageSentByCurrentUser,
-  //             child: SizedBox(width: AppSizes.smallDistance)),
-  //         Container(
-  //           height: 70,
-  //           width: 220,
-  //           alignment: isMessageSentByCurrentUser
-  //               ? Alignment.centerLeft
-  //               : Alignment.centerRight,
-  //           padding: const EdgeInsets.all(AppSizes.mediumDistance),
-  //           decoration: BoxDecoration(
-  //             color: isMessageSentByCurrentUser
-  //                 ? AppColors.lightBlue
-  //                 : AppColors.mediumBlue,
-  //             borderRadius: BorderRadius.only(
-  //                 topLeft: Radius.circular(AppSizes.borders),
-  //                 topRight: Radius.circular(AppSizes.borders),
-  //                 bottomLeft: isMessageSentByCurrentUser
-  //                     ? Radius.circular(AppSizes.borders)
-  //                     : Radius.zero,
-  //                 bottomRight: isMessageSentByCurrentUser
-  //                     ? Radius.zero
-  //                     : Radius.circular(
-  //                         AppSizes.borders,
-  //                       )),
-  //           ),
-  //           child: Center(
-  //             child: Text(
-  //               data["message"],
-  //               style: AppStyles.hintComponentStyle.copyWith(
-  //                 color: AppColors.white,
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //         Visibility(
-  //             visible: isMessageSentByCurrentUser,
-  //             child: SizedBox(width: AppSizes.smallDistance)),
-  //         Visibility(
-  //           visible: isMessageSentByCurrentUser,
-  //           child: SizedBox(
-  //               height: 50,
-  //               width: 50,
-  //               child: _firebaseAuth.currentUser!.photoURL != null
-  //                   ? CircleAvatar(
-  //                       backgroundImage:
-  //                           NetworkImage(_firebaseAuth.currentUser!.photoURL!))
-  //                   : CircleAvatar(
-  //                       backgroundImage:
-  //                           AssetImage(AppPaths.defaultProfilePicture),
-  //                       backgroundColor: AppColors.white,
-  //                     )),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+  return Padding(
+    padding: EdgeInsets.only(bottom: 8.0),
+    child: Row(
+      mainAxisAlignment:
+          isMessageSentByCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        if (!isMessageSentByCurrentUser)
+          CircleAvatar(
+            backgroundImage: AssetImage('assets/images/chatbot_icon.png'),
+            radius: 25,
+          ),
+        if (!isMessageSentByCurrentUser)
+          SizedBox(width: 8.0),
+        Flexible(
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: 250,
+            ),
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: isMessageSentByCurrentUser
+                  ? ColorsHelper.mediumPurple
+                  : ColorsHelper.mainPurple,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(25.0),
+                topRight: Radius.circular(25.0),
+                bottomLeft: isMessageSentByCurrentUser
+                    ? Radius.circular(25.0)
+                    : Radius.zero,
+                bottomRight: isMessageSentByCurrentUser
+                    ? Radius.zero
+                    : Radius.circular(25.0),
+              ),
+            ),
+            child: Text(
+              message.message,
+              style: TextStyle(
+                color: ColorsHelper.mainWhite.withAlpha(179), // 0.7 * 255
+                fontFamily: 'Poppins',
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+              ),
+              softWrap: true,
+            ),
+          ),
+        ),
+        if (isMessageSentByCurrentUser)
+          SizedBox(width: 8.0),
+        if (isMessageSentByCurrentUser)
+          CircleAvatar(
+            backgroundColor: ColorsHelper.mediumPurple,
+            radius: 25,
+            child: Text(
+              "${(firstName?.isNotEmpty ?? false ? firstName![0] : '')}${(lastName?.isNotEmpty ?? false ? lastName![0] : '')}",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: ColorsHelper.mainWhite,
+              ),
+            )
+          )
+          // Center(
+          //   child: Text(
+          //     "${(firstName?.isNotEmpty ?? false ? firstName![0] : '')}${(lastName?.isNotEmpty ?? false ? lastName![0] : '')}",
+          //     style: TextStyle(
+          //       fontSize: 24,
+          //       fontWeight: FontWeight.bold,
+          //       color: ColorsHelper.mainWhite,
+          //     ),
+          //   ),
+          // ),
+        ],
+      ),
+    );
+  }
 
-  // Widget _buildMessageInput() {
-  //   return Expanded(
-  //       child: TextFormField(
-  //     controller: _messageController,
-  //     decoration: InputDecoration(
-  //       isDense: true,
-  //       contentPadding: const EdgeInsets.fromLTRB(
-  //         AppSizes.mediumDistance,
-  //         AppSizes.smallDistance,
-  //         AppSizes.mediumDistance,
-  //         AppSizes.smallDistance,
-  //       ),
-  //       hintText: AppStrings.typeAMessageHint,
-  //       hintStyle: AppStyles.bodyStyle.copyWith(color: AppColors.mediumGray),
-  //       fillColor: AppColors.componentGray,
-  //       filled: true,
-  //       suffixIcon:
-  //           IconButton(icon: Icon(Icons.send_outlined), onPressed: sendMessage),
-  //       suffixIconColor: AppColors.mainDarkGray,
-  //       border: OutlineInputBorder(
-  //         borderRadius: BorderRadius.circular(AppSizes.borders),
-  //       ),
-  //       enabledBorder: OutlineInputBorder(
-  //         borderSide: const BorderSide(color: AppColors.componentGray),
-  //         borderRadius: BorderRadius.circular(AppSizes.borders),
-  //       ),
-  //       focusedBorder: OutlineInputBorder(
-  //         borderSide: const BorderSide(color: AppColors.componentGray),
-  //         borderRadius: BorderRadius.circular(AppSizes.borders),
-  //       ),
-  //     ),
-  //     textCapitalization: TextCapitalization.sentences,
-  //     keyboardType: TextInputType.text,
-  //   ));
-  // }
+  Widget _buildMessageInput() {
+    return TextFormField(
+      controller: _messageController,
+      decoration: InputDecoration(
+        isDense: true,
+        contentPadding: const EdgeInsets.fromLTRB(
+          16.0,
+          8.0,
+          16.0,
+          8.0,
+        ),
+        hintText: "Ask any question about the app",
+        hintStyle: TextStyle(
+            color: ColorsHelper.darkGray,
+            fontFamily: 'Poppins',
+            fontSize: 16,
+            fontWeight: FontWeight.w400),
+        fillColor: ColorsHelper.lightGray,
+        filled: true,
+        suffixIcon:
+            IconButton(icon: Icon(Icons.send_outlined), onPressed: () {
+              _handleSendMessage();
+            }),
+        suffixIconColor: ColorsHelper.mainDark,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25.0),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: ColorsHelper.darkGray),
+          borderRadius: BorderRadius.circular(25.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: ColorsHelper.darkGray),
+          borderRadius: BorderRadius.circular(25.0),
+        ),
+      ),
+      textCapitalization: TextCapitalization.sentences,
+      keyboardType: TextInputType.text,
+    );
+  }
+
+  void _handleSendMessage() {
+    final messageText = _messageController.text.trim();
+    if (messageText.isEmpty) return;
+
+    setState(() {
+      chatMessages.add(
+        ChatMessage(
+          message: messageText,
+          sender: SenderType.user,
+        ),
+      );
+    });
+
+    _messageController.clear();
+
+    Future.delayed(Duration(milliseconds: 100), () {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: ColorsHelper.mainWhite,
-          elevation: 0,
-          titleSpacing: 0.0,
-          title: Row(
-            children: [
-              SizedBox(
-                height: 50,
-                width: 50,
-                child: Padding(
-                    padding:
-                        const EdgeInsets.only(right: 15),
-                    child: 
-                      CircleAvatar(
-                        backgroundImage:
-                          AssetImage('assets/images/chatbot_icon.png',),
-                        backgroundColor: ColorsHelper.mainWhite,
-                      )),
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "ChatBot",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: ColorsHelper.mainDark,
-                    ),
-                  ),
-                ],
-              )
-            ],
-          ),
-          leading: IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(
-              Icons.arrow_back_ios,
-              color: ColorsHelper.mainDark,
-            ),
+      appBar: AppBar(
+        backgroundColor: ColorsHelper.mainWhite,
+        elevation: 0,
+        titleSpacing: 0.0,
+        centerTitle: true,
+        title: Text(
+          "Chatbot Support",
+          style: TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+            color: ColorsHelper.mainDark,
           ),
         ),
-        body: Padding(
+      ),
+      body: SafeArea(
+        child: Padding(
           padding: const EdgeInsets.all(15),
           child: Column(
             children: [
-              // Expanded(child: _buildMessageList()),
-              // Align(
-              //   alignment: Alignment.bottomCenter,
-              //   child: _buildMessageInput(),
-              // ),
+              Expanded(child: _buildMessageList()),
+              Align(
+                alignment: Alignment(0.0, 0.0),
+                child: _buildMessageInput(),
+              ),
             ],
-          ),
-        ));
+          )
+        )
+      )
+    );
   }
 }
