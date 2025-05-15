@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/animated_dots_helper.dart';
 import 'package:e_health_monitoring_system_frontend/models/chat_message.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:e_health_monitoring_system_frontend/services/ai_chat_service.dart';
 
 class ChatSupportScreen extends ConsumerStatefulWidget {
   @override
@@ -11,15 +13,15 @@ class ChatSupportScreen extends ConsumerStatefulWidget {
 }
 
 class _ChatScreenState extends ConsumerState<ChatSupportScreen> {
-  final TextEditingController _messageController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
+  final TextEditingController messageController = TextEditingController();
+  final ScrollController scrollController = ScrollController();
   List<ChatMessage> chatMessages = [
-    ChatMessage(message: "Hi, what can I help you with?", sender: SenderType.chatbot),
-    ChatMessage(message: "Hi, what can I help you with?", sender: SenderType.user)
+    ChatMessage(message: "Hi, what can I help you with?", sender: SenderType.chatbot)
   ];
   String? firstName;
   String? lastName;
   static final SharedPreferencesAsync _prefs = SharedPreferencesAsync();
+  bool chatIsTyping = false;
 
   @override
   void initState() {
@@ -39,7 +41,7 @@ class _ChatScreenState extends ConsumerState<ChatSupportScreen> {
 
   Widget _buildMessageList() {
     return ListView.builder(
-      controller: _scrollController,
+      controller: scrollController,
       itemCount: chatMessages.length,
       itemBuilder: (context, index) {
         return _buildListItem(chatMessages[index]);
@@ -49,6 +51,10 @@ class _ChatScreenState extends ConsumerState<ChatSupportScreen> {
 
   Widget _buildListItem(ChatMessage message) {
   bool isMessageSentByCurrentUser = message.sender == SenderType.user;
+
+  if (message.message == '...' && message.sender == SenderType.chatbot) {
+    return _buildTypingIndicator();
+  }
 
   return Padding(
     padding: EdgeInsets.only(bottom: 8.0),
@@ -112,16 +118,6 @@ class _ChatScreenState extends ConsumerState<ChatSupportScreen> {
               ),
             )
           )
-          // Center(
-          //   child: Text(
-          //     "${(firstName?.isNotEmpty ?? false ? firstName![0] : '')}${(lastName?.isNotEmpty ?? false ? lastName![0] : '')}",
-          //     style: TextStyle(
-          //       fontSize: 24,
-          //       fontWeight: FontWeight.bold,
-          //       color: ColorsHelper.mainWhite,
-          //     ),
-          //   ),
-          // ),
         ],
       ),
     );
@@ -129,7 +125,7 @@ class _ChatScreenState extends ConsumerState<ChatSupportScreen> {
 
   Widget _buildMessageInput() {
     return TextFormField(
-      controller: _messageController,
+      controller: messageController,
       decoration: InputDecoration(
         isDense: true,
         contentPadding: const EdgeInsets.fromLTRB(
@@ -147,9 +143,7 @@ class _ChatScreenState extends ConsumerState<ChatSupportScreen> {
         fillColor: ColorsHelper.lightGray,
         filled: true,
         suffixIcon:
-            IconButton(icon: Icon(Icons.send_outlined), onPressed: () {
-              _handleSendMessage();
-            }),
+            IconButton(icon: Icon(Icons.send_outlined), onPressed: chatIsTyping ? null : _handleSendMessage),
         suffixIconColor: ColorsHelper.mainDark,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(25.0),
@@ -168,29 +162,89 @@ class _ChatScreenState extends ConsumerState<ChatSupportScreen> {
     );
   }
 
-  void _handleSendMessage() {
-    final messageText = _messageController.text.trim();
-    if (messageText.isEmpty) return;
+  void _handleSendMessage() async {
+  final messageText = messageController.text.trim();
+  if (messageText.isEmpty || chatIsTyping) return;
 
-    setState(() {
-      chatMessages.add(
-        ChatMessage(
-          message: messageText,
-          sender: SenderType.user,
-        ),
-      );
-    });
+  setState(() {
+    chatIsTyping = true;
 
-    _messageController.clear();
+    chatMessages.add(
+      ChatMessage(message: messageText, sender: SenderType.user),
+    );
+  });
 
-    Future.delayed(Duration(milliseconds: 100), () {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
+  messageController.clear();
+  scrollToBottom();
+
+  await Future.delayed(Duration(milliseconds: 1000));
+
+  setState(() {
+    chatMessages.add(ChatMessage(message: '...', sender: SenderType.chatbot));
+  });
+
+  scrollToBottom();
+
+  final response = await OpenRouterService.sendMessage(chatMessages);
+
+  setState(() {
+    chatMessages.removeLast();
+
+    if (response != null) {
+      chatMessages.add(ChatMessage(message: response, sender: SenderType.chatbot));
+    }
+
+    chatIsTyping = false;
+  });
+
+  scrollToBottom();
+}
+
+
+  void scrollToBottom() async {
+    await Future.delayed(Duration(milliseconds: 100), () {
+      scrollController.animateTo(
+        scrollController.position.maxScrollExtent,
         duration: Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
     });
   }
+
+  Widget _buildTypingIndicator() {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          CircleAvatar(
+            backgroundImage: AssetImage('assets/images/chatbot_icon.png'),
+            radius: 25,
+          ),
+          SizedBox(width: 8.0),
+          Container(
+            constraints: BoxConstraints(
+              maxWidth: 100,
+              minHeight: 40,
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: ColorsHelper.mainPurple,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(25.0),
+                topRight: Radius.circular(25.0),
+                bottomRight: Radius.circular(25.0),
+              ),
+            ),
+            child: AnimatedDots(),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
