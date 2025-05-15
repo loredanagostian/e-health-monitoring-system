@@ -83,7 +83,7 @@ public class DoctorController : ControllerBase
 
         var appointmentTypes = (await _appointmentTypeRepository
                 .GetAllByAsync(at => at.DoctorId == doctor.Id))
-            .Select(at => new AppointmentTypeDto {Name = at.Name, Price = at.Price});
+            .Select(at => new AppointmentTypeDto {Id = at.Id, Name = at.Name, Price = at.Price});
 
         doctorDto.AppointmentTypes = appointmentTypes;
 

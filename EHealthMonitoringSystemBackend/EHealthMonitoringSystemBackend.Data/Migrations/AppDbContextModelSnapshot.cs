@@ -25,6 +25,7 @@ namespace EHealthMonitoringSystemBackend.Data.Migrations
             modelBuilder.Entity("EHealthMonitoringSystemBackend.Core.Models.AppFile", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("Created")
@@ -51,12 +52,74 @@ namespace EHealthMonitoringSystemBackend.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AppFiles", (string)null);
+                    b.ToTable("AppFiles");
+                });
+
+            modelBuilder.Entity("EHealthMonitoringSystemBackend.Core.Models.Appointment", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text");
+
+                    b.Property<string>("AppointmentTypeId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Diagnostic")
+                        .HasColumnType("text");
+
+                    b.Property<string>("MedicalHistory")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Recommendation")
+                        .HasColumnType("text");
+
+                    b.Property<int>("TotalCost")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppointmentTypeId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Appointments");
+                });
+
+            modelBuilder.Entity("EHealthMonitoringSystemBackend.Core.Models.AppointmentFile", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text");
+
+                    b.Property<string>("AppointmentId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FileId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppointmentId");
+
+                    b.HasIndex("FileId");
+
+                    b.ToTable("AppointmentFiles");
                 });
 
             modelBuilder.Entity("EHealthMonitoringSystemBackend.Core.Models.AppointmentType", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
                     b.Property<string>("DoctorId")
@@ -74,12 +137,13 @@ namespace EHealthMonitoringSystemBackend.Data.Migrations
 
                     b.HasIndex("DoctorId");
 
-                    b.ToTable("AppointmentTypes", (string)null);
+                    b.ToTable("AppointmentTypes");
                 });
 
             modelBuilder.Entity("EHealthMonitoringSystemBackend.Core.Models.Doctor", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
                     b.Property<string>("Description")
@@ -98,12 +162,13 @@ namespace EHealthMonitoringSystemBackend.Data.Migrations
 
                     b.HasIndex("PictureId");
 
-                    b.ToTable("Doctors", (string)null);
+                    b.ToTable("Doctors");
                 });
 
             modelBuilder.Entity("EHealthMonitoringSystemBackend.Core.Models.DoctorSpecialization", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
                     b.Property<string>("DoctorId")
@@ -120,38 +185,13 @@ namespace EHealthMonitoringSystemBackend.Data.Migrations
 
                     b.HasIndex("SpecializationId");
 
-                    b.ToTable("DoctorSpecializations", (string)null);
-                });
-
-            modelBuilder.Entity("EHealthMonitoringSystemBackend.Core.Models.PatientInfo", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Cnp")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PatientInfos", (string)null);
+                    b.ToTable("DoctorSpecializations");
                 });
 
             modelBuilder.Entity("EHealthMonitoringSystemBackend.Core.Models.Specialization", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
@@ -160,7 +200,7 @@ namespace EHealthMonitoringSystemBackend.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Specializations", (string)null);
+                    b.ToTable("Specializations");
                 });
 
             modelBuilder.Entity("EHealthMonitoringSystemBackend.Core.Models.User", b =>
@@ -199,6 +239,9 @@ namespace EHealthMonitoringSystemBackend.Data.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("text");
 
+                    b.Property<int?>("PatientProfileId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("text");
 
@@ -227,6 +270,8 @@ namespace EHealthMonitoringSystemBackend.Data.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
+                    b.HasIndex("PatientProfileId");
+
                     b.HasIndex("RefreshTokenId");
 
                     b.ToTable("AspNetUsers", (string)null);
@@ -248,7 +293,36 @@ namespace EHealthMonitoringSystemBackend.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserRefreshTokens", (string)null);
+                    b.ToTable("UserRefreshTokens");
+                });
+
+            modelBuilder.Entity("EHealthMonitoringSystemBackend.Data.Models.PatientProfile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Cnp")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PatientProfiles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -383,6 +457,44 @@ namespace EHealthMonitoringSystemBackend.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("EHealthMonitoringSystemBackend.Core.Models.Appointment", b =>
+                {
+                    b.HasOne("EHealthMonitoringSystemBackend.Core.Models.AppointmentType", "AppointmentType")
+                        .WithMany()
+                        .HasForeignKey("AppointmentTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EHealthMonitoringSystemBackend.Core.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppointmentType");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EHealthMonitoringSystemBackend.Core.Models.AppointmentFile", b =>
+                {
+                    b.HasOne("EHealthMonitoringSystemBackend.Core.Models.Appointment", "Appointment")
+                        .WithMany()
+                        .HasForeignKey("AppointmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EHealthMonitoringSystemBackend.Core.Models.AppFile", "File")
+                        .WithMany()
+                        .HasForeignKey("FileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Appointment");
+
+                    b.Navigation("File");
+                });
+
             modelBuilder.Entity("EHealthMonitoringSystemBackend.Core.Models.AppointmentType", b =>
                 {
                     b.HasOne("EHealthMonitoringSystemBackend.Core.Models.Doctor", "Doctor")
@@ -426,9 +538,15 @@ namespace EHealthMonitoringSystemBackend.Data.Migrations
 
             modelBuilder.Entity("EHealthMonitoringSystemBackend.Core.Models.User", b =>
                 {
+                    b.HasOne("EHealthMonitoringSystemBackend.Data.Models.PatientProfile", "PatientProfile")
+                        .WithMany()
+                        .HasForeignKey("PatientProfileId");
+
                     b.HasOne("EHealthMonitoringSystemBackend.Core.Models.UserRefreshToken", "RefreshToken")
                         .WithMany()
                         .HasForeignKey("RefreshTokenId");
+
+                    b.Navigation("PatientProfile");
 
                     b.Navigation("RefreshToken");
                 });

@@ -21,4 +21,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     public virtual DbSet<Specialization> Specializations { get; set; }
     public virtual DbSet<DoctorSpecialization> DoctorSpecializations { get; set; }
     public virtual DbSet<AppointmentType> AppointmentTypes { get; set; }
+    public virtual DbSet<Appointment> Appointments { get; set; }
+    public virtual DbSet<AppointmentFile> AppointmentFiles { get; set; }
 }

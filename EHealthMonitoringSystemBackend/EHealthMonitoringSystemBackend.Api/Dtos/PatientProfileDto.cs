@@ -1,4 +1,6 @@
-public class PatientProfileDTO
+namespace EHealthMonitoringSystemBackend.Api.Dtos;
+
+public class PatientProfileDto
 {
     public string? FirstName { get; set; }
 
