@@ -1,7 +1,6 @@
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
-import 'package:e_health_monitoring_system_frontend/helpers/auth_manager.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/book_now_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_row_icon_string.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/doctor_card.dart';
@@ -32,12 +31,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> loadUserInfo() async {
-    final fname = await _prefs.getString('firstName');
-    final lname = await _prefs.getString('lastName');
+    final _firstname = await _prefs.getString('firstName');
+    final _lastname = await _prefs.getString('lastName');
 
     setState(() {
-      firstName = fname;
-      lastName = lname;
+      firstName = _firstname;
+      lastName = _lastname;
     });
   }
 
@@ -74,7 +73,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             height: 50,
             width: 50,
             decoration: BoxDecoration(
-              color: ColorsHelper.mainPurple,
+              color: ColorsHelper.mediumPurple,
               shape: BoxShape.circle,
             ),
             child: Center(
