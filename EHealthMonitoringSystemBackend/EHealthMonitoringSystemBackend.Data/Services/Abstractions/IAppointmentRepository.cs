@@ -7,4 +7,6 @@ public interface IAppointmentRepository
 {
     Task<Appointment> AddUpdateAsync(Appointment appointment);
     Task<Appointment> GetOneAsync(Expression<Func<Appointment, bool>> predicate);
+    Task<Appointment> GetByIdAsync(string id);
+    Task<IEnumerable<Appointment>> GetAsync();
 }

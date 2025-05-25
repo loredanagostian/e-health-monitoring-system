@@ -13,9 +13,15 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureAppConfiguration((builderContext, config) =>
+{
+    config
+        .AddJsonFile("secrets/appsettings.secrets.json", optional: true) 
+        .AddEnvironmentVariables();
+});
+
 var services = builder.Services;
 var configuration = builder.Configuration;
-builder.WebHost.UseUrls("http://0.0.0.0:5200", "http://localhost:5200");
 
 services.AddControllers();
 services.AddSwaggerGen(options =>
@@ -151,7 +157,7 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "InventoryManagementBackend.Api v1")
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "EHealthMonitoringSystemBackend.Api v1")
 );
 
 using (var scope = app.Services.CreateScope())

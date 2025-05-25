@@ -98,6 +98,77 @@ public class AppointmentController : ControllerBase
         var dbAppointment = await _appointmentRepository.AddUpdateAsync(existingAppointment);
         return Ok(dbAppointment);
     }
+    
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> GetPastVisits()
+    {
+        var user = await _getUser();
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        var appointments = (await _appointmentRepository.GetAsync())
+            .Where(a => a.UserId == user.Id && a.Date < DateTime.Now)
+            .OrderByDescending(a => a.Date)
+            .Take(3)
+            .Select(a => new AppointmentGetAllDto
+            {
+                Id = a.Id,
+                Date = a.Date,
+                AppointmentType = a.AppointmentType.Name,
+                DoctorName = a.AppointmentType.Doctor.Name,
+                DoctorPicture = a.AppointmentType.Doctor.Picture.Path.Replace("../", "http://localhost:5200/"),
+            });
+
+        return Ok(appointments);
+    }
+
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> GetFutureAppointments()
+    {
+        var user = await _getUser();
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        var appointments = (await _appointmentRepository.GetAsync())
+            .Where(a => a.UserId == user.Id && a.Date >= DateTime.Now)
+            .OrderBy(a => a.Date)
+            .Select(a => new AppointmentGetAllDto
+            {
+                Id = a.Id,
+                Date = a.Date,
+                AppointmentType = a.AppointmentType.Name,
+                DoctorName = a.AppointmentType.Doctor.Name,
+                DoctorPicture = a.AppointmentType.Doctor.Picture.Path.Replace("../", "http://localhost:5200/"),
+            });
+
+        return Ok(appointments);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(string id)
+    {
+        var appointment = await _appointmentRepository.GetByIdAsync(id);
+
+        if (appointment is null) return NotFound();
+
+        return Ok(new AppointmentGetOneDto
+        {
+            Id = appointment.Id,
+            Date = appointment.Date,
+            AppointmentType = appointment.AppointmentType.Name,
+            DoctorName = appointment.AppointmentType.Doctor.Name,
+            DoctorPicture = appointment.AppointmentType.Doctor.Picture.Path.Replace("../", "http://localhost:5200/"),
+            MedicalHistory = appointment.MedicalHistory,
+            Diagnostic = appointment.Diagnostic,
+            Recommendation = appointment.Recommendation
+        });
+    }
 
     private async Task<User?> _getUser()
     {

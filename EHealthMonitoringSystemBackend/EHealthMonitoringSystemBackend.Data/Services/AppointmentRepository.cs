@@ -42,4 +42,22 @@ public class AppointmentRepository : IAppointmentRepository
     {
         return await _dbSet.Include(a => a.AppointmentType).FirstOrDefaultAsync(predicate);
     }
+
+    public async Task<Appointment> GetByIdAsync(string id)
+    {
+        return await _dbSet
+            .Include(a => a.AppointmentType)
+            .ThenInclude(at => at.Doctor)
+            .ThenInclude(d => d.Picture)
+            .FirstOrDefaultAsync(a => a.Id == id);
+    }
+
+    public async Task<IEnumerable<Appointment>> GetAsync()
+    {
+        return await _dbSet.
+            Include(a => a.AppointmentType)
+            .ThenInclude(at => at.Doctor)
+            .ThenInclude(d => d.Picture)
+            .ToListAsync();
+    }
 }

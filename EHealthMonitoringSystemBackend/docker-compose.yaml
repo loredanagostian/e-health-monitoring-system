@@ -1,0 +1,24 @@
+# local use only; server deployment uses a docker-compose file that is not in git
+# you will find that file in /home/docker/${project}/...
+
+version: '3.1'
+services:
+  ehealthmonitoringsystem-backend:
+    image: 188.34.177.197:32000/ehealthmonitoringsystem-backend
+    network_mode: "host"
+    container_name: ehealthmonitoringsystem-backend
+    restart: always
+    environment:
+      - TZ=Europe/Bucharest
+    ports:
+      - 5200:8080
+    # networks:
+    #   postgres-net:
+    volumes:
+      - ./content:/app/bin/content
+      - ./secrets:/app/bin/secrets
+
+# networks:
+#  postgres-net:
+#    external:
+#      name: postgres-net
