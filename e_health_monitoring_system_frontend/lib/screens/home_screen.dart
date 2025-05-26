@@ -1,6 +1,7 @@
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/auth_manager.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/book_now_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_row_icon_string.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/doctor_card.dart';
@@ -9,6 +10,7 @@ import 'package:e_health_monitoring_system_frontend/widgets/upcoming_appointment
 import 'package:e_health_monitoring_system_frontend/widgets/info_tag.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -19,6 +21,25 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool hasNotifications = true;
+  String? firstName;
+  String? lastName;
+  static final SharedPreferencesAsync _prefs = SharedPreferencesAsync();
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserInfo();
+  }
+
+  Future<void> loadUserInfo() async {
+    final fname = await _prefs.getString('firstName');
+    final lname = await _prefs.getString('lastName');
+
+    setState(() {
+      firstName = fname;
+      lastName = lname;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +79,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             child: Center(
               child: Text(
-                "LG",
+                "${(firstName?.isNotEmpty ?? false ? firstName![0] : '')}${(lastName?.isNotEmpty ?? false ? lastName![0] : '')}",
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -80,7 +101,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
               Text(
-                "Loredana Gostian",
+                "$firstName $lastName",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

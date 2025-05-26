@@ -15,15 +15,17 @@ public class DoctorController : ControllerBase
     private readonly IDoctorSpecializationsRepository _doctorSpecializationsRepository;
     private readonly IAppointmentTypeRepository _appointmentTypeRepository;
     private readonly IUploadManager _uploadManager;
-
+    private readonly IConfiguration _configuration;
+    
     public DoctorController(IDoctorRepository doctorRepository, ISpecializationRepository specializationRepository,
-        IDoctorSpecializationsRepository doctorSpecializationsRepository, IAppointmentTypeRepository appointmentTypeRepository, IUploadManager uploadManager)
+        IDoctorSpecializationsRepository doctorSpecializationsRepository, IAppointmentTypeRepository appointmentTypeRepository, IUploadManager uploadManager, IConfiguration configuration)
     {
         _doctorRepository = doctorRepository;
         _specializationRepository = specializationRepository;
         _doctorSpecializationsRepository = doctorSpecializationsRepository;
         _appointmentTypeRepository = appointmentTypeRepository;
         _uploadManager = uploadManager;
+        _configuration = configuration;
     }
 
     [HttpPost]
@@ -63,12 +65,14 @@ public class DoctorController : ControllerBase
 
     private async Task<DoctorDto> _getDoctorDto(Doctor doctor)
     {
+        var baseUrl = _configuration["Base_url"];
+        
         var doctorDto = new DoctorDto
         {
             Id = doctor.Id,
             Name = doctor.Name,
             Description = doctor.Description,
-            Picture = doctor.Picture.Path.Replace("../", "http://localhost:5200/"),
+            Picture = doctor.Picture.Path.Replace("../", baseUrl),
         };
 
         var doctorSpecializationIds = (await _doctorSpecializationsRepository
@@ -83,7 +87,7 @@ public class DoctorController : ControllerBase
 
         var appointmentTypes = (await _appointmentTypeRepository
                 .GetAllByAsync(at => at.DoctorId == doctor.Id))
-            .Select(at => new AppointmentTypeDto {Name = at.Name, Price = at.Price});
+            .Select(at => new AppointmentTypeDto {Id = at.Id, Name = at.Name, Price = at.Price});
 
         doctorDto.AppointmentTypes = appointmentTypes;
 

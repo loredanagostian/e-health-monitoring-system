@@ -1,3 +1,4 @@
+using EHealthMonitoringSystemBackend.Api.Dtos;
 using EHealthMonitoringSystemBackend.Api.Models;
 using EHealthMonitoringSystemBackend.Api.Services.Abstractions;
 using EHealthMonitoringSystemBackend.Core.Models;
@@ -5,6 +6,7 @@ using EHealthMonitoringSystemBackend.Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace EHealthMonitoringSystemBackend.Api.Controllers;
 
@@ -22,7 +24,7 @@ public class PatientController(
     private readonly IJWTManager _jwtManager = jwtManager;
 
     [HttpPost]
-    public async Task<IActionResult> CompleteProfile(PatientProfileDTO profile)
+    public async Task<IActionResult> CompleteProfile(PatientProfileDto profile)
     {
         string? jwtToken = null;
         foreach (var header in Request.Headers.Authorization)
@@ -58,4 +60,33 @@ public class PatientController(
 
         return Ok();
     }
+
+    [HttpGet]
+    public async Task<IActionResult> GetPatientProfileByEmail(string email)
+    {
+        var user = await _userManger.Users
+            .Include(u => u.PatientProfile)
+            .FirstOrDefaultAsync(u => u.Email == email);
+
+        if (user == null)
+        {
+            return NotFound($"No user found with email '{email}'.");
+        }
+
+        if (user.PatientProfile == null)
+        {
+            return NotFound($"User '{email}' does not have a completed profile.");
+        }
+
+        var profileDto = new PatientProfileDto
+        {
+            FirstName = user.PatientProfile.FirstName,
+            LastName = user.PatientProfile.LastName,
+            Cnp = user.PatientProfile.Cnp,
+            PhoneNumber = user.PatientProfile.PhoneNumber,
+        };
+
+        return Ok(profileDto);
+    }
+
 }

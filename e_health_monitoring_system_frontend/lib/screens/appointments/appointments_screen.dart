@@ -1,12 +1,13 @@
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
-import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
-import 'package:e_health_monitoring_system_frontend/screens/appointments/doctor_profile_screen.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/image_helper.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/book_now_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_searchbar.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/doctor_card.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/medical_category.dart';
+import 'package:e_health_monitoring_system_frontend/models/doctor_profile.dart';
+import 'package:e_health_monitoring_system_frontend/services/doctor_service.dart';
 import 'package:flutter/material.dart';
 
 class AppointmentsScreen extends StatefulWidget {
@@ -19,6 +20,13 @@ class AppointmentsScreen extends StatefulWidget {
 class _AppointmentsScreenState extends State<AppointmentsScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedCategory = StringsHelper.cardiology;
+  late Future<List<DoctorProfile>> _doctorsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _doctorsFuture = DoctorService().getAllDoctors();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,82 +134,71 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 25),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(StringsHelper.popularDoctors, style: StylesHelper.titleStyle),
-          SizedBox(height: 20),
+          Text("Popular Doctors", style: StylesHelper.titleStyle),
+          const SizedBox(height: 20),
           CustomSearchbar(
-            onChanged: (String) {},
+            onChanged: (value) {
+              // implement filtering logic
+            },
             searchController: _searchController,
             searchPlaceholder: StringsHelper.doctorSearchPlaceholder,
           ),
-          SizedBox(height: 20),
-          DoctorCard(
-            doctorName: "Dr. Lorem Ipsum",
-            doctorSpecialization: _selectedCategory,
-            detailsList: [
-              Row(
-                children: [
-                  Icon(Icons.star, color: ColorsHelper.mainYellow, size: 24),
-                  Text(
-                    "4.8",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10),
-              BookNowButton(onPressed: () {}),
-            ],
-            doctorPhotoPath: 'assets/images/mockup_doctor.png',
-            onPressed:
-                () => navigator.push(
-                  MaterialPageRoute(
-                    builder:
-                        (context) =>
-                            DoctorProfileScreen(doctorName: "Dr. Lorem Ipsum"),
-                  ),
-                ),
-          ),
-          SizedBox(height: 20),
-          DoctorCard(
-            doctorName: "Dr. Lorem Ipsum",
-            doctorSpecialization: _selectedCategory,
-            detailsList: [
-              Row(
-                children: [
-                  Icon(Icons.star, color: ColorsHelper.mainYellow, size: 24),
-                  Text(
-                    "4.8",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10),
-              BookNowButton(onPressed: () {}),
-            ],
-            doctorPhotoPath: 'assets/images/mockup_doctor.png',
-            onPressed: () {},
-          ),
-          SizedBox(height: 20),
-          DoctorCard(
-            doctorName: "Dr. Lorem Ipsum",
-            doctorSpecialization: _selectedCategory,
-            detailsList: [
-              Row(
-                children: [
-                  Icon(Icons.star, color: ColorsHelper.mainYellow, size: 24),
-                  Text(
-                    "4.8",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10),
-              BookNowButton(onPressed: () {}),
-            ],
-            doctorPhotoPath: 'assets/images/mockup_doctor.png',
-            onPressed: () {},
+          const SizedBox(height: 20),
+          FutureBuilder<List<DoctorProfile>>(
+            future: _doctorsFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Text("Failed to load doctors: ${snapshot.error}");
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Text("No doctors found.");
+              }
+
+              final doctors = snapshot.data!;
+              return Column(
+                children:
+                    doctors.map((doc) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: DoctorCard(
+                          doctorName: doc.name,
+                          doctorSpecialization:
+                              doc.specializations.isNotEmpty
+                                  ? doc.specializations[0]
+                                  : "N/A",
+                          detailsList: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.star,
+                                  color: ColorsHelper.mainYellow,
+                                  size: 24,
+                                ),
+                                Text(
+                                  "4.8", // Replace with real rating if available
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            BookNowButton(
+                              onPressed: () {
+                                // Implement booking logic
+                              },
+                            ),
+                          ],
+                          doctorPhotoPath: ImageHelper.fixImageUrl(doc.picture),
+                        ),
+                      );
+                    }).toList(),
+              );
+            },
           ),
         ],
       ),
