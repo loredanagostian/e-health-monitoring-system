@@ -35,6 +35,7 @@ class ExaminationReportsScreen extends StatelessWidget {
                     ),
                   ],
                   hasVisibleIcons: true,
+                  onPressed: () {},
                 ),
               ],
             ),
