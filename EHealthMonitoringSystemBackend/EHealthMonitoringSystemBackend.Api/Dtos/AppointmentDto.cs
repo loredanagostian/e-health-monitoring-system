@@ -3,7 +3,6 @@ namespace EHealthMonitoringSystemBackend.Api.Dtos;
 public class AppointmentCreateDto
 {
     public string AppointmentTypeId { get; set; }
-    public string DoctorId { get; set; }
     public DateTime Date { get; set; }
     public int TotalCost { get; set; }
 }

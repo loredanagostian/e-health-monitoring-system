@@ -15,7 +15,6 @@ public class AppointmentController : ControllerBase
     private readonly IAppointmentRepository _appointmentRepository;
     private readonly IAppointmentTypeRepository _appointmentTypeRepository;
     private readonly IAppointmentFileRepository _appointmentFileRepository;
-    private readonly IDoctorRepository _doctorRepository;
     private readonly IJWTManager _jwtManager;
     private readonly UserManager<User> _userManger;
     private readonly IUploadManager _uploadManager;
@@ -23,7 +22,7 @@ public class AppointmentController : ControllerBase
     
     public AppointmentController(IAppointmentRepository appointmentRepository, IJWTManager jwtManager, UserManager<User> userManger,
         IUploadManager uploadManager, IAppointmentFileRepository appointmentFileRepository, IConfiguration configuration,
-        IAppointmentTypeRepository appointmentTypeRepository, IDoctorRepository doctorRepository)
+        IAppointmentTypeRepository appointmentTypeRepository)
     {
         _appointmentRepository = appointmentRepository;
         _jwtManager = jwtManager;
@@ -32,7 +31,6 @@ public class AppointmentController : ControllerBase
         _appointmentFileRepository = appointmentFileRepository;
         _configuration = configuration;
         _appointmentTypeRepository = appointmentTypeRepository;
-        _doctorRepository = doctorRepository;
     }
 
     [Authorize]
@@ -51,14 +49,8 @@ public class AppointmentController : ControllerBase
             return BadRequest("Appointment Type not found!");
         }
 
-        var doctor = await _doctorRepository.GetOneAsync(d => d.Id == appointmentDto.DoctorId);
-        if (doctor == null)
-        {
-            return BadRequest("Doctor not found!");
-        }
-
         var existingAppointmentTypeIds = (await _appointmentTypeRepository
-            .GetAllByAsync(at => at.DoctorId == appointmentDto.DoctorId))
+            .GetAllByAsync(at => at.DoctorId == appointmentType.DoctorId))
             .Select(at => at.Id);
 
         var existingAppointments = await _appointmentRepository
@@ -71,8 +63,6 @@ public class AppointmentController : ControllerBase
                 return BadRequest("Cannot make an appointment at that time!");
             }
         }
-        
-        
         
         var newAppointment = new Appointment
         {
