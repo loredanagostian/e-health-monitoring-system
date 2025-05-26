@@ -80,7 +80,7 @@ class StringsHelper {
   /// Examinations Reports
   static const String examinationReports = "Examination Reports";
 
-  /// Appoinments
+  /// Appointments
   static const String categories = "Categories";
   static const String cardiology = "Cardiology";
   static const String dentistry = "Dentistry";
@@ -95,6 +95,24 @@ class StringsHelper {
   static const String popularDoctors = "Popular Doctors";
   static const String doctorSearchPlaceholder = "Search for a doctor";
 
+  /// Doctor's Profile
+  static const String specialist = "Specialist";
+  static const String reviews = "Reviews";
+  static const String prices = "Prices";
+  static const String bookAppointment = "Book appointment";
+
+  /// Book Appointment
+  static const String searchReasonToVisit = "Search for reason to visit";
+  static const String reasonToVisit = "Reason to visit";
+  static const String totalCost = "Total cost";
+  static const String appointmentBookedSuccessfully =
+      "Appointment booked successfully";
+  static const String appointmentBookedError =
+      "There was an error.\nPlease re-try the process.";
+  static const String goToHomePage = "Go to Home Page";
+  static const String cancel = "Cancel";
+
+  /// General Strings
   static const String internalError =
       "Ooops! Something went wrong, please try again later.";
 }

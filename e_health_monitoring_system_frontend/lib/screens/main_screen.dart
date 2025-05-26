@@ -1,5 +1,5 @@
+import 'package:e_health_monitoring_system_frontend/screens/appointments/appointments_screen.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/auth_manager.dart';
-import 'package:e_health_monitoring_system_frontend/screens/appointments_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/home_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/ai_chat_support_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/sign_in_screen.dart';
@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
-  const MainScreen({super.key});
+  final int? bottomNavigatorIndex;
+  const MainScreen({super.key, this.bottomNavigatorIndex});
 
   @override
   ConsumerState<MainScreen> createState() => _MainScreenState();
@@ -26,6 +27,18 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     }
 
     return HomeScreen();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.bottomNavigatorIndex != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(bottomNavigatorIndex.notifier).state =
+            widget.bottomNavigatorIndex!;
+      });
+    }
   }
 
   @override

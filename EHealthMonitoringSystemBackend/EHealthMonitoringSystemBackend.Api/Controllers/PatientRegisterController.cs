@@ -24,7 +24,8 @@ public class RegisterController(
     IUserStore<User> userStore,
     ILogger<PatientRegister> logger,
     IJWTManager jwtManager,
-    ITokenRepository tokenRepository
+    ITokenRepository tokenRepository,
+    IConfiguration configuration
 ) : ControllerBase
 {
     private readonly SignInManager<User> _signInManager = signInManager;
@@ -84,9 +85,11 @@ public class RegisterController(
             new { userId = newUser.Id, code },
             protocol: Request.Scheme
         );
+        
+        var baseUrl = configuration["Base_url"];
         // TODO: !!!temp until hosted, requests from android use 10.0.0.2 ip
         callbackUrl =
-            $"http://localhost:5200/api/Register/ConfirmEmail?userId={newUser.Id}&code={code}";
+            $"{baseUrl}api/Register/ConfirmEmail?userId={newUser.Id}&code={code}";
         _logger.LogInformation(callbackUrl);
         // await _emailSender.SendEmailAsync(
         //     newPatient.Email,

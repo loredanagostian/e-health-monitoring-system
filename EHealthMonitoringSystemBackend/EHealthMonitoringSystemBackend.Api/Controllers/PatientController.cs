@@ -1,3 +1,4 @@
+using EHealthMonitoringSystemBackend.Api.Dtos;
 using EHealthMonitoringSystemBackend.Api.Models;
 using EHealthMonitoringSystemBackend.Api.Services.Abstractions;
 using EHealthMonitoringSystemBackend.Core.Models;
@@ -23,7 +24,7 @@ public class PatientController(
     private readonly IJWTManager _jwtManager = jwtManager;
 
     [HttpPost]
-    public async Task<IActionResult> CompleteProfile(PatientProfileDTO profile)
+    public async Task<IActionResult> CompleteProfile(PatientProfileDto profile)
     {
         string? jwtToken = null;
         foreach (var header in Request.Headers.Authorization)
@@ -77,7 +78,7 @@ public class PatientController(
             return NotFound($"User '{email}' does not have a completed profile.");
         }
 
-        var profileDto = new PatientProfileDTO
+        var profileDto = new PatientProfileDto
         {
             FirstName = user.PatientProfile.FirstName,
             LastName = user.PatientProfile.LastName,

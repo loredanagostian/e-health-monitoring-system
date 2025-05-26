@@ -1,5 +1,6 @@
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
 import 'package:flutter/material.dart';
 
 class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
@@ -14,6 +15,7 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      backgroundColor: ColorsHelper.mainWhite,
       centerTitle: true,
       automaticallyImplyLeading: implyLeading,
       leading:
@@ -26,14 +28,7 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
                 onPressed: () => navigator.pop(),
               )
               : null,
-      title: Text(
-        appBarTitle,
-        style: TextStyle(
-          fontSize: 20,
-          color: ColorsHelper.mainDark,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      title: Text(appBarTitle, style: StylesHelper.appBarStyle),
     );
   }
 

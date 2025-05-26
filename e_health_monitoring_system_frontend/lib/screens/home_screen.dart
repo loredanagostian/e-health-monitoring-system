@@ -6,7 +6,7 @@ import 'package:e_health_monitoring_system_frontend/widgets/custom_row_icon_stri
 import 'package:e_health_monitoring_system_frontend/widgets/doctor_card.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/medical_report.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/upcoming_appointment.dart';
-import 'package:e_health_monitoring_system_frontend/widgets/view_all_button.dart';
+import 'package:e_health_monitoring_system_frontend/widgets/info_tag.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -215,6 +215,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ],
                   width: 340,
                   hasVisibleIcons: true,
+                  onPressed: () {},
                 ),
               ),
               Padding(
@@ -232,6 +233,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ],
                   width: 340,
                   hasVisibleIcons: true,
+                  onPressed: () {},
                 ),
               ),
             ],
@@ -272,7 +274,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Text(title, style: StylesHelper.titleStyle),
           Visibility(
             visible: isViewAllButtonVisible,
-            child: ViewAllButton(onPressed: () {}), // TODO: add navigation
+            child: InfoTag(onPressed: () {}), // TODO: add navigation
           ),
         ],
       ),
