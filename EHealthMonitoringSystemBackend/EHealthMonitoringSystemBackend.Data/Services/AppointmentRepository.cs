@@ -60,4 +60,9 @@ public class AppointmentRepository : IAppointmentRepository
             .ThenInclude(d => d.Picture)
             .ToListAsync();
     }
+
+    public async Task<IEnumerable<Appointment>> GetAsync(Expression<Func<Appointment, bool>> predicate)
+    {
+        return await _dbContext.Appointments.Where(predicate).ToListAsync();
+    }
 }

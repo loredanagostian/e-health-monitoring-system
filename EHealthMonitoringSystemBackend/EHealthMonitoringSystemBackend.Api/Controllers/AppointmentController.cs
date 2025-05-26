@@ -13,19 +13,26 @@ namespace EHealthMonitoringSystemBackend.Api.Controllers;
 public class AppointmentController : ControllerBase
 {
     private readonly IAppointmentRepository _appointmentRepository;
+    private readonly IAppointmentTypeRepository _appointmentTypeRepository;
     private readonly IAppointmentFileRepository _appointmentFileRepository;
+    private readonly IDoctorRepository _doctorRepository;
     private readonly IJWTManager _jwtManager;
     private readonly UserManager<User> _userManger;
     private readonly IUploadManager _uploadManager;
+    private readonly IConfiguration _configuration;
     
     public AppointmentController(IAppointmentRepository appointmentRepository, IJWTManager jwtManager, UserManager<User> userManger,
-        IUploadManager uploadManager, IAppointmentFileRepository appointmentFileRepository)
+        IUploadManager uploadManager, IAppointmentFileRepository appointmentFileRepository, IConfiguration configuration,
+        IAppointmentTypeRepository appointmentTypeRepository, IDoctorRepository doctorRepository)
     {
         _appointmentRepository = appointmentRepository;
         _jwtManager = jwtManager;
         _userManger = userManger;
         _uploadManager = uploadManager;
         _appointmentFileRepository = appointmentFileRepository;
+        _configuration = configuration;
+        _appointmentTypeRepository = appointmentTypeRepository;
+        _doctorRepository = doctorRepository;
     }
 
     [Authorize]
@@ -38,6 +45,35 @@ public class AppointmentController : ControllerBase
             return Unauthorized();
         }
 
+        var appointmentType = await _appointmentTypeRepository.GetOneAsync(at => at.Id == appointmentDto.AppointmentTypeId);
+        if (appointmentType == null)
+        {
+            return BadRequest("Appointment Type not found!");
+        }
+
+        var doctor = await _doctorRepository.GetOneAsync(d => d.Id == appointmentDto.DoctorId);
+        if (doctor == null)
+        {
+            return BadRequest("Doctor not found!");
+        }
+
+        var existingAppointmentTypeIds = (await _appointmentTypeRepository
+            .GetAllByAsync(at => at.DoctorId == appointmentDto.DoctorId))
+            .Select(at => at.Id);
+
+        var existingAppointments = await _appointmentRepository
+            .GetAsync(a => existingAppointmentTypeIds.Contains(a.AppointmentTypeId));
+
+        foreach (var appointment in existingAppointments)
+        {
+            if (Math.Abs((appointment.Date - appointmentDto.Date).TotalMinutes) <= 15)
+            {
+                return BadRequest("Cannot make an appointment at that time!");
+            }
+        }
+        
+        
+        
         var newAppointment = new Appointment
         {
             TotalCost = appointmentDto.TotalCost,
@@ -109,6 +145,8 @@ public class AppointmentController : ControllerBase
             return Unauthorized();
         }
 
+        var baseUrl = _configuration["Base_url"];
+
         var appointments = (await _appointmentRepository.GetAsync())
             .Where(a => a.UserId == user.Id && a.Date < DateTime.Now)
             .OrderByDescending(a => a.Date)
@@ -119,7 +157,7 @@ public class AppointmentController : ControllerBase
                 Date = a.Date,
                 AppointmentType = a.AppointmentType.Name,
                 DoctorName = a.AppointmentType.Doctor.Name,
-                DoctorPicture = a.AppointmentType.Doctor.Picture.Path.Replace("../", "http://localhost:5200/"),
+                DoctorPicture = a.AppointmentType.Doctor.Picture.Path.Replace("../", baseUrl),
             });
 
         return Ok(appointments);
@@ -134,6 +172,8 @@ public class AppointmentController : ControllerBase
         {
             return Unauthorized();
         }
+        
+        var baseUrl = _configuration["Base_url"];
 
         var appointments = (await _appointmentRepository.GetAsync())
             .Where(a => a.UserId == user.Id && a.Date >= DateTime.Now)
@@ -144,7 +184,7 @@ public class AppointmentController : ControllerBase
                 Date = a.Date,
                 AppointmentType = a.AppointmentType.Name,
                 DoctorName = a.AppointmentType.Doctor.Name,
-                DoctorPicture = a.AppointmentType.Doctor.Picture.Path.Replace("../", "http://localhost:5200/"),
+                DoctorPicture = a.AppointmentType.Doctor.Picture.Path.Replace("../", baseUrl),
             });
 
         return Ok(appointments);
@@ -156,6 +196,8 @@ public class AppointmentController : ControllerBase
         var appointment = await _appointmentRepository.GetByIdAsync(id);
 
         if (appointment is null) return NotFound();
+        
+        var baseUrl = _configuration["Base_url"];
 
         return Ok(new AppointmentGetOneDto
         {
@@ -163,7 +205,7 @@ public class AppointmentController : ControllerBase
             Date = appointment.Date,
             AppointmentType = appointment.AppointmentType.Name,
             DoctorName = appointment.AppointmentType.Doctor.Name,
-            DoctorPicture = appointment.AppointmentType.Doctor.Picture.Path.Replace("../", "http://localhost:5200/"),
+            DoctorPicture = appointment.AppointmentType.Doctor.Picture.Path.Replace("../", baseUrl),
             MedicalHistory = appointment.MedicalHistory,
             Diagnostic = appointment.Diagnostic,
             Recommendation = appointment.Recommendation
