@@ -1,6 +1,7 @@
 import 'package:e_health_monitoring_system_frontend/screens/appointments/appointments_screen.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/auth_manager.dart';
 import 'package:e_health_monitoring_system_frontend/screens/home_screen.dart';
+import 'package:e_health_monitoring_system_frontend/screens/ai_chat_support_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/sign_in_screen.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_bottom_tab_navigator.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   Widget _getBody(int index) {
     switch (index) {
       case 0:
-      // return ChatSupportScreen();
+        return ChatSupportScreen();
       case 1:
         return HomeScreen();
       case 2:
