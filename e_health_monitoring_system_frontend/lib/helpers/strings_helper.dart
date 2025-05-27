@@ -82,6 +82,7 @@ class StringsHelper {
 
   /// Appointments
   static const String categories = "Categories";
+  static const String allCategories = "All";
   static const String cardiology = "Cardiology";
   static const String dentistry = "Dentistry";
   static const String pediatrics = "Pediatrics";

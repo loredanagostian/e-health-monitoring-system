@@ -204,7 +204,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 padding: const EdgeInsets.only(right: 15),
                 child: DoctorCard(
                   doctorName: "Dr. Lorem Ipsum",
-                  doctorSpecialization: "Dentist",
+                  doctorSpecialization: [], // TODO
                   doctorPhotoPath: 'assets/images/mockup_doctor.png',
                   detailsList: [
                     CustomRowIconText(
@@ -222,7 +222,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 padding: const EdgeInsets.only(right: 15),
                 child: DoctorCard(
                   doctorName: "Dr. Lorem Ipsum",
-                  doctorSpecialization: "Dentist",
+                  doctorSpecialization: [], // TODO
                   doctorPhotoPath: 'assets/images/mockup_doctor.png',
                   detailsList: [
                     CustomRowIconText(

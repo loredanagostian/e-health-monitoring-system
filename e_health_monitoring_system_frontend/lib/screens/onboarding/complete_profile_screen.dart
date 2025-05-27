@@ -4,7 +4,7 @@ import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/widgets_helper.dart';
 import 'package:e_health_monitoring_system_frontend/models/patient_profile.dart';
-import 'package:e_health_monitoring_system_frontend/screens/home_screen.dart';
+import 'package:e_health_monitoring_system_frontend/screens/main_screen.dart';
 import 'package:e_health_monitoring_system_frontend/services/patient_service.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
@@ -70,11 +70,14 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                           ),
                         );
                         if (resp.statusCode == 200) {
-                          _prefs.setString("firstName", firstNameController.text);
+                          _prefs.setString(
+                            "firstName",
+                            firstNameController.text,
+                          );
                           _prefs.setString("lastName", lastNameController.text);
                           navigator.pushReplacement(
                             MaterialPageRoute(
-                              builder: (context) => const HomeScreen(),
+                              builder: (context) => const MainScreen(),
                             ),
                           );
                         } else {

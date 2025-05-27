@@ -22,7 +22,7 @@ class ExaminationReportsScreen extends StatelessWidget {
               children: [
                 DoctorCard(
                   doctorName: "Dr. Lorem Ipsum",
-                  doctorSpecialization: "Dentist",
+                  doctorSpecialization: [], // TODO
                   doctorPhotoPath: 'assets/images/mockup_doctor.png',
                   detailsList: [
                     CustomRowIconText(

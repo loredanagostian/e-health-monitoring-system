@@ -76,7 +76,7 @@ class _BookAppointmentFinalDetailsScreenState
               children: [
                 DoctorCard(
                   doctorName: widget.doctorName,
-                  doctorSpecialization: "Dentist",
+                  doctorSpecialization: [], // TODO
                   detailsList: [
                     Spacer(),
                     Column(

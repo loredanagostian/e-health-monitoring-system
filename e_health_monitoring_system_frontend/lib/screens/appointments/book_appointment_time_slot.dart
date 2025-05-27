@@ -1,17 +1,20 @@
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/image_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
+import 'package:e_health_monitoring_system_frontend/models/doctor_profile.dart';
 import 'package:e_health_monitoring_system_frontend/screens/appointments/book_appoinment_final_details_screen.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/doctor_card.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/info_tag.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class BookAppointmentTimeSlotScreen extends StatefulWidget {
-  final String doctorName;
-  const BookAppointmentTimeSlotScreen({super.key, required this.doctorName});
+  final DoctorProfile doctor;
+  const BookAppointmentTimeSlotScreen({super.key, required this.doctor});
 
   @override
   State<BookAppointmentTimeSlotScreen> createState() =>
@@ -45,38 +48,29 @@ class _BookAppointmentTimeSlotScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 DoctorCard(
-                  doctorName: widget.doctorName,
-                  doctorSpecialization: "Dentist",
-                  detailsList: [
-                    Spacer(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Icon(
-                          Icons.star,
-                          color: ColorsHelper.mainYellow,
-                          size: 25,
-                        ),
-                        Text(
-                          "4.8/5 (31)",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                  doctorPhotoPath: "assets/images/mockup_doctor.png",
+                  doctorName: widget.doctor.name,
+                  doctorSpecialization:
+                      widget.doctor.specializations.isNotEmpty
+                          ? widget.doctor.specializations
+                          : ["N/A"],
+                  detailsList: [],
+                  doctorPhotoPath: ImageHelper.fixImageUrl(
+                    widget.doctor.picture,
+                  ),
                 ),
                 SizedBox(height: 30),
-                getDaySchedule("Monday, 26 July"),
-                SizedBox(height: 30),
-                getDaySchedule("Tuesday, 27 July"),
-                SizedBox(height: 30),
-                getDaySchedule("Wednesday, 28 July"),
-                SizedBox(height: 30),
-                getDaySchedule("Thursday, 29 July"),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: List.generate(7, (index) {
+                    final currentDay = DateTime.now().add(
+                      Duration(days: index),
+                    );
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 30),
+                      child: getDaySchedule(currentDay),
+                    );
+                  }),
+                ),
               ],
             ),
           ),
@@ -106,33 +100,28 @@ class _BookAppointmentTimeSlotScreenState
                       MaterialPageRoute(
                         builder:
                             (context) => BookAppointmentFinalDetailsScreen(
-                              doctorName: widget.doctorName,
+                              doctorName: widget.doctor.name,
                               date: selectedDay!,
                               time: selectedTime!,
                             ),
                       ),
                     )
-                    : null, // disable button when no time selected
+                    : null,
           ),
         ),
       ),
     );
   }
 
-  Widget getDaySchedule(String day) {
-    final List<String> times = [
-      "08:00",
-      "09:00",
-      "10:00",
-      "11:00",
-      "17:00",
-      "18:00",
-    ];
+  Widget getDaySchedule(DateTime day) {
+    final String dayLabel = DateFormat('EEEE, dd MMMM').format(day);
+
+    final List<String> times = ["08:00", "10:00", "12:00", "14:00", "16:00"];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(day, style: StylesHelper.titleStyle),
+        Text(dayLabel, style: StylesHelper.titleStyle),
         SizedBox(height: 15),
         GridView.count(
           crossAxisCount: 3,
@@ -144,10 +133,10 @@ class _BookAppointmentTimeSlotScreenState
           children:
               times.map((time) {
                 return GestureDetector(
-                  onTap: () => onTimeSelected(time, day),
+                  onTap: () => onTimeSelected(time, dayLabel),
                   child: InfoTag(
                     infoText: time,
-                    isSelected: selectedTime == time,
+                    isSelected: selectedTime == time && selectedDay == dayLabel,
                     centerText: true,
                   ),
                 );

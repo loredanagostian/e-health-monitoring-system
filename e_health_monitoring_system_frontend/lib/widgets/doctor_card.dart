@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class DoctorCard extends StatelessWidget {
   final String doctorName;
-  final String doctorSpecialization;
+  final List<String> doctorSpecialization;
   final String doctorPhotoPath;
   final List<Widget> detailsList;
   final double? width;
@@ -43,20 +43,22 @@ class DoctorCard extends StatelessWidget {
                       topLeft: Radius.circular(15),
                       bottomLeft: Radius.circular(15),
                     ),
-                    child: Image.network(
-                      doctorPhotoPath,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Image.asset(
-                        'assets/images/mockup_doctor.png',
+                    child: SizedBox(
+                      width: MediaQuery.sizeOf(context).width * 0.25,
+                      child: Image.network(
+                        doctorPhotoPath,
                         fit: BoxFit.cover,
+                        errorBuilder:
+                            (context, error, stackTrace) => Image.asset(
+                              'assets/images/mockup_doctor.png',
+                              fit: BoxFit.cover,
+                            ),
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(child: CircularProgressIndicator());
+                        },
                       ),
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Center(child: CircularProgressIndicator());
-                      },
                     ),
-
-
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
@@ -75,15 +77,24 @@ class DoctorCard extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Text(
-                          doctorSpecialization,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: ColorsHelper.darkGray,
-                            fontWeight: FontWeight.normal,
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children:
+                              doctorSpecialization
+                                  .expand((spec) => spec.split('|'))
+                                  .map(
+                                    (spec) => Text(
+                                      spec.trim(),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: ColorsHelper.darkGray,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
                         ),
-                        SizedBox(height: 10),
+                        Spacer(),
                         ...detailsList,
                       ],
                     ),

@@ -5,10 +5,13 @@ import 'package:flutter/widgets.dart';
 class MedicalCategory extends StatefulWidget {
   final String categoryName;
   final bool isActive;
+  final IconData? icon;
+
   const MedicalCategory({
     super.key,
     required this.categoryName,
     required this.isActive,
+    this.icon,
   });
 
   @override
@@ -39,7 +42,11 @@ class _MedicalCategoryState extends State<MedicalCategory> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(medicalIcons[widget.categoryName], size: 30, color: iconColor),
+          Icon(
+            widget.icon ?? medicalIcons[widget.categoryName],
+            size: 30,
+            color: iconColor,
+          ),
           SizedBox(height: 5),
           Text(
             widget.categoryName,

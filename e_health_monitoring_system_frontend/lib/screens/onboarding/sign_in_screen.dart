@@ -9,7 +9,7 @@ import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart'
 import 'package:e_health_monitoring_system_frontend/helpers/widgets_helper.dart';
 import 'package:e_health_monitoring_system_frontend/models/jwt_token.dart';
 import 'package:e_health_monitoring_system_frontend/models/patient_register.dart';
-import 'package:e_health_monitoring_system_frontend/screens/home_screen.dart';
+import 'package:e_health_monitoring_system_frontend/screens/main_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/forgot_password_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/sign_up_screen.dart';
 import 'package:e_health_monitoring_system_frontend/services/register_service.dart';
@@ -103,7 +103,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       if (shouldLogin) {
                         navigator.pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder: (context) => const MainScreen(),
                           ),
                           (route) => false,
                         );

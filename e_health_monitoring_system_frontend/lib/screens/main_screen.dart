@@ -26,7 +26,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         return AppointmentsScreen();
     }
 
-    return HomeScreen();
+    return Container();
   }
 
   @override

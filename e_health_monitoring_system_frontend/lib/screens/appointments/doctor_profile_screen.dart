@@ -1,7 +1,9 @@
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/image_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
+import 'package:e_health_monitoring_system_frontend/models/doctor_profile.dart';
 import 'package:e_health_monitoring_system_frontend/screens/appointments/book_appointment_time_slot.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
@@ -10,13 +12,13 @@ import 'package:e_health_monitoring_system_frontend/widgets/price_tile.dart';
 import 'package:flutter/material.dart';
 
 class DoctorProfileScreen extends StatelessWidget {
-  final String doctorName;
-  const DoctorProfileScreen({super.key, required this.doctorName});
+  final DoctorProfile doctor;
+  const DoctorProfileScreen({super.key, required this.doctor});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(appBarTitle: doctorName, implyLeading: true),
+      appBar: CustomAppbar(appBarTitle: doctor.name, implyLeading: true),
       body: SingleChildScrollView(
         child: SafeArea(
           child: Padding(
@@ -37,8 +39,6 @@ class DoctorProfileScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 30),
                 getSpecialistTags(),
-                SizedBox(height: 20),
-                getReviewsSection(),
                 SizedBox(height: 20),
                 getPrices(),
               ],
@@ -64,9 +64,8 @@ class DoctorProfileScreen extends StatelessWidget {
                 () => navigator.push(
                   MaterialPageRoute(
                     builder:
-                        (context) => BookAppointmentTimeSlotScreen(
-                          doctorName: doctorName,
-                        ),
+                        (context) =>
+                            BookAppointmentTimeSlotScreen(doctor: doctor),
                   ),
                 ),
           ),
@@ -83,11 +82,19 @@ class DoctorProfileScreen extends StatelessWidget {
         child: Container(
           width: double.infinity,
           height: 200,
-          color: ColorsHelper.mainPurple,
-          child: Image.asset(
-            'assets/images/mockup_doctor.png',
-            fit: BoxFit.cover,
-            alignment: Alignment.topCenter,
+          color: ColorsHelper.mainWhite,
+          child: Image.network(
+            ImageHelper.fixImageUrl(doctor.picture),
+            fit: BoxFit.fitHeight,
+            errorBuilder:
+                (context, error, stackTrace) => Image.asset(
+                  'assets/images/mockup_doctor.png',
+                  fit: BoxFit.cover,
+                ),
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Center(child: CircularProgressIndicator());
+            },
           ),
         ),
       ),
@@ -95,37 +102,19 @@ class DoctorProfileScreen extends StatelessWidget {
   }
 
   Widget getDoctorSpecialization() {
-    return Column(
-      children: [
-        Text(
-          "Orthodontics and dentofacial orthopedics specialist",
-          style: TextStyle(color: ColorsHelper.mainDark, fontSize: 20),
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(height: 15),
-        Text(
-          "General dentistry",
-          style: TextStyle(
-            color: ColorsHelper.mainDark,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
+    return Text(
+      doctor.description,
+      style: TextStyle(
+        color: ColorsHelper.mainDark,
+        fontSize: 20,
+        fontWeight: FontWeight.w400,
+      ),
+      textAlign: TextAlign.center,
     );
   }
 
   Widget getSpecialistTags() {
-    // TODO: replace mockup specialties
-    final List<String> specialties = [
-      "Orthodontics",
-      "Dento-alveolar surgery",
-      "Prosthetics",
-      "Prosthetics",
-      "Prosthetics",
-      "Prosthetics",
-    ];
+    final List<String> specialties = doctor.specializations;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -139,21 +128,6 @@ class DoctorProfileScreen extends StatelessWidget {
               specialties.map((specialty) {
                 return InfoTag(infoText: specialty);
               }).toList(),
-        ),
-      ],
-    );
-  }
-
-  Widget getReviewsSection() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(StringsHelper.reviews, style: StylesHelper.titleStyle),
-        Spacer(),
-        Icon(Icons.star, color: ColorsHelper.mainYellow, size: 30),
-        Text(
-          "4.8/5 (31)",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ],
     );

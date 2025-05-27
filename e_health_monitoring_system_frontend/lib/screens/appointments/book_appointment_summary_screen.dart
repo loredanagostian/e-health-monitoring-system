@@ -45,7 +45,7 @@ class BookAppointmentSummaryScreen extends StatelessWidget {
                     children: [
                       DoctorCard(
                         doctorName: doctorName,
-                        doctorSpecialization: "Dentist",
+                        doctorSpecialization: [], // TODO
                         detailsList: [
                           Spacer(),
                           Column(
