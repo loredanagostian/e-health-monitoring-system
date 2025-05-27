@@ -8,7 +8,7 @@ public class DoctorDto
     public string Name { get; set; }
     public string Description { get; set; }
     public string Picture { get; set; }
-    public IEnumerable<SpecializationDto> Specializations { get; set; }
+    public IEnumerable<SpecializationAddDto> Specializations { get; set; }
     public IEnumerable<AppointmentTypeDto> AppointmentTypes { get; set; }
 }
 

@@ -21,17 +21,32 @@ public class SpecializationController : ControllerBase
         _doctorRepository = doctorRepository;
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var specializations = (await _specializationRepository.GetAllAsync())
+            .Select(s => new SpecializationGetDto
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Icon = s.Icon
+            });
+
+        return Ok(specializations);
+    }
+
     [HttpPost]
-    public async Task<IActionResult> Add([FromBody] SpecializationDto dto)
+    public async Task<IActionResult> Add([FromBody] SpecializationAddDto dto)
     {
         var specialization = new Specialization
         {
-            Name = dto.Name
+            Name = dto.Name,
+            Icon = dto.Icon
         };
 
         var dbSpecialization = await _specializationRepository.AddAsync(specialization);
 
-        return Ok(new SpecializationDto {Name = dbSpecialization.Name});
+        return Ok(new SpecializationAddDto() {Name = dbSpecialization.Name, Icon = dbSpecialization.Icon});
     }
 
     [HttpPost]

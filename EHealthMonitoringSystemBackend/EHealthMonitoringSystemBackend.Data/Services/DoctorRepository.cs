@@ -30,6 +30,11 @@ public class DoctorRepository : IDoctorRepository
         return await _dbContext.Doctors.Include(d => d.Picture).ToListAsync();
     }
 
+    public async Task<IEnumerable<Doctor>> GetAllByAsync(Expression<Func<Doctor, bool>> predicate)
+    {
+        return await _dbContext.Doctors.Where(predicate).Include(d => d.Picture).ToListAsync();
+    }
+
     public async Task<Doctor> GetOneAsync(Expression<Func<Doctor, bool>> predicate)
     {
         return await _dbSet.Include(d => d.Picture).FirstOrDefaultAsync(predicate);

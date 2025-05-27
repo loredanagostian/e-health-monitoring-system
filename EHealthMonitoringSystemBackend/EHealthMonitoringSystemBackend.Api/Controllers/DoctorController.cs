@@ -62,6 +62,26 @@ public class DoctorController : ControllerBase
         
         return Ok(doctorDtos);
     }
+    
+    [HttpGet("{specializationId}")]
+    public async Task<IActionResult> GetAllBySpecialization(string specializationId)
+    {
+        var doctorDtos = new List<DoctorDto>{};
+        
+        var doctorIds = (await _doctorSpecializationsRepository
+                .GetAllByAsync(ds => ds.SpecializationId == specializationId))
+            .Select(ds => ds.DoctorId);
+
+        var doctors = await _doctorRepository.GetAllByAsync(d => doctorIds.Contains(d.Id));
+        
+        foreach (var doctor in doctors)
+        {
+            var doctorDto = await _getDoctorDto(doctor);
+            doctorDtos.Add(doctorDto);
+        }
+        
+        return Ok(doctorDtos);
+    }
 
     private async Task<DoctorDto> _getDoctorDto(Doctor doctor)
     {
@@ -81,7 +101,7 @@ public class DoctorController : ControllerBase
 
         var specializations = (await _specializationRepository
                 .GetAllByAsync(s => doctorSpecializationIds.Contains(s.Id)))
-            .Select(s => new SpecializationDto {Name = s.Name});
+            .Select(s => new SpecializationAddDto() {Name = s.Name, Icon = s.Icon});
 
         doctorDto.Specializations = specializations;
 

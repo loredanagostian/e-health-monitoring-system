@@ -7,5 +7,6 @@ public interface IDoctorRepository
 {
     Task<Doctor> AddAsync(Doctor doctor);
     Task<IEnumerable<Doctor>> GetAllAsync();
+    Task<IEnumerable<Doctor>> GetAllByAsync(Expression<Func<Doctor, bool>> predicate);
     Task<Doctor> GetOneAsync(Expression<Func<Doctor, bool>> predicate);
 }
