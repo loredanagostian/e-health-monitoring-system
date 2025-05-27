@@ -144,6 +144,7 @@ services.AddTransient<IAppointmentTypeRepository, AppointmentTypeRepository>();
 services.AddTransient<IDoctorSpecializationsRepository, DoctorSpecializationRepository>();
 services.AddTransient<IAppointmentRepository, AppointmentRepository>();
 services.AddTransient<IAppointmentFileRepository, AppointmentFileRepository>();
+services.AddTransient<IPatientProfileRepository, PatientProfileRepository>();
 services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 
 var app = builder.Build();

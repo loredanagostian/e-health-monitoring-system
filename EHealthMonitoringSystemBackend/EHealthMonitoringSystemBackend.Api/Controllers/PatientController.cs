@@ -3,6 +3,7 @@ using EHealthMonitoringSystemBackend.Api.Models;
 using EHealthMonitoringSystemBackend.Api.Services.Abstractions;
 using EHealthMonitoringSystemBackend.Core.Models;
 using EHealthMonitoringSystemBackend.Data.Models;
+using EHealthMonitoringSystemBackend.Data.Services.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +17,8 @@ namespace EHealthMonitoringSystemBackend.Api.Controllers;
 public class PatientController(
     UserManager<User> userManger,
     ILogger<PatientRegister> logger,
-    IJWTManager jwtManager
+    IJWTManager jwtManager,
+    IPatientProfileRepository patientProfileRepository
 ) : ControllerBase
 {
     private readonly UserManager<User> _userManger = userManger;
@@ -59,6 +61,44 @@ public class PatientController(
         await _userManger.UpdateAsync(user);
 
         return Ok();
+    }
+
+    [HttpPatch]
+    public async Task<IActionResult> UpdateProfile(PatientProfileDto profile)
+    {
+        string? jwtToken = null;
+        foreach (var header in Request.Headers.Authorization)
+        {
+            if (header is not null && header.Contains("Bearer"))
+            {
+                jwtToken = header.Replace("Bearer", "").Trim();
+                break;
+            }
+        }
+
+        if (jwtToken is null)
+        {
+            return Unauthorized("Missing JWT Token.");
+        }
+
+        var principal = _jwtManager.GetPrincipalFromToken(jwtToken);
+        var user = await _userManger.FindByIdAsync(principal.Identity!.Name!);
+        if (user is null)
+        {
+            return Unauthorized("Invalid user id");
+        }
+
+        var existingProfile = await patientProfileRepository.GetByUserId(user.Id);
+
+        if (existingProfile is null)
+        {
+            return BadRequest("Patient Profile does not exist!");
+        }
+        
+        var updatedProfile = await patientProfileRepository
+            .UpdateAsync(existingProfile.Id, new PatientProfile{FirstName = profile.FirstName, LastName = profile.LastName, Cnp = profile.Cnp, PhoneNumber = profile.PhoneNumber});
+
+        return Ok(updatedProfile);
     }
 
     [HttpGet]
