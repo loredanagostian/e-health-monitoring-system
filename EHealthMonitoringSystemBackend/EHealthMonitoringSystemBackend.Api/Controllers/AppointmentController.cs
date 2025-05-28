@@ -80,7 +80,7 @@ public class AppointmentController : ControllerBase
             TotalCost = appointmentDto.TotalCost,
             Date = appointmentDto.Date,
             AppointmentTypeId = appointmentDto.AppointmentTypeId,
-            UserId = "6a368a6e-8382-4ab2-b7a6-99df55289195",
+            UserId = user.Id,
         };
 
         var dbAppointment = await _appointmentRepository.AddUpdateAsync(newAppointment);
