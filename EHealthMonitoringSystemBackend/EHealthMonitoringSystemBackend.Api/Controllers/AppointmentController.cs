@@ -244,6 +244,12 @@ public class AppointmentController : ControllerBase
     [HttpGet("{doctorId}")]
     public async Task<IActionResult> GetBookedTimeSlots(string doctorId)
     {
+        var user = await _getUser();
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
         var types = await _appointmentTypeRepository.GetAllByAsync(t => t.DoctorId == doctorId);
         var typeIds = new HashSet<string>();
         foreach (var type in types)
