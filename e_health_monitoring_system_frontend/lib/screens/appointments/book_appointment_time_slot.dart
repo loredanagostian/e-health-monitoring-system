@@ -67,8 +67,9 @@ class _BookAppointmentTimeSlotScreenState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: List.generate(7, (index) {
                           final currentDay = DateTime.now().add(
-                            Duration(days: index),
-                          );
+                            Duration(days: index + 1),
+                          ); // start from tomorrow
+
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 30),
                             child: getDaySchedule(
@@ -108,7 +109,7 @@ class _BookAppointmentTimeSlotScreenState
                       MaterialPageRoute(
                         builder:
                             (context) => BookAppointmentFinalDetailsScreen(
-                              doctorName: widget.doctor.name,
+                              doctor: widget.doctor,
                               date: selectedDay!,
                               time: selectedTime!,
                             ),

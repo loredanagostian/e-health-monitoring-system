@@ -1,8 +1,10 @@
 import 'package:e_health_monitoring_system_frontend/helpers/assets_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/image_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
+import 'package:e_health_monitoring_system_frontend/models/api_models/doctor_profile.dart';
 import 'package:e_health_monitoring_system_frontend/screens/main_screen.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
@@ -12,7 +14,7 @@ import 'package:e_health_monitoring_system_frontend/widgets/price_tile.dart';
 import 'package:flutter/material.dart';
 
 class BookAppointmentSummaryScreen extends StatelessWidget {
-  final String doctorName;
+  final DoctorProfile doctor;
   final String date;
   final String time;
   final String reasonToVisit;
@@ -20,7 +22,7 @@ class BookAppointmentSummaryScreen extends StatelessWidget {
   final bool isSuccess;
   const BookAppointmentSummaryScreen({
     super.key,
-    required this.doctorName,
+    required this.doctor,
     required this.reasonToVisit,
     required this.totalCost,
     required this.date,
@@ -33,7 +35,7 @@ class BookAppointmentSummaryScreen extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppbar(
         appBarTitle: StringsHelper.bookAppointment,
-        implyLeading: true,
+        implyLeading: false,
       ),
       body: SafeArea(
         child: Padding(
@@ -44,8 +46,11 @@ class BookAppointmentSummaryScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       DoctorCard(
-                        doctorName: doctorName,
-                        doctorSpecialization: [], // TODO
+                        doctorName: doctor.name,
+                        doctorSpecialization:
+                            doctor.specializations.isNotEmpty
+                                ? doctor.specializations
+                                : ["N/A"],
                         detailsList: [
                           Spacer(),
                           Column(
@@ -96,7 +101,10 @@ class BookAppointmentSummaryScreen extends StatelessWidget {
                             ],
                           ),
                         ],
-                        doctorPhotoPath: "assets/images/mockup_doctor.png",
+                        doctorPhotoPath:
+                            doctor.picture.isNotEmpty
+                                ? ImageHelper.fixImageUrl(doctor.picture)
+                                : "/assets/images/mockup_doctor.png",
                       ),
                       SizedBox(height: 30),
                       getReasonToVisit(),

@@ -134,24 +134,19 @@ class DoctorProfileScreen extends StatelessWidget {
   }
 
   Widget getPrices() {
+    final appointments = doctor.appointments;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(StringsHelper.prices, style: StylesHelper.titleStyle),
         SizedBox(height: 15),
-        PriceTile(
-          consultationType: "Prosthetic Consultation",
-          price: "220 LEI",
-        ),
-        PriceTile(consultationType: "Prosthetic Check-up", price: "85 LEI"),
-        PriceTile(
-          consultationType: "Acrylic Temporary Crown in Office",
-          price: "120 LEI",
-        ),
-        PriceTile(
-          consultationType: "Acrylic Temporary Crown in Laboratory",
-          price: "290 LEI",
-        ),
+        ...appointments.map((appointment) {
+          return PriceTile(
+            consultationType: appointment.name,
+            price: "${appointment.price} LEI",
+          );
+        }),
       ],
     );
   }

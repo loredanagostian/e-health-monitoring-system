@@ -1,9 +1,15 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/date_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/image_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
+import 'package:e_health_monitoring_system_frontend/models/api_models/appointment_type_dto.dart';
+import 'package:e_health_monitoring_system_frontend/models/api_models/doctor_profile.dart';
+import 'package:e_health_monitoring_system_frontend/models/appointment_api_model.dart';
 import 'package:e_health_monitoring_system_frontend/screens/appointments/book_appointment_summary_screen.dart';
+import 'package:e_health_monitoring_system_frontend/services/appointment_service.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/booking_dialog.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
@@ -11,12 +17,12 @@ import 'package:e_health_monitoring_system_frontend/widgets/doctor_card.dart';
 import 'package:flutter/material.dart';
 
 class BookAppointmentFinalDetailsScreen extends StatefulWidget {
-  final String doctorName;
+  final DoctorProfile doctor;
   final String date;
   final String time;
   const BookAppointmentFinalDetailsScreen({
     super.key,
-    required this.doctorName,
+    required this.doctor,
     required this.date,
     required this.time,
   });
@@ -32,17 +38,14 @@ class _BookAppointmentFinalDetailsScreenState
   String? selectedPrice;
 
   void onSelectedReasonChange(String reason) {
-    final selectedReasonData = reasons.firstWhere(
-      (r) => r['label'] == reason,
-      orElse: () => <String, dynamic>{},
+    final selectedReasonData = widget.doctor.appointments.firstWhere(
+      (r) => r.name == reason,
+      orElse: () => AppointmentTypeDto(name: '', price: 0, id: ''),
     );
 
     setState(() {
       selectedReason = reason;
-      selectedPrice =
-          selectedReasonData.containsKey('price')
-              ? selectedReasonData['price'].toString()
-              : null;
+      selectedPrice = "${selectedReasonData.price} LEI";
     });
   }
 
@@ -52,13 +55,6 @@ class _BookAppointmentFinalDetailsScreenState
       selectedPrice = null;
     });
   }
-
-  final List<Map<String, dynamic>> reasons = [
-    {'label': 'Prosthetic Consultation', 'price': "220 LEI"},
-    {'label': 'Prosthetic Check-up', 'price': "85 LEI"},
-    {'label': 'Acrylic Temporary Crown in Office', 'price': "120 LEI"},
-    {'label': 'Acrylic Temporary Crown in Laboratory', 'price': "290 LEI"},
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -75,8 +71,11 @@ class _BookAppointmentFinalDetailsScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 DoctorCard(
-                  doctorName: widget.doctorName,
-                  doctorSpecialization: [], // TODO
+                  doctorName: widget.doctor.name,
+                  doctorSpecialization:
+                      widget.doctor.specializations.isNotEmpty
+                          ? widget.doctor.specializations
+                          : ["N/A"],
                   detailsList: [
                     Spacer(),
                     Column(
@@ -125,7 +124,10 @@ class _BookAppointmentFinalDetailsScreenState
                       ],
                     ),
                   ],
-                  doctorPhotoPath: "assets/images/mockup_doctor.png",
+                  doctorPhotoPath:
+                      widget.doctor.picture.isNotEmpty
+                          ? ImageHelper.fixImageUrl(widget.doctor.picture)
+                          : "/assets/images/mockup_doctor.png",
                 ),
                 SizedBox(height: 30),
                 getReasonToVisit(),
@@ -156,24 +158,80 @@ class _BookAppointmentFinalDetailsScreenState
                     : ColorsHelper.mainPurple,
             onPressed:
                 selectedReason != null
-                    ? () => showAppointmentBookedDialog(
-                      context,
-                      () => navigator.pushAndRemoveUntil(
-                        MaterialPageRoute(
-                          builder:
-                              (context) => BookAppointmentSummaryScreen(
-                                doctorName: widget.doctorName,
-                                date: widget.date,
-                                time: widget.time,
-                                totalCost: selectedPrice!,
-                                reasonToVisit: selectedReason!,
-                                isSuccess: false,
-                              ),
+                    ? () async {
+                      final selectedAppointment = widget.doctor.appointments
+                          .firstWhere((a) => a.name == selectedReason);
+
+                      final appointment = AppointmentApiModel(
+                        appointmentTypeId: selectedAppointment.id,
+                        date: DateHelper.formatDateTimeUtc(
+                          widget.date,
+                          widget.time,
                         ),
-                        (route) => false,
-                      ),
-                    )
-                    : null, // disable button when no reason selected
+                        totalCost: selectedAppointment.price + 10,
+                      );
+
+                      try {
+                        final response =
+                            await AppointmentService.createAppointment(
+                              appointment,
+                            );
+
+                        if (response.statusCode == 200) {
+                          showAppointmentBookedDialog(
+                            context,
+                            () => navigator.pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => BookAppointmentSummaryScreen(
+                                      doctor: widget.doctor,
+                                      date: widget.date,
+                                      time: widget.time,
+                                      totalCost: "${appointment.totalCost} LEI",
+                                      reasonToVisit: selectedReason!,
+                                      isSuccess: true,
+                                    ),
+                              ),
+                              (route) => false,
+                            ),
+                          );
+                        } else {
+                          navigator.pushAndRemoveUntil(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => BookAppointmentSummaryScreen(
+                                    doctor: widget.doctor,
+                                    date: widget.date,
+                                    time: widget.time,
+                                    totalCost: "${appointment.totalCost} LEI",
+                                    reasonToVisit: selectedReason!,
+                                    isSuccess: false,
+                                  ),
+                            ),
+                            (route) => false,
+                          );
+                        }
+                      } catch (e) {
+                        showDialog(
+                          context: context,
+                          builder:
+                              (context) => AlertDialog(
+                                title: Text("Network Error"),
+                                content: Text(
+                                  "Something went wrong. Please check your internet connection.",
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.of(context).pop(),
+                                    child: Text("OK"),
+                                  ),
+                                ],
+                              ),
+                        );
+                      }
+                    }
+                    : null,
           ),
         ),
       ),
@@ -205,22 +263,20 @@ class _BookAppointmentFinalDetailsScreenState
               ],
             ),
             items:
-                reasons
-                    .map(
-                      (reason) => DropdownMenuItem<String>(
-                        value: reason['label'], // value is the label string
-                        child: Text(
-                          reason['label'],
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: ColorsHelper.darkGray,
-                            fontWeight: FontWeight.normal,
-                          ),
-                          overflow: TextOverflow.visible,
-                        ),
+                widget.doctor.appointments.map((appointment) {
+                  return DropdownMenuItem<String>(
+                    value: appointment.name,
+                    child: Text(
+                      appointment.name,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: ColorsHelper.darkGray,
+                        fontWeight: FontWeight.normal,
                       ),
-                    )
-                    .toList(),
+                      overflow: TextOverflow.visible,
+                    ),
+                  );
+                }).toList(),
             value: selectedReason,
             onChanged: (value) => onSelectedReasonChange(value ?? ""),
             buttonStyleData: ButtonStyleData(
@@ -344,7 +400,7 @@ class _BookAppointmentFinalDetailsScreenState
                   ),
                 ),
                 Text(
-                  "XX LEI",
+                  "${(int.tryParse(selectedPrice?.replaceAll(' LEI', '') ?? '0') ?? 0) + 10} LEI",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
