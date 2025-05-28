@@ -35,4 +35,5 @@ public class AppointmentGetOneDto
     public string MedicalHistory { get; set; }
     public string Diagnostic { get; set; }
     public string Recommendation { get; set; }
+    public int TotalCost { get; set; }
 }

@@ -215,6 +215,7 @@ public class AppointmentController : ControllerBase
                 MedicalHistory = appointment.MedicalHistory,
                 Diagnostic = appointment.Diagnostic,
                 Recommendation = appointment.Recommendation,
+                TotalCost = appointment.TotalCost,
             }
         );
     }
@@ -264,7 +265,7 @@ public class AppointmentController : ControllerBase
         foreach (var app in appointments)
         {
             timeSlots.Add(
-                DateTime.UtcNow.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
+                app.Date.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
             );
         }
 
