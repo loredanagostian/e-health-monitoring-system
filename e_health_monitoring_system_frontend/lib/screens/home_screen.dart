@@ -5,6 +5,7 @@ import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart'
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
 import 'package:e_health_monitoring_system_frontend/models/api_models/patient_profile.dart';
 import 'package:e_health_monitoring_system_frontend/models/api_models/upcoming_appointment_dto.dart';
+import 'package:e_health_monitoring_system_frontend/screens/appointments/upcoming_appointments_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/complete_profile_screen.dart';
 import 'package:e_health_monitoring_system_frontend/services/appointment_service.dart';
 import 'package:e_health_monitoring_system_frontend/services/patient_service.dart';
@@ -277,7 +278,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Text(title, style: StylesHelper.titleStyle),
           Visibility(
             visible: isViewAllButtonVisible,
-            child: InfoTag(onPressed: () {}), // TODO: add navigation
+            child: InfoTag(
+              onPressed:
+                  () => navigator.push(
+                    MaterialPageRoute(
+                      builder: (_) => UpcomingAppointmentsScreen(),
+                    ),
+                  ),
+            ),
           ),
         ],
       ),

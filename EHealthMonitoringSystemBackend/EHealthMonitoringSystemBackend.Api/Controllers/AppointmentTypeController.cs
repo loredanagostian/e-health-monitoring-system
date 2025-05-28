@@ -12,7 +12,10 @@ public class AppointmentTypeController : ControllerBase
     private readonly IAppointmentTypeRepository _appointmentTypeRepository;
     private readonly IDoctorRepository _doctorRepository;
 
-    public AppointmentTypeController(IAppointmentTypeRepository appointmentTypeRepository, IDoctorRepository doctorRepository)
+    public AppointmentTypeController(
+        IAppointmentTypeRepository appointmentTypeRepository,
+        IDoctorRepository doctorRepository
+    )
     {
         _appointmentTypeRepository = appointmentTypeRepository;
         _doctorRepository = doctorRepository;
@@ -21,18 +24,28 @@ public class AppointmentTypeController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Add([FromBody] AppointmentTypePostDto appointmentTypeDto)
     {
-        var existingDoctor = await _doctorRepository.GetOneAsync(d => d.Id == appointmentTypeDto.DoctorId);
-        if (existingDoctor is null) return NotFound("Doctor not found!");
+        var existingDoctor = await _doctorRepository.GetOneAsync(d =>
+            d.Id == appointmentTypeDto.DoctorId
+        );
+        if (existingDoctor is null)
+            return NotFound("Doctor not found!");
 
         var appointmentType = new AppointmentType
         {
             Name = appointmentTypeDto.Name,
             Price = appointmentTypeDto.Price,
-            DoctorId = appointmentTypeDto.DoctorId
+            DoctorId = appointmentTypeDto.DoctorId,
         };
 
         var dbAppointmentType = await _appointmentTypeRepository.AddAsync(appointmentType);
 
-        return Ok(new AppointmentTypePostDto {Name = dbAppointmentType.Name, Price = dbAppointmentType.Price, DoctorId = dbAppointmentType.DoctorId});
+        return Ok(
+            new AppointmentTypePostDto
+            {
+                Name = dbAppointmentType.Name,
+                Price = dbAppointmentType.Price,
+                DoctorId = dbAppointmentType.DoctorId,
+            }
+        );
     }
 }

@@ -179,6 +179,7 @@ public class AppointmentController : ControllerBase
         var appointments = (await _appointmentRepository.GetAsync())
             .Where(a => a.UserId == user.Id && a.Date >= DateTime.Now)
             .OrderBy(a => a.Date)
+            .Take(3)
             .Select(a => new AppointmentGetAllDto
             {
                 Id = a.Id,
