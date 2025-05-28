@@ -16,9 +16,15 @@ public class DoctorController : ControllerBase
     private readonly IAppointmentTypeRepository _appointmentTypeRepository;
     private readonly IUploadManager _uploadManager;
     private readonly IConfiguration _configuration;
-    
-    public DoctorController(IDoctorRepository doctorRepository, ISpecializationRepository specializationRepository,
-        IDoctorSpecializationsRepository doctorSpecializationsRepository, IAppointmentTypeRepository appointmentTypeRepository, IUploadManager uploadManager, IConfiguration configuration)
+
+    public DoctorController(
+        IDoctorRepository doctorRepository,
+        ISpecializationRepository specializationRepository,
+        IDoctorSpecializationsRepository doctorSpecializationsRepository,
+        IAppointmentTypeRepository appointmentTypeRepository,
+        IUploadManager uploadManager,
+        IConfiguration configuration
+    )
     {
         _doctorRepository = doctorRepository;
         _specializationRepository = specializationRepository;
@@ -33,25 +39,33 @@ public class DoctorController : ControllerBase
     {
         var appFile = await _uploadManager.Upload(file);
 
-        if (appFile is null) return BadRequest("File upload failed!");
+        if (appFile is null)
+            return BadRequest("File upload failed!");
 
         var doctor = new Doctor
         {
             Name = doctorPost.Name,
             Description = doctorPost.Description,
-            PictureId = appFile.Id
+            PictureId = appFile.Id,
         };
 
         var dbDoctor = await _doctorRepository.AddAsync(doctor);
 
-        return Ok(new DoctorDto {Name = dbDoctor.Name, Description = dbDoctor.Description, Picture = appFile.Path});
+        return Ok(
+            new DoctorDto
+            {
+                Name = dbDoctor.Name,
+                Description = dbDoctor.Description,
+                Picture = appFile.Path,
+            }
+        );
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var doctorDtos = new List<DoctorDto>{};
-        
+        var doctorDtos = new List<DoctorDto> { };
+
         var doctors = await _doctorRepository.GetAllAsync();
 
         foreach (var doctor in doctors)
@@ -59,34 +73,36 @@ public class DoctorController : ControllerBase
             var doctorDto = await _getDoctorDto(doctor);
             doctorDtos.Add(doctorDto);
         }
-        
+
         return Ok(doctorDtos);
     }
-    
+
     [HttpGet("{specializationId}")]
     public async Task<IActionResult> GetAllBySpecialization(string specializationId)
     {
-        var doctorDtos = new List<DoctorDto>{};
-        
-        var doctorIds = (await _doctorSpecializationsRepository
-                .GetAllByAsync(ds => ds.SpecializationId == specializationId))
-            .Select(ds => ds.DoctorId);
+        var doctorDtos = new List<DoctorDto> { };
+
+        var doctorIds = (
+            await _doctorSpecializationsRepository.GetAllByAsync(ds =>
+                ds.SpecializationId == specializationId
+            )
+        ).Select(ds => ds.DoctorId);
 
         var doctors = await _doctorRepository.GetAllByAsync(d => doctorIds.Contains(d.Id));
-        
+
         foreach (var doctor in doctors)
         {
             var doctorDto = await _getDoctorDto(doctor);
             doctorDtos.Add(doctorDto);
         }
-        
+
         return Ok(doctorDtos);
     }
 
     private async Task<DoctorDto> _getDoctorDto(Doctor doctor)
     {
         var baseUrl = _configuration["Base_url"];
-        
+
         var doctorDto = new DoctorDto
         {
             Id = doctor.Id,
@@ -95,19 +111,26 @@ public class DoctorController : ControllerBase
             Picture = doctor.Picture.Path.Replace("../", baseUrl),
         };
 
-        var doctorSpecializationIds = (await _doctorSpecializationsRepository
-                .GetAllByAsync(ds => ds.DoctorId == doctor.Id))
-            .Select(ds => ds.SpecializationId);
+        var doctorSpecializationIds = (
+            await _doctorSpecializationsRepository.GetAllByAsync(ds => ds.DoctorId == doctor.Id)
+        ).Select(ds => ds.SpecializationId);
 
-        var specializations = (await _specializationRepository
-                .GetAllByAsync(s => doctorSpecializationIds.Contains(s.Id)))
-            .Select(s => new SpecializationAddDto() {Name = s.Name, Icon = s.Icon});
+        var specializations = (
+            await _specializationRepository.GetAllByAsync(s =>
+                doctorSpecializationIds.Contains(s.Id)
+            )
+        ).Select(s => new SpecializationAddDto() { Name = s.Name, Icon = s.Icon });
 
         doctorDto.Specializations = specializations;
 
-        var appointmentTypes = (await _appointmentTypeRepository
-                .GetAllByAsync(at => at.DoctorId == doctor.Id))
-            .Select(at => new AppointmentTypeDto {Id = at.Id, Name = at.Name, Price = at.Price});
+        var appointmentTypes = (
+            await _appointmentTypeRepository.GetAllByAsync(at => at.DoctorId == doctor.Id)
+        ).Select(at => new AppointmentTypeDto
+        {
+            Id = at.Id,
+            Name = at.Name,
+            Price = at.Price,
+        });
 
         doctorDto.AppointmentTypes = appointmentTypes;
 

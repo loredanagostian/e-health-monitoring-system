@@ -1,9 +1,8 @@
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/image_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
-import 'package:e_health_monitoring_system_frontend/helpers/widgets_helper.dart';
-import 'package:e_health_monitoring_system_frontend/models/appointment_api_model.dart';
 import 'package:e_health_monitoring_system_frontend/models/doctor_profile.dart';
 import 'package:e_health_monitoring_system_frontend/screens/appointments/book_appoinment_final_details_screen.dart';
 import 'package:e_health_monitoring_system_frontend/services/appointment_service.dart';
@@ -42,41 +41,48 @@ class _BookAppointmentTimeSlotScreenState
         appBarTitle: StringsHelper.bookAppointment,
         implyLeading: true,
       ),
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(30),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                DoctorCard(
-                  doctorName: widget.doctor.name,
-                  doctorSpecialization:
-                      widget.doctor.specializations.isNotEmpty
-                          ? widget.doctor.specializations
-                          : ["N/A"],
-                  detailsList: [],
-                  doctorPhotoPath: ImageHelper.fixImageUrl(
-                    widget.doctor.picture,
+      body: FutureBuilder(
+        future: AppointmentService().getBookedTimeSlots(widget.doctor.id),
+        builder:
+            (ctx, snapshot) => SingleChildScrollView(
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(30),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      DoctorCard(
+                        doctorName: widget.doctor.name,
+                        doctorSpecialization:
+                            widget.doctor.specializations.isNotEmpty
+                                ? widget.doctor.specializations
+                                : ["N/A"],
+                        detailsList: [],
+                        doctorPhotoPath: ImageHelper.fixImageUrl(
+                          widget.doctor.picture,
+                        ),
+                      ),
+                      SizedBox(height: 30),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: List.generate(7, (index) {
+                          final currentDay = DateTime.now().add(
+                            Duration(days: index),
+                          );
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 30),
+                            child: getDaySchedule(
+                              currentDay,
+                              snapshot.data ?? [],
+                            ),
+                          );
+                        }),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(height: 30),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: List.generate(7, (index) {
-                    final currentDay = DateTime.now().add(
-                      Duration(days: index),
-                    );
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 30),
-                      child: getDaySchedule(currentDay),
-                    );
-                  }),
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 15),
@@ -98,47 +104,16 @@ class _BookAppointmentTimeSlotScreenState
                     : ColorsHelper.mainPurple,
             onPressed:
                 selectedTime != null && selectedDay != null
-                    ? () async {
-                      final contextRef = context;
-
-                      try {
-                        final fullDateTime = DateFormat(
-                          'EEEE, dd MMMM HH:mm',
-                        ).parse("$selectedDay $selectedTime");
-
-                        final appointment = AppointmentApiModel(
-                          appointmentTypeId:
-                              "", // TODO: doctor appointment type ID
-                          date: fullDateTime.toUtc().toIso8601String(),
-                          totalCost: 100, // TODO
-                        );
-
-                        final response = await AppointmentService()
-                            .createAppointment(appointment);
-
-                        if (response.statusCode == 200) {
-                          if (!contextRef.mounted) return;
-                          Navigator.push(
-                            contextRef,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) =>
-                                      BookAppointmentFinalDetailsScreen(
-                                        doctorName: widget.doctor.name,
-                                        date: selectedDay!,
-                                        time: selectedTime!,
-                                      ),
+                    ? () => navigator.push(
+                      MaterialPageRoute(
+                        builder:
+                            (context) => BookAppointmentFinalDetailsScreen(
+                              doctorName: widget.doctor.name,
+                              date: selectedDay!,
+                              time: selectedTime!,
                             ),
-                          );
-                        } else {
-                          WidgetsHelper.showCustomSnackBar(
-                            message: "Failed to create appointment.",
-                          );
-                        }
-                      } catch (e) {
-                        WidgetsHelper.showCustomSnackBar(message: e.toString());
-                      }
-                    }
+                      ),
+                    )
                     : null,
           ),
         ),
@@ -146,10 +121,13 @@ class _BookAppointmentTimeSlotScreenState
     );
   }
 
-  Widget getDaySchedule(DateTime day) {
+  Widget getDaySchedule(DateTime day, List<DateTime> bookedSlots) {
+    final bookedSlotsToday =
+        bookedSlots.where((s) => s.day == day.day).map((s) => s.hour).toSet();
+    final numberFormat = NumberFormat("00");
     final String dayLabel = DateFormat('EEEE, dd MMMM').format(day);
 
-    final List<String> times = ["08:00", "10:00", "12:00", "14:00", "16:00"];
+    final times = [8, 10, 12, 14, 16];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,16 +142,21 @@ class _BookAppointmentTimeSlotScreenState
           physics: NeverScrollableScrollPhysics(),
           childAspectRatio: 3,
           children:
-              times.map((time) {
-                return GestureDetector(
-                  onTap: () => onTimeSelected(time, dayLabel),
-                  child: InfoTag(
-                    infoText: time,
-                    isSelected: selectedTime == time && selectedDay == dayLabel,
-                    centerText: true,
-                  ),
-                );
-              }).toList(),
+              times
+                  .where((t) => !bookedSlotsToday.contains(t))
+                  .map((t) => "${numberFormat.format(t)}:00")
+                  .map((time) {
+                    return GestureDetector(
+                      onTap: () => onTimeSelected(time, dayLabel),
+                      child: InfoTag(
+                        infoText: time,
+                        isSelected:
+                            selectedTime == time && selectedDay == dayLabel,
+                        centerText: true,
+                      ),
+                    );
+                  })
+                  .toList(),
         ),
       ],
     );

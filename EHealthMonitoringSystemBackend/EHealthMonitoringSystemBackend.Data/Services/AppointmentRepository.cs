@@ -12,9 +12,10 @@ public class AppointmentRepository : IAppointmentRepository
     public AppointmentRepository(AppDbContext dbContext)
     {
         _dbContext = dbContext;
-        _dbSet = _dbContext.Set<Appointment>();;
+        _dbSet = _dbContext.Set<Appointment>();
+        ;
     }
-    
+
     public DbSet<Appointment> _dbSet { get; }
 
     public async Task<Appointment> AddUpdateAsync(Appointment appointment)
@@ -54,14 +55,16 @@ public class AppointmentRepository : IAppointmentRepository
 
     public async Task<IEnumerable<Appointment>> GetAsync()
     {
-        return await _dbSet.
-            Include(a => a.AppointmentType)
+        return await _dbSet
+            .Include(a => a.AppointmentType)
             .ThenInclude(at => at.Doctor)
             .ThenInclude(d => d.Picture)
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Appointment>> GetAsync(Expression<Func<Appointment, bool>> predicate)
+    public async Task<IEnumerable<Appointment>> GetAsync(
+        Expression<Func<Appointment, bool>> predicate
+    )
     {
         return await _dbContext.Appointments.Where(predicate).ToListAsync();
     }

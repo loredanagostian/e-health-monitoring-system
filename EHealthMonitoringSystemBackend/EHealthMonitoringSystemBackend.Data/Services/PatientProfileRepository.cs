@@ -14,7 +14,7 @@ public class PatientProfileRepository : IPatientProfileRepository
         _dbContext = dbContext;
         _dbSet = _dbContext.Set<PatientProfile>();
     }
-    
+
     public DbSet<PatientProfile> _dbSet { get; }
 
     public async Task<PatientProfile> UpdateAsync(int id, PatientProfile patientProfile)
@@ -37,17 +37,18 @@ public class PatientProfileRepository : IPatientProfileRepository
 
     public async Task<PatientProfile> GetByUserId(string id)
     {
-        var user = await _dbContext.Users
-            .Include(u => u.PatientProfile)
+        var user = await _dbContext
+            .Users.Include(u => u.PatientProfile)
             .FirstOrDefaultAsync(u => u.Id == id);
 
         if (user is null || user.PatientProfile is null)
         {
             return null;
         }
-        
-        var patientProfile = await _dbContext.PatientProfiles
-            .FirstOrDefaultAsync(p => p.Id == user.PatientProfile.Id);
+
+        var patientProfile = await _dbContext.PatientProfiles.FirstOrDefaultAsync(p =>
+            p.Id == user.PatientProfile.Id
+        );
 
         return patientProfile;
     }

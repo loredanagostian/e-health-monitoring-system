@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace EHealthMonitoringSystemBackend.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]/[action]")]
 public class AppointmentController : ControllerBase
 {
@@ -19,10 +20,16 @@ public class AppointmentController : ControllerBase
     private readonly UserManager<User> _userManger;
     private readonly IUploadManager _uploadManager;
     private readonly IConfiguration _configuration;
-    
-    public AppointmentController(IAppointmentRepository appointmentRepository, IJWTManager jwtManager, UserManager<User> userManger,
-        IUploadManager uploadManager, IAppointmentFileRepository appointmentFileRepository, IConfiguration configuration,
-        IAppointmentTypeRepository appointmentTypeRepository)
+
+    public AppointmentController(
+        IAppointmentRepository appointmentRepository,
+        IJWTManager jwtManager,
+        UserManager<User> userManger,
+        IUploadManager uploadManager,
+        IAppointmentFileRepository appointmentFileRepository,
+        IConfiguration configuration,
+        IAppointmentTypeRepository appointmentTypeRepository
+    )
     {
         _appointmentRepository = appointmentRepository;
         _jwtManager = jwtManager;
@@ -33,7 +40,6 @@ public class AppointmentController : ControllerBase
         _appointmentTypeRepository = appointmentTypeRepository;
     }
 
-    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Add([FromBody] AppointmentCreateDto appointmentDto)
     {
@@ -43,18 +49,23 @@ public class AppointmentController : ControllerBase
             return Unauthorized();
         }
 
-        var appointmentType = await _appointmentTypeRepository.GetOneAsync(at => at.Id == appointmentDto.AppointmentTypeId);
+        var appointmentType = await _appointmentTypeRepository.GetOneAsync(at =>
+            at.Id == appointmentDto.AppointmentTypeId
+        );
         if (appointmentType == null)
         {
             return BadRequest("Appointment Type not found!");
         }
 
-        var existingAppointmentTypeIds = (await _appointmentTypeRepository
-            .GetAllByAsync(at => at.DoctorId == appointmentType.DoctorId))
-            .Select(at => at.Id);
+        var existingAppointmentTypeIds = (
+            await _appointmentTypeRepository.GetAllByAsync(at =>
+                at.DoctorId == appointmentType.DoctorId
+            )
+        ).Select(at => at.Id);
 
-        var existingAppointments = await _appointmentRepository
-            .GetAsync(a => existingAppointmentTypeIds.Contains(a.AppointmentTypeId));
+        var existingAppointments = await _appointmentRepository.GetAsync(a =>
+            existingAppointmentTypeIds.Contains(a.AppointmentTypeId)
+        );
 
         foreach (var appointment in existingAppointments)
         {
@@ -63,31 +74,33 @@ public class AppointmentController : ControllerBase
                 return BadRequest("Cannot make an appointment at that time!");
             }
         }
-        
+
         var newAppointment = new Appointment
         {
             TotalCost = appointmentDto.TotalCost,
             Date = appointmentDto.Date,
             AppointmentTypeId = appointmentDto.AppointmentTypeId,
-            UserId = user.Id
+            UserId = "6a368a6e-8382-4ab2-b7a6-99df55289195",
         };
 
         var dbAppointment = await _appointmentRepository.AddUpdateAsync(newAppointment);
         return Ok(dbAppointment);
     }
 
-    [Authorize]
     [HttpPatch]
     public async Task<IActionResult> Update(
         [FromForm] List<IFormFile> files,
-        [FromForm] AppointmentUpdateDto appointmentDto)
+        [FromForm] AppointmentUpdateDto appointmentDto
+    )
     {
-        var existingAppointment = await _appointmentRepository.GetOneAsync(a => a.Id == appointmentDto.Id);
+        var existingAppointment = await _appointmentRepository.GetOneAsync(a =>
+            a.Id == appointmentDto.Id
+        );
         if (existingAppointment is null)
         {
             return BadRequest("Appointment not found!");
         }
-        
+
         var user = await _getUser();
         if (user is null)
         {
@@ -110,7 +123,7 @@ public class AppointmentController : ControllerBase
             var appointmentFile = new AppointmentFile
             {
                 AppointmentId = appointmentDto.Id,
-                FileId = appFile.Id
+                FileId = appFile.Id,
             };
             appointmentFiles.Add(appointmentFile);
         }
@@ -124,8 +137,7 @@ public class AppointmentController : ControllerBase
         var dbAppointment = await _appointmentRepository.AddUpdateAsync(existingAppointment);
         return Ok(dbAppointment);
     }
-    
-    [Authorize]
+
     [HttpGet]
     public async Task<IActionResult> GetPastVisits()
     {
@@ -153,7 +165,6 @@ public class AppointmentController : ControllerBase
         return Ok(appointments);
     }
 
-    [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetFutureAppointments()
     {
@@ -162,7 +173,7 @@ public class AppointmentController : ControllerBase
         {
             return Unauthorized();
         }
-        
+
         var baseUrl = _configuration["Base_url"];
 
         var appointments = (await _appointmentRepository.GetAsync())
@@ -185,21 +196,27 @@ public class AppointmentController : ControllerBase
     {
         var appointment = await _appointmentRepository.GetByIdAsync(id);
 
-        if (appointment is null) return NotFound();
-        
+        if (appointment is null)
+            return NotFound();
+
         var baseUrl = _configuration["Base_url"];
 
-        return Ok(new AppointmentGetOneDto
-        {
-            Id = appointment.Id,
-            Date = appointment.Date,
-            AppointmentType = appointment.AppointmentType.Name,
-            DoctorName = appointment.AppointmentType.Doctor.Name,
-            DoctorPicture = appointment.AppointmentType.Doctor.Picture.Path.Replace("../", baseUrl),
-            MedicalHistory = appointment.MedicalHistory,
-            Diagnostic = appointment.Diagnostic,
-            Recommendation = appointment.Recommendation
-        });
+        return Ok(
+            new AppointmentGetOneDto
+            {
+                Id = appointment.Id,
+                Date = appointment.Date,
+                AppointmentType = appointment.AppointmentType.Name,
+                DoctorName = appointment.AppointmentType.Doctor.Name,
+                DoctorPicture = appointment.AppointmentType.Doctor.Picture.Path.Replace(
+                    "../",
+                    baseUrl
+                ),
+                MedicalHistory = appointment.MedicalHistory,
+                Diagnostic = appointment.Diagnostic,
+                Recommendation = appointment.Recommendation,
+            }
+        );
     }
 
     private async Task<User?> _getUser()
@@ -222,5 +239,29 @@ public class AppointmentController : ControllerBase
         var principal = _jwtManager.GetPrincipalFromToken(jwtToken);
         var user = await _userManger.FindByIdAsync(principal.Identity!.Name!);
         return user;
+    }
+
+    [HttpGet("{doctorId}")]
+    public async Task<IActionResult> GetBookedTimeSlots(string doctorId)
+    {
+        var types = await _appointmentTypeRepository.GetAllByAsync(t => t.DoctorId == doctorId);
+        var typeIds = new HashSet<string>();
+        foreach (var type in types)
+        {
+            typeIds.Add(type.Id);
+        }
+        var appointments = await _appointmentRepository.GetAsync(a =>
+            typeIds.Contains(a.AppointmentTypeId)
+        );
+
+        var timeSlots = new List<string>();
+        foreach (var app in appointments)
+        {
+            timeSlots.Add(
+                DateTime.UtcNow.ToString("s", System.Globalization.CultureInfo.InvariantCulture)
+            );
+        }
+
+        return Ok(new { timeSlots });
     }
 }
