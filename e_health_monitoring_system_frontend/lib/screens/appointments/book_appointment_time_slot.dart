@@ -1,10 +1,12 @@
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
-import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/image_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/widgets_helper.dart';
+import 'package:e_health_monitoring_system_frontend/models/appointment_api_model.dart';
 import 'package:e_health_monitoring_system_frontend/models/doctor_profile.dart';
 import 'package:e_health_monitoring_system_frontend/screens/appointments/book_appoinment_final_details_screen.dart';
+import 'package:e_health_monitoring_system_frontend/services/appointment_service.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/doctor_card.dart';
@@ -96,16 +98,47 @@ class _BookAppointmentTimeSlotScreenState
                     : ColorsHelper.mainPurple,
             onPressed:
                 selectedTime != null && selectedDay != null
-                    ? () => navigator.push(
-                      MaterialPageRoute(
-                        builder:
-                            (context) => BookAppointmentFinalDetailsScreen(
-                              doctorName: widget.doctor.name,
-                              date: selectedDay!,
-                              time: selectedTime!,
+                    ? () async {
+                      final contextRef = context;
+
+                      try {
+                        final fullDateTime = DateFormat(
+                          'EEEE, dd MMMM HH:mm',
+                        ).parse("$selectedDay $selectedTime");
+
+                        final appointment = AppointmentApiModel(
+                          appointmentTypeId:
+                              "", // TODO: doctor appointment type ID
+                          date: fullDateTime.toUtc().toIso8601String(),
+                          totalCost: 100, // TODO
+                        );
+
+                        final response = await AppointmentService()
+                            .createAppointment(appointment);
+
+                        if (response.statusCode == 200) {
+                          if (!contextRef.mounted) return;
+                          Navigator.push(
+                            contextRef,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      BookAppointmentFinalDetailsScreen(
+                                        doctorName: widget.doctor.name,
+                                        date: selectedDay!,
+                                        time: selectedTime!,
+                                      ),
                             ),
-                      ),
-                    )
+                          );
+                        } else {
+                          WidgetsHelper.showCustomSnackBar(
+                            message: "Failed to create appointment.",
+                          );
+                        }
+                      } catch (e) {
+                        WidgetsHelper.showCustomSnackBar(message: e.toString());
+                      }
+                    }
                     : null,
           ),
         ),
