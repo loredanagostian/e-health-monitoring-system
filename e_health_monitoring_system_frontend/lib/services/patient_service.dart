@@ -3,6 +3,7 @@ import 'package:e_health_monitoring_system_frontend/models/patient_profile.dart'
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+// TODO: make singleton
 class PatientService {
   static final AuthManager _manager = AuthManager();
 
@@ -22,12 +23,12 @@ class PatientService {
         .timeout(Duration(seconds: 10));
   }
 
-  Future<Map<String, dynamic>?> getPatientProfile(String email) async {
+  Future<PatientProfile?> getPatientProfile() async {
     final token = await AuthManager().jwtToken;
 
     if (token == null) return null;
 
-    final uri = Uri.parse('${AuthManager.endpoint}/Patient/GetPatientProfileByEmail?email=$email');
+    final uri = Uri.parse('${AuthManager.endpoint}/Patient/GetPatientProfile');
 
     final response = await http.get(
       uri,
@@ -38,10 +39,12 @@ class PatientService {
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return PatientProfile.fromJson(response.body);
     } else {
       print("Failed to fetch patient profile: ${response.body}");
       return null;
     }
   }
+
+  void updateProfile(PatientProfile profile) {}
 }

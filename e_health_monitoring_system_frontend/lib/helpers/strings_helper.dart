@@ -52,6 +52,10 @@ class StringsHelper {
   static const String enterCnp = "Enter your CNP";
   static const String finish = "Finish";
 
+  // Update Profile
+  static const String updateProfile = "Update Profile";
+  static const String update = "Update";
+
   /// Forgot Password
   static const String forgotPasswordTitle = "Forgot Password";
   static const String enterEmailBelow =

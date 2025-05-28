@@ -94,39 +94,53 @@ public class PatientController(
         {
             return BadRequest("Patient Profile does not exist!");
         }
-        
-        var updatedProfile = await patientProfileRepository
-            .UpdateAsync(existingProfile.Id, new PatientProfile{FirstName = profile.FirstName, LastName = profile.LastName, Cnp = profile.Cnp, PhoneNumber = profile.PhoneNumber});
+
+        var updatedProfile = await patientProfileRepository.UpdateAsync(
+            existingProfile.Id,
+            new PatientProfile
+            {
+                FirstName = profile.FirstName,
+                LastName = profile.LastName,
+                Cnp = profile.Cnp,
+                PhoneNumber = profile.PhoneNumber,
+            }
+        );
 
         return Ok(updatedProfile);
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetPatientProfileByEmail(string email)
+    public async Task<IActionResult> GetPatientProfile()
     {
-        var user = await _userManger.Users
-            .Include(u => u.PatientProfile)
-            .FirstOrDefaultAsync(u => u.Email == email);
-
-        if (user == null)
+        string? jwtToken = null;
+        foreach (var header in Request.Headers.Authorization)
         {
-            return NotFound($"No user found with email '{email}'.");
+            if (header is not null && header.Contains("Bearer"))
+            {
+                jwtToken = header.Replace("Bearer", "").Trim();
+                break;
+            }
         }
 
-        if (user.PatientProfile == null)
+        if (jwtToken is null)
         {
-            return NotFound($"User '{email}' does not have a completed profile.");
+            return Unauthorized("Missing JWT Token.");
         }
 
-        var profileDto = new PatientProfileDto
+        var principal = _jwtManager.GetPrincipalFromToken(jwtToken);
+        var user = await _userManger.FindByIdAsync(principal.Identity!.Name!);
+        if (user is null)
         {
-            FirstName = user.PatientProfile.FirstName,
-            LastName = user.PatientProfile.LastName,
-            Cnp = user.PatientProfile.Cnp,
-            PhoneNumber = user.PatientProfile.PhoneNumber,
-        };
+            return Unauthorized("Invalid user id");
+        }
 
-        return Ok(profileDto);
+        var existingProfile = await patientProfileRepository.GetByUserId(user.Id);
+
+        if (existingProfile is null)
+        {
+            return BadRequest("Patient Profile does not exist!");
+        }
+
+        return Ok(existingProfile);
     }
-
 }
