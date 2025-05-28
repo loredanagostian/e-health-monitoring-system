@@ -12,7 +12,6 @@ import 'package:e_health_monitoring_system_frontend/services/patient_service.dar
 import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_textfield.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
 // TODO: this should be a proper form and provide validation
@@ -158,20 +157,6 @@ class UpdateProfileScreen extends StatelessWidget {
           ) => [
             SizedBox(height: MediaQuery.sizeOf(context).height * 0.29),
             Padding(
-              padding: const EdgeInsets.all(10),
-              child: CustomButton(
-                text: "Log out",
-                backgroundColor: ColorsHelper.mainRed,
-                onPressed: () async {
-                  await AuthManager().reset();
-                  await navigator.pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (_) => OnboardingScreen()),
-                    (_) => true,
-                  );
-                },
-              ),
-            ),
-            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: CustomButton(
                 text: StringsHelper.update,
@@ -198,6 +183,20 @@ class UpdateProfileScreen extends StatelessWidget {
                       message: StringsHelper.internalError,
                     );
                   }
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: CustomButton(
+                text: "Log out",
+                backgroundColor: ColorsHelper.mainRed,
+                onPressed: () async {
+                  await AuthManager().reset();
+                  await navigator.pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => OnboardingScreen()),
+                    (_) => true,
+                  );
                 },
               ),
             ),
