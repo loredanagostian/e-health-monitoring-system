@@ -21,4 +21,14 @@ class PatientProfile {
       "cnp": cnp,
     });
   }
+
+  factory PatientProfile.fromJson(String json) {
+    var map = jsonDecode(json);
+    return PatientProfile(
+      firstName: map['firstName'],
+      lastName: map['lastName'],
+      cnp: map['cnp'],
+      phoneNumber: map['phoneNumber'],
+    );
+  }
 }

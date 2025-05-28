@@ -38,6 +38,12 @@ class AuthManager {
     await _prefs.setBool("isLoggedIn", true);
   }
 
+  Future<void> reset() async {
+    await _secureStorage.delete(key: "accessToken");
+    await _secureStorage.delete(key: "refreshToken");
+    await _prefs.setBool("isLoggedIn", false);
+  }
+
   Future<JwtToken?> _loadToken() async {
     var accessToken = await _secureStorage.read(key: "accessToken");
     var refreshToken = await _secureStorage.read(key: "refreshToken");

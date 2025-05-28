@@ -1,6 +1,10 @@
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
+import 'package:e_health_monitoring_system_frontend/models/patient_profile.dart';
+import 'package:e_health_monitoring_system_frontend/screens/onboarding/complete_profile_screen.dart';
+import 'package:e_health_monitoring_system_frontend/services/patient_service.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/book_now_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_row_icon_string.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/doctor_card.dart';
@@ -12,33 +16,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
-  const HomeScreen({super.key});
+  final PatientProfile patientProfile;
+  const HomeScreen({required this.patientProfile, super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() =>
+      _HomeScreenState(patientProfile: patientProfile);
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  PatientProfile patientProfile;
+  _HomeScreenState({required this.patientProfile});
   bool hasNotifications = true;
-  String? firstName;
-  String? lastName;
-  static final SharedPreferencesAsync _prefs = SharedPreferencesAsync();
-
-  @override
-  void initState() {
-    super.initState();
-    loadUserInfo();
-  }
-
-  Future<void> loadUserInfo() async {
-    final _firstname = await _prefs.getString('firstName');
-    final _lastname = await _prefs.getString('lastName');
-
-    setState(() {
-      firstName = _firstname;
-      lastName = _lastname;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,23 +58,49 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         padding: const EdgeInsets.only(left: 25, right: 25, top: 10),
         child: AppBar(
           backgroundColor: ColorsHelper.mainWhite,
-          leading: Container(
-            height: 50,
-            width: 50,
-            decoration: BoxDecoration(
-              color: ColorsHelper.mediumPurple,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                "${(firstName?.isNotEmpty ?? false ? firstName![0] : '')}${(lastName?.isNotEmpty ?? false ? lastName![0] : '')}",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: ColorsHelper.mainWhite,
+          leading: InkWell(
+            child: Container(
+              height: 50,
+              width: 50,
+              decoration: BoxDecoration(
+                color: ColorsHelper.mediumPurple,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  "${patientProfile.firstName[0]}${patientProfile.lastName[0]}"
+                      .toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: ColorsHelper.mainWhite,
+                  ),
                 ),
               ),
             ),
+            onTap:
+                () async => await navigator
+                    .push(
+                      MaterialPageRoute(
+                        builder:
+                            (_) => Scaffold(
+                              body: SafeArea(
+                                child: Stack(
+                                  children: [
+                                    UpdateProfileScreen(),
+                                    BackButton(),
+                                  ],
+                                ),
+                              ),
+                            ),
+                      ),
+                    )
+                    .then((_) async {
+                      var profile = await PatientService().getPatientProfile();
+                      setState(() {
+                        patientProfile = profile ?? widget.patientProfile;
+                      });
+                    }),
           ),
           title: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -100,7 +115,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
               Text(
-                "$firstName $lastName",
+                "${patientProfile.firstName} ${patientProfile.lastName}",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
