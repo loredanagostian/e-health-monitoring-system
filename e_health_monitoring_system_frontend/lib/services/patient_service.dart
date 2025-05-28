@@ -1,7 +1,6 @@
 import 'package:e_health_monitoring_system_frontend/helpers/auth_manager.dart';
-import 'package:e_health_monitoring_system_frontend/models/patient_profile.dart';
+import 'package:e_health_monitoring_system_frontend/models/api_models/patient_profile.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 // TODO: make singleton
 class PatientService {

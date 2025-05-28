@@ -3,7 +3,7 @@ import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/image_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
-import 'package:e_health_monitoring_system_frontend/models/doctor_profile.dart';
+import 'package:e_health_monitoring_system_frontend/models/api_models/doctor_profile.dart';
 import 'package:e_health_monitoring_system_frontend/screens/appointments/book_appointment_time_slot.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';

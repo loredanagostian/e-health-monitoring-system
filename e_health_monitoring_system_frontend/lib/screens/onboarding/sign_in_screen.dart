@@ -7,16 +7,14 @@ import 'package:e_health_monitoring_system_frontend/helpers/fields_validation_he
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/widgets_helper.dart';
-import 'package:e_health_monitoring_system_frontend/models/jwt_token.dart';
+import 'package:e_health_monitoring_system_frontend/models/api_models/jwt_token.dart';
 import 'package:e_health_monitoring_system_frontend/models/patient_register.dart';
 import 'package:e_health_monitoring_system_frontend/screens/main_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/forgot_password_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/sign_up_screen.dart';
 import 'package:e_health_monitoring_system_frontend/services/register_service.dart';
-import 'package:e_health_monitoring_system_frontend/services/patient_service.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_textfield.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
 class SignInScreen extends StatefulWidget {

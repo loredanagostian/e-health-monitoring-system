@@ -1,9 +1,12 @@
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/date_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
-import 'package:e_health_monitoring_system_frontend/models/patient_profile.dart';
+import 'package:e_health_monitoring_system_frontend/models/api_models/patient_profile.dart';
+import 'package:e_health_monitoring_system_frontend/models/api_models/upcoming_appointment_dto.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/complete_profile_screen.dart';
+import 'package:e_health_monitoring_system_frontend/services/appointment_service.dart';
 import 'package:e_health_monitoring_system_frontend/services/patient_service.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/book_now_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_row_icon_string.dart';
@@ -13,7 +16,6 @@ import 'package:e_health_monitoring_system_frontend/widgets/upcoming_appointment
 import 'package:e_health_monitoring_system_frontend/widgets/info_tag.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   final PatientProfile patientProfile;
@@ -27,7 +29,23 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   PatientProfile patientProfile;
   _HomeScreenState({required this.patientProfile});
-  bool hasNotifications = true;
+
+  List<UpcomingAppointmentDto> _upcomingAppointments = [];
+  bool _isLoadingAppointments = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUpcomingAppointments();
+  }
+
+  void _loadUpcomingAppointments() async {
+    final appointments = await AppointmentService.getUpcomingAppointments();
+    setState(() {
+      _upcomingAppointments = appointments;
+      _isLoadingAppointments = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,37 +142,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ],
           ),
-          actions: [
-            GestureDetector(
-              // TODO: navigate to NotificationScreen
-              onTap: () {},
-              child: Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color:
-                      hasNotifications
-                          ? ColorsHelper.lightPurple
-                          : ColorsHelper.lightGray,
-                  border: Border.all(
-                    color:
-                        hasNotifications
-                            ? ColorsHelper.mainPurple
-                            : ColorsHelper.mediumGray,
-                  ),
-                ),
-                child: Icon(
-                  Icons.notifications_outlined,
-                  size: 25,
-                  color:
-                      hasNotifications
-                          ? ColorsHelper.mainPurple
-                          : ColorsHelper.mediumGray,
-                ),
-              ),
-            ),
-          ],
         ),
       ),
     );
@@ -162,40 +149,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget getUpcomingAppointments() {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         getSectionTitle(
           StringsHelper.upcomingAppointments,
-          isViewAllButtonVisible: true,
+          isViewAllButtonVisible: _upcomingAppointments.isNotEmpty,
         ),
         SizedBox(height: 20),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: EdgeInsets.only(left: 25),
-          child: Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 15),
-                child: UpcomingAppointment(
-                  doctorName: "Dr. Lorem Ipsum",
-                  appointmentName: "Dermatology consultation",
-                  date: "Saturday, 26 September",
-                  time: "09:00",
-                ),
+        _isLoadingAppointments
+            ? Padding(
+              padding: const EdgeInsets.only(left: 25),
+              child: CircularProgressIndicator(),
+            )
+            : _upcomingAppointments.isEmpty
+            ? Padding(
+              padding: const EdgeInsets.only(left: 25),
+              child: Text("No upcoming appointments"),
+            )
+            : SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.only(left: 25),
+              child: Row(
+                children:
+                    _upcomingAppointments.map((appointment) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 15),
+                        child: UpcomingAppointment(
+                          doctorName: appointment.doctorName,
+                          appointmentName: appointment.appointmentType,
+                          date: DateHelper.formatDate(appointment.date),
+                          time: DateHelper.formatTime(appointment.date),
+                        ),
+                      );
+                    }).toList(),
               ),
-              Padding(
-                padding: const EdgeInsets.only(right: 15),
-                child: UpcomingAppointment(
-                  doctorName: "Dr. Lorem Ipsum",
-                  appointmentName: "Dermatology consultation",
-                  date: "Saturday, 26 September",
-                  time: "09:00",
-                ),
-              ),
-            ],
-          ),
-        ),
+            ),
       ],
     );
   }

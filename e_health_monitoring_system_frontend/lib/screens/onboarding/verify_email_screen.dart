@@ -6,7 +6,7 @@ import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/widgets_helper.dart';
-import 'package:e_health_monitoring_system_frontend/models/jwt_token.dart';
+import 'package:e_health_monitoring_system_frontend/models/api_models/jwt_token.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/complete_profile_screen.dart';
 import 'package:e_health_monitoring_system_frontend/services/register_service.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/doctor_profile.dart';
+import '../models/api_models/doctor_profile.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/auth_manager.dart';
 
 class DoctorService {
