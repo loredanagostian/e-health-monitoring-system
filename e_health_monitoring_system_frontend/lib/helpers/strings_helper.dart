@@ -70,6 +70,7 @@ class StringsHelper {
   static const String upcomingAppointments = "Upcoming Appointments";
   static const String upcomingAppointment = "Upcoming Appointment";
   static const String recentVisits = "Recent Visits";
+  static const String recentVisit = "Recent Visit";
   static const String bookNow = "Book now";
   static const String medicalReports = "Medical Reports";
   static const String examinations = "Examinations";

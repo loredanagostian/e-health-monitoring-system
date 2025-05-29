@@ -1,4 +1,4 @@
-class UpcomingAppointmentDto {
+class AppointmentDto {
   final String id;
   final int totalCost;
   final String date;
@@ -6,7 +6,7 @@ class UpcomingAppointmentDto {
   final String doctorName;
   final String doctorPicture;
 
-  UpcomingAppointmentDto({
+  AppointmentDto({
     required this.id,
     required this.totalCost,
     required this.doctorName,
@@ -15,8 +15,8 @@ class UpcomingAppointmentDto {
     required this.doctorPicture,
   });
 
-  factory UpcomingAppointmentDto.fromJson(Map<String, dynamic> json) {
-    return UpcomingAppointmentDto(
+  factory AppointmentDto.fromJson(Map<String, dynamic> json) {
+    return AppointmentDto(
       id: json['id'] as String,
       totalCost: json['totalCost'] as int,
       date: json['date'] as String,

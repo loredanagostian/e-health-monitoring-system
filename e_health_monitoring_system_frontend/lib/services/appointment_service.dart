@@ -74,7 +74,7 @@ class AppointmentService {
     }
   }
 
-  static Future<List<UpcomingAppointmentDto>> getUpcomingAppointments() async {
+  static Future<List<AppointmentDto>> getUpcomingAppointments() async {
     var token = await _manager.jwtToken;
 
     var resp = await http
@@ -92,9 +92,30 @@ class AppointmentService {
     if (resp.statusCode == 200) {
       var body = jsonDecode(resp.body);
       var appointments = body as List;
-      return appointments
-          .map((a) => UpcomingAppointmentDto.fromJson(a))
-          .toList();
+      return appointments.map((a) => AppointmentDto.fromJson(a)).toList();
+    } else {
+      print("status error");
+      return [];
+    }
+  }
+
+  static Future<List<AppointmentDto>> getPastVisits() async {
+    var token = await _manager.jwtToken;
+
+    var resp = await http
+        .get(
+          Uri.parse("${AuthManager.endpoint}/Appointment/GetPastVisits"),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer ${token?.accessToken}",
+          },
+        )
+        .timeout(Duration(seconds: 10));
+
+    if (resp.statusCode == 200) {
+      var body = jsonDecode(resp.body);
+      var appointments = body as List;
+      return appointments.map((a) => AppointmentDto.fromJson(a)).toList();
     } else {
       print("status error");
       return [];

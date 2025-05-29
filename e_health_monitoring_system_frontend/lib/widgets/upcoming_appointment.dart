@@ -6,19 +6,20 @@ class UpcomingAppointment extends StatelessWidget {
   final String appointmentName;
   final String date;
   final String time;
+  final void Function() onTap;
   const UpcomingAppointment({
     super.key,
     required this.doctorName,
     required this.appointmentName,
     required this.date,
     required this.time,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      // TODO: navigate
-      onTap: () {},
+      onTap: onTap,
       child: Container(
         width: 340,
         padding: EdgeInsets.all(15),

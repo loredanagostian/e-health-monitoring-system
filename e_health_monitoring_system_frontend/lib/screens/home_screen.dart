@@ -5,7 +5,9 @@ import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart'
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
 import 'package:e_health_monitoring_system_frontend/models/api_models/patient_profile.dart';
 import 'package:e_health_monitoring_system_frontend/models/api_models/upcoming_appointment_dto.dart';
-import 'package:e_health_monitoring_system_frontend/screens/appointments/upcoming_appointments_screen.dart';
+import 'package:e_health_monitoring_system_frontend/screens/appointments/appointments_screen.dart';
+import 'package:e_health_monitoring_system_frontend/screens/appointments/upcoming_appointment_screen.dart';
+import 'package:e_health_monitoring_system_frontend/screens/appointments/appointments_list_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/complete_profile_screen.dart';
 import 'package:e_health_monitoring_system_frontend/services/appointment_service.dart';
 import 'package:e_health_monitoring_system_frontend/services/patient_service.dart';
@@ -31,13 +33,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   PatientProfile patientProfile;
   _HomeScreenState({required this.patientProfile});
 
-  List<UpcomingAppointmentDto> _upcomingAppointments = [];
+  List<AppointmentDto> _upcomingAppointments = [];
+  List<AppointmentDto> _recentVisits = [];
   bool _isLoadingAppointments = true;
+  bool _isLoadingRecentVisits = true;
 
   @override
   void initState() {
     super.initState();
     _loadUpcomingAppointments();
+    _loadRecentVisits();
   }
 
   void _loadUpcomingAppointments() async {
@@ -45,6 +50,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     setState(() {
       _upcomingAppointments = appointments;
       _isLoadingAppointments = false;
+    });
+  }
+
+  void _loadRecentVisits() async {
+    final appointments = await AppointmentService.getPastVisits();
+    setState(() {
+      _recentVisits = appointments;
+      _isLoadingRecentVisits = false;
     });
   }
 
@@ -155,6 +168,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         getSectionTitle(
           StringsHelper.upcomingAppointments,
           isViewAllButtonVisible: _upcomingAppointments.isNotEmpty,
+          onPressed: () async {
+            if (!_isLoadingAppointments) {
+              await navigator.push(
+                MaterialPageRoute(
+                  builder:
+                      (_) => AppointmentsListScreen(
+                        title: StringsHelper.upcomingAppointments,
+                        appointments: _upcomingAppointments,
+                      ),
+                ),
+              );
+            }
+          },
         ),
         SizedBox(height: 20),
         _isLoadingAppointments
@@ -180,6 +206,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           appointmentName: appointment.appointmentType,
                           date: DateHelper.formatDate(appointment.date),
                           time: DateHelper.formatTime(appointment.date),
+                          onTap:
+                              () => navigator.push(
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) => AppointmentDetailsScreen(
+                                        appointmentId: appointment.id,
+                                        title:
+                                            StringsHelper.upcomingAppointment,
+                                      ),
+                                ),
+                              ),
                         ),
                       );
                     }).toList(),
@@ -195,52 +232,64 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         getSectionTitle(
+          onPressed: () async {
+            await navigator.push(
+              MaterialPageRoute(
+                builder:
+                    (_) => AppointmentsListScreen(
+                      title: StringsHelper.recentVisits,
+                      appointments: _recentVisits,
+                    ),
+              ),
+            );
+          },
           StringsHelper.recentVisits,
           isViewAllButtonVisible: true,
         ),
-        SizedBox(height: 20),
+        _isLoadingRecentVisits
+            ? Padding(
+              padding: const EdgeInsets.only(left: 25),
+              child: CircularProgressIndicator(),
+            )
+            : SizedBox(height: 20),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           padding: EdgeInsets.only(left: 25),
           child: Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 15),
-                child: DoctorCard(
-                  doctorName: "Dr. Lorem Ipsum",
-                  doctorSpecialization: [], // TODO
-                  doctorPhotoPath: 'assets/images/mockup_doctor.png',
-                  detailsList: [
-                    CustomRowIconText(
-                      icon: Icons.history,
-                      text: "26 July 2024, 12:00",
-                    ),
-                    BookNowButton(onPressed: () {}),
-                  ],
-                  width: 340,
-                  hasVisibleIcons: true,
-                  onPressed: () {},
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 15),
-                child: DoctorCard(
-                  doctorName: "Dr. Lorem Ipsum",
-                  doctorSpecialization: [], // TODO
-                  doctorPhotoPath: 'assets/images/mockup_doctor.png',
-                  detailsList: [
-                    CustomRowIconText(
-                      icon: Icons.history,
-                      text: "26 July 2024, 12:00",
-                    ),
-                    BookNowButton(onPressed: () {}),
-                  ],
-                  width: 340,
-                  hasVisibleIcons: true,
-                  onPressed: () {},
-                ),
-              ),
-            ],
+            children:
+                _recentVisits
+                    .map(
+                      (ap) => Padding(
+                        padding: const EdgeInsets.only(right: 15),
+                        child: DoctorCard(
+                          doctorName: ap.doctorName,
+                          doctorSpecialization: [], // TODO
+                          doctorPhotoPath: ap.doctorPicture,
+                          detailsList: [
+                            CustomRowIconText(
+                              icon: Icons.history,
+                              text:
+                                  "${DateHelper.formatDate(ap.date)} ${DateHelper.formatTime(ap.date)}",
+                            ),
+                            BookNowButton(onPressed: () {}),
+                          ],
+                          width: 340,
+                          hasVisibleIcons: true,
+                          onPressed: () {
+                            navigator.push(
+                              MaterialPageRoute(
+                                builder:
+                                    (_) => AppointmentDetailsScreen(
+                                      appointmentId: ap.id,
+                                      title: StringsHelper.recentVisit,
+                                    ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    )
+                    .toList(),
           ),
         ),
       ],
@@ -268,7 +317,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget getSectionTitle(String title, {bool isViewAllButtonVisible = false}) {
+  Widget getSectionTitle(
+    String title, {
+    void Function()? onPressed,
+    bool isViewAllButtonVisible = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 25),
       child: Row(
@@ -278,14 +331,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Text(title, style: StylesHelper.titleStyle),
           Visibility(
             visible: isViewAllButtonVisible,
-            child: InfoTag(
-              onPressed:
-                  () => navigator.push(
-                    MaterialPageRoute(
-                      builder: (_) => UpcomingAppointmentsScreen(),
-                    ),
-                  ),
-            ),
+            child: InfoTag(onPressed: onPressed),
           ),
         ],
       ),

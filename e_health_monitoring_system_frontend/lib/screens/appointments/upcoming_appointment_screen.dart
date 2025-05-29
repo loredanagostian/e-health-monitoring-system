@@ -13,7 +13,12 @@ import 'package:flutter/widgets.dart';
 
 class AppointmentDetailsScreen extends StatefulWidget {
   final String appointmentId;
-  const AppointmentDetailsScreen({super.key, required this.appointmentId});
+  final String title;
+  const AppointmentDetailsScreen({
+    super.key,
+    required this.appointmentId,
+    required this.title,
+  });
 
   @override
   State<AppointmentDetailsScreen> createState() =>
@@ -23,32 +28,13 @@ class AppointmentDetailsScreen extends StatefulWidget {
 class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return FutureBuilder(
       future: AppointmentService.getAppointmentDetails(widget.appointmentId),
       builder:
           (ctx, snapshot) => Scaffold(
-            floatingActionButton: Padding(
-              padding: const EdgeInsets.all(25.0),
-              child: CustomButton(
-                text: "Book again",
-                icon: Icons.calendar_month,
-                onPressed: () async {
-                  // navigator.push(
-                  //   MaterialPageRoute(
-                  //     builder:
-                  //         (_) => BookAppointmentTimeSlotScreen(doctor: doctor),
-                  //   ),
-                  // );
-                },
-              ),
-            ),
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,
-            appBar: CustomAppbar(
-              appBarTitle: StringsHelper.upcomingAppointment,
-              implyLeading: true,
-            ),
+            appBar: CustomAppbar(appBarTitle: widget.title, implyLeading: true),
             body:
                 snapshot.hasData
                     ? SafeArea(

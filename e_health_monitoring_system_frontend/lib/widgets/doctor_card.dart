@@ -62,7 +62,7 @@ class DoctorCard extends StatelessWidget {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 15,
+                      horizontal: 5,
                       vertical: 10,
                     ),
                     child: Column(
