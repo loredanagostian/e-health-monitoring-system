@@ -2,6 +2,8 @@ using EHealthMonitoringSystemBackend.Api.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using System.Text.Json;
+using EHealthMonitoringSystemBackend.Data;
+using System.Diagnostics;
 
 namespace EHealthMonitoringSystemBackend.Api.Controllers;
 
@@ -12,7 +14,7 @@ namespace EHealthMonitoringSystemBackend.Api.Controllers;
 public class ChatController : ControllerBase
 {
     private readonly IHttpClientFactory _clientFactory;
-    private readonly IConfiguration _config;
+    private readonly AppDbContext _dbContext;
 
     const String API_KEY = "api_key_placeholder";
     const String BASE_URL = "https://openrouter.ai/api/v1";
@@ -48,15 +50,25 @@ public class ChatController : ControllerBase
         "\n\n- To **cancel an appointment**:" +
         "\n- Select the appointment and press the \"Cancel\" button";
 
-    public ChatController(IHttpClientFactory clientFactory, IConfiguration config)
+    public ChatController(IHttpClientFactory clientFactory, IConfiguration config, AppDbContext dbContext)
     {
         _clientFactory = clientFactory;
-        _config = config;
+        _dbContext = dbContext;
     }
 
     [HttpPost]
     public async Task<IActionResult> SendMessage([FromBody] ChatRequest request)
     {
+        var userId = User.Identity?.Name;
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized("User is not authenticated.");
+        }
+
+        Console.WriteLine("userId = ");
+        Console.WriteLine(userId);
+
         var client = _clientFactory.CreateClient();
         client.DefaultRequestHeaders.Authorization =
             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", API_KEY);
@@ -114,9 +126,48 @@ public class ChatController : ControllerBase
             .GetProperty("choices")[0]
             .GetProperty("message")
             .GetProperty("content")
-            .GetString();
+            .GetString()
+            ?.Trim();
+
+        _dbContext.Conversations.Add(new ChatMessage
+        {
+            UserId = userId,
+            Sender = "user",
+            Message = lastUserMessage.Content
+        });
+
+        _dbContext.Conversations.Add(new ChatMessage
+        {
+            UserId = userId,
+            Sender = "assistant",
+            Message = content
+        });
+
+        await _dbContext.SaveChangesAsync();
 
         return Ok(new { response = content });
     }
 
+    [HttpGet]
+    public IActionResult GetConversation()
+    {
+        var userId = User.Identity?.Name;
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized("User is not authenticated.");
+        }
+
+        var messages = _dbContext.Conversations
+            .Where(m => m.UserId == userId)
+            .OrderBy(m => m.Id)
+            .Select(m => new
+            {
+                m.Sender,
+                m.Message
+            })
+            .ToList();
+
+        return Ok(messages);
+    }
 }

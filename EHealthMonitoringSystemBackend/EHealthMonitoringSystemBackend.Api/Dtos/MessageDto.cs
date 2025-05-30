@@ -8,5 +8,6 @@ public class ChatMessage
 
 public class ChatRequest
 {
+    //public string UserId { get; set; }
     public List<ChatMessage> Messages { get; set; }
 }

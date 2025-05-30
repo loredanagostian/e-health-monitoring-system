@@ -39,4 +39,27 @@ class AiChatService {
       return "Failed to contact support. Please try again later.";
     }
   }
+
+  static Future<List<ChatMessage>> getConversation() async {
+    var token = await _manager.jwtToken;
+    final url = Uri.parse('${AuthManager.endpoint}/Chat/GetConversation');
+    final response = await http.get(url, headers: {
+      'Authorization': 'Bearer ${token?.accessToken}',
+      'Content-Type': 'application/json',
+    });
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+
+      return data.map((msg) {
+        return ChatMessage(
+          message: msg['message'],
+          sender: msg['sender'] == 'user' ? SenderType.user : SenderType.chatbot,
+        );
+      }).toList();
+    } else {
+      print("Failed to load conversation: ${response.body}");
+      return [];
+    }
+  }
 }

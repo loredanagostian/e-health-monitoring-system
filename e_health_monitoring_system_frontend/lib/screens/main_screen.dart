@@ -21,7 +21,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   Widget _getBody(int index, PatientProfile profile) {
     switch (index) {
       case 0:
-        return ChatSupportScreen();
+        return ChatSupportScreen(userInitials: "${profile.firstName[0]}${profile.lastName[0]}".toUpperCase());
       case 1:
         return HomeScreen(patientProfile: profile);
       case 2:

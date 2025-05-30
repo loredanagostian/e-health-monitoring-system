@@ -7,37 +7,34 @@ import 'package:e_health_monitoring_system_frontend/models/chat_message.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:e_health_monitoring_system_frontend/services/ai_chat_service.dart';
 
-class ChatSupportScreen extends ConsumerStatefulWidget {
+class ChatSupportScreen extends StatefulWidget {
+  final String userInitials;
+  const ChatSupportScreen({required this.userInitials, Key? key}) : super(key: key);
+
   @override
-  ConsumerState<ChatSupportScreen> createState() => _ChatScreenState();
+  State<ChatSupportScreen> createState() => _ChatSupportScreenState();
 }
 
-class _ChatScreenState extends ConsumerState<ChatSupportScreen> {
+class _ChatSupportScreenState  extends State<ChatSupportScreen> {
   final TextEditingController messageController = TextEditingController();
   final ScrollController scrollController = ScrollController();
-  List<ChatMessage> chatMessages = [
-    ChatMessage(message: "Hi, what can I help you with?", sender: SenderType.chatbot)
-  ];
-  String? firstName;
-  String? lastName;
+  List<ChatMessage> chatMessages = [];
   static final SharedPreferencesAsync _prefs = SharedPreferencesAsync();
   bool chatIsTyping = false;
 
   @override
   void initState() {
     super.initState();
-    loadUserInfo();
+    loadConversation();
   }
 
-  Future<void> loadUserInfo() async {
-    final _firstname = await _prefs.getString('firstName');
-    final _lastname = await _prefs.getString('lastName');
+  Future<void> loadConversation() async {
+  final messages = await AiChatService.getConversation();
 
-    setState(() {
-      firstName = _firstname;
-      lastName = _lastname;
-    });
-  }
+  setState(() {
+    chatMessages = messages;
+  });
+}
 
   Widget _buildMessageList() {
     return ListView.builder(
@@ -110,7 +107,7 @@ class _ChatScreenState extends ConsumerState<ChatSupportScreen> {
             backgroundColor: ColorsHelper.mediumPurple,
             radius: 25,
             child: Text(
-              "${(firstName?.isNotEmpty ?? false ? firstName![0] : '')}${(lastName?.isNotEmpty ?? false ? lastName![0] : '')}",
+              widget.userInitials,
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,

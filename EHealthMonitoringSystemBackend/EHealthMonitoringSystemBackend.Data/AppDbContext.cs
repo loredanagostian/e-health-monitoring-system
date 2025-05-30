@@ -23,4 +23,5 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     public virtual DbSet<AppointmentType> AppointmentTypes { get; set; }
     public virtual DbSet<Appointment> Appointments { get; set; }
     public virtual DbSet<AppointmentFile> AppointmentFiles { get; set; }
+    public virtual DbSet<ChatMessage> Conversations { get; set; }
 }
