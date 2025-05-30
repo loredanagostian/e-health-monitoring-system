@@ -1,15 +1,14 @@
-
-import { 
-  Calendar, 
-  User, 
-  Stethoscope, 
-  Clock, 
+import {
+  Calendar,
+  User,
+  Stethoscope,
+  Clock,
   Plus,
   Settings,
   Home,
   LogOut
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -63,6 +62,7 @@ const menuItems = [
 
 export function DoctorSidebar() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     localStorage.removeItem("isAuthenticated");
@@ -82,24 +82,35 @@ export function DoctorSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="hover:bg-blue-50 hover:text-blue-700">
-                    <Link to={item.url}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {menuItems.map((item) => {
+                const isActive = location.pathname === item.url;
+
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      className={`${
+                        isActive
+                          ? "bg-blue-100 text-blue-700 font-medium"
+                          : "hover:bg-blue-50 hover:text-blue-700"
+                      }`}
+                    >
+                      <Link to={item.url}>
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="border-t border-slate-200 p-4">
-        <Button 
+        <Button
           onClick={handleLogout}
-          variant="ghost" 
+          variant="ghost"
           className="w-full justify-start text-slate-600 hover:text-red-600 hover:bg-red-50"
         >
           <LogOut className="h-4 w-4 mr-2" />
