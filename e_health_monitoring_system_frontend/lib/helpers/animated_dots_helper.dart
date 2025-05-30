@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class AnimatedDots extends StatefulWidget {
+  const AnimatedDots({super.key});
+
   @override
   _AnimatedDotsState createState() => _AnimatedDotsState();
 }

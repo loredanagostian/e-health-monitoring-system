@@ -5,7 +5,6 @@ import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart'
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
 import 'package:e_health_monitoring_system_frontend/models/api_models/patient_profile.dart';
 import 'package:e_health_monitoring_system_frontend/models/api_models/upcoming_appointment_dto.dart';
-import 'package:e_health_monitoring_system_frontend/screens/appointments/appointments_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/appointments/upcoming_appointment_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/appointments/appointments_list_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/complete_profile_screen.dart';

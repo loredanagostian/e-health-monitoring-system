@@ -4,7 +4,6 @@ import 'package:e_health_monitoring_system_frontend/helpers/auth_manager.dart';
 import 'package:e_health_monitoring_system_frontend/models/api_models/upcoming_appointment_details.dart';
 import 'package:e_health_monitoring_system_frontend/models/api_models/upcoming_appointment_dto.dart';
 import 'package:e_health_monitoring_system_frontend/models/appointment_api_model.dart';
-import 'package:e_health_monitoring_system_frontend/widgets/upcoming_appointment.dart';
 import 'package:http/http.dart' as http;
 
 class AppointmentService {
