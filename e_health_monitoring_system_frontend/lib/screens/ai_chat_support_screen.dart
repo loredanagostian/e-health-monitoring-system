@@ -185,7 +185,7 @@ class _ChatScreenState extends ConsumerState<ChatSupportScreen> {
 
   scrollToBottom();
 
-  final response = await OpenRouterService.sendMessage(chatMessages);
+  final response = await AiChatService.sendMessage(chatMessages);
 
   setState(() {
     chatMessages.removeLast();

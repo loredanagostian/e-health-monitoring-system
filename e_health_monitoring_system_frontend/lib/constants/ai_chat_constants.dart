@@ -1,5 +1,5 @@
 class ChatGptConstants {
-  static final String apiKey = "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";
+  static final String apiKey = "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";
   static final String baseUrl = "https://openrouter.ai/api/v1";
   static final String chatEndpoint = "/chat/completions";
   static final double temperature = 0.5;
