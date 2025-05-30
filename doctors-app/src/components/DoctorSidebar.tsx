@@ -6,8 +6,10 @@ import {
   Clock, 
   Plus,
   Settings,
-  Home
+  Home,
+  LogOut
 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -17,7 +19,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "../components/ui/sidebar";
+  SidebarFooter,
+} from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 
 const menuItems = [
   {
@@ -58,6 +62,13 @@ const menuItems = [
 ];
 
 export function DoctorSidebar() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("isAuthenticated");
+    navigate("/signin");
+  };
+
   return (
     <Sidebar className="border-r border-slate-200">
       <SidebarContent>
@@ -74,10 +85,10 @@ export function DoctorSidebar() {
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild className="hover:bg-blue-50 hover:text-blue-700">
-                    <a href={item.url}>
+                    <Link to={item.url}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -85,6 +96,16 @@ export function DoctorSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter className="border-t border-slate-200 p-4">
+        <Button 
+          onClick={handleLogout}
+          variant="ghost" 
+          className="w-full justify-start text-slate-600 hover:text-red-600 hover:bg-red-50"
+        >
+          <LogOut className="h-4 w-4 mr-2" />
+          Logout
+        </Button>
+      </SidebarFooter>
     </Sidebar>
   );
 }
