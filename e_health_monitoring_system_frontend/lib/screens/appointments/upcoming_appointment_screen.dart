@@ -1,15 +1,10 @@
 import 'package:e_health_monitoring_system_frontend/helpers/date_helper.dart';
-import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
-import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
-import 'package:e_health_monitoring_system_frontend/screens/appointments/book_appointment_time_slot.dart';
 import 'package:e_health_monitoring_system_frontend/services/appointment_service.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
-import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_row_icon_string.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/doctor_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class AppointmentDetailsScreen extends StatefulWidget {
   final String appointmentId;
