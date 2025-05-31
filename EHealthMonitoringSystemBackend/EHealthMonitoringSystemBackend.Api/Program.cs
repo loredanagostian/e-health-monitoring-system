@@ -16,9 +16,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.ConfigureAppConfiguration((builderContext, config) =>
 {
     config
-        .AddJsonFile("secrets/appsettings.secrets.json", optional: true) 
+        .AddJsonFile("secrets/appsettings.secrets.json", optional: true)
         .AddEnvironmentVariables();
 });
+builder.Services.AddHttpClient();
 
 var services = builder.Services;
 var configuration = builder.Configuration;
