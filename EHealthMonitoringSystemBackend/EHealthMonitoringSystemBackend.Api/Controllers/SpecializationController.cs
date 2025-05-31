@@ -44,7 +44,7 @@ public class SpecializationController : ControllerBase
             Icon = dto.Icon
         };
 
-        var dbSpecialization = await _specializationRepository.AddAsync(specialization);
+        var dbSpecialization = await _specializationRepository.AddUpdateAsync(specialization);
 
         return Ok(new SpecializationAddDto() {Name = dbSpecialization.Name, Icon = dbSpecialization.Icon});
     }
@@ -63,5 +63,43 @@ public class SpecializationController : ControllerBase
 
         return Ok(new DoctorSpecializationDto
             {DoctorId = dbDoctorSpecialization.DoctorId, SpecializationId = dbDoctorSpecialization.SpecializationId});
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        var deleted = await _specializationRepository.DeleteOneAsync(s => s.Id == id);
+
+        if (deleted is null)
+        {
+            return BadRequest("Specialization not found!");
+        }
+
+        return Ok(new SpecializationGetDto
+        {
+            Id = deleted.Id,
+            Icon = deleted.Icon,
+            Name = deleted.Name
+        });
+    }
+    
+    [HttpPatch]
+    public async Task<IActionResult> Update([FromBody] SpecializationGetDto dto)
+    {
+        var specialization = new Specialization
+        {
+            Id = dto.Id,
+            Name = dto.Name,
+            Icon = dto.Icon
+        };
+
+        var existing = await _specializationRepository.GetOneAsync(s => s.Id == dto.Id);
+        if (existing is null)
+        {
+            return BadRequest("Specialization not found!");
+        }
+
+        var dbSpecialization = await _specializationRepository.AddUpdateAsync(specialization);
+        return Ok(new SpecializationGetDto() {Id = dbSpecialization.Id, Name = dbSpecialization.Name, Icon = dbSpecialization.Icon});
     }
 }

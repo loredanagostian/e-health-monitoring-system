@@ -37,7 +37,7 @@ public class AppointmentTypeController : ControllerBase
             DoctorId = appointmentTypeDto.DoctorId,
         };
 
-        var dbAppointmentType = await _appointmentTypeRepository.AddAsync(appointmentType);
+        var dbAppointmentType = await _appointmentTypeRepository.AddUpdateAsync(appointmentType);
 
         return Ok(
             new AppointmentTypePostDto
@@ -47,5 +47,18 @@ public class AppointmentTypeController : ControllerBase
                 DoctorId = dbAppointmentType.DoctorId,
             }
         );
+    }
+    
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        var deleted = await _appointmentTypeRepository.DeleteOneAsync(s => s.Id == id);
+
+        if (deleted is null)
+        {
+            return BadRequest("Specialization not found!");
+        }
+
+        return Ok(deleted);
     }
 }

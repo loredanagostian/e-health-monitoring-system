@@ -16,6 +16,7 @@ public class AppointmentController : ControllerBase
     private readonly IAppointmentRepository _appointmentRepository;
     private readonly IAppointmentTypeRepository _appointmentTypeRepository;
     private readonly IAppointmentFileRepository _appointmentFileRepository;
+    private readonly IDoctorRepository _doctorRepository;
     private readonly IJWTManager _jwtManager;
     private readonly UserManager<User> _userManger;
     private readonly IUploadManager _uploadManager;
@@ -28,8 +29,8 @@ public class AppointmentController : ControllerBase
         IUploadManager uploadManager,
         IAppointmentFileRepository appointmentFileRepository,
         IConfiguration configuration,
-        IAppointmentTypeRepository appointmentTypeRepository
-    )
+        IAppointmentTypeRepository appointmentTypeRepository,
+        IDoctorRepository doctorRepository)
     {
         _appointmentRepository = appointmentRepository;
         _jwtManager = jwtManager;
@@ -38,6 +39,7 @@ public class AppointmentController : ControllerBase
         _appointmentFileRepository = appointmentFileRepository;
         _configuration = configuration;
         _appointmentTypeRepository = appointmentTypeRepository;
+        _doctorRepository = doctorRepository;
     }
 
     [HttpPost]
@@ -105,10 +107,6 @@ public class AppointmentController : ControllerBase
         if (user is null)
         {
             return Unauthorized();
-        }
-        if (user.Id != existingAppointment.UserId)
-        {
-            return Unauthorized("User cannot perform this action!");
         }
 
         var appointmentFiles = new List<AppointmentFile>();
@@ -180,6 +178,52 @@ public class AppointmentController : ControllerBase
             .Where(a => a.UserId == user.Id && a.Date >= DateTime.Now)
             .OrderBy(a => a.Date)
             .Take(3)
+            .Select(a => new AppointmentGetAllDto
+            {
+                Id = a.Id,
+                Date = a.Date,
+                AppointmentType = a.AppointmentType.Name,
+                DoctorName = a.AppointmentType.Doctor.Name,
+                DoctorPicture = a.AppointmentType.Doctor.Picture.Path.Replace("../", baseUrl),
+            });
+
+        return Ok(appointments);
+    }
+    
+    [HttpGet("{doctorId}")]
+    public async Task<IActionResult> GetDoctorAppointments(string doctorId, [FromQuery] string time)
+    {
+        var doctor = await _doctorRepository.GetOneAsync(d => d.Id == doctorId);
+        if (doctor is null)
+        {
+            return BadRequest("Doctor not found!");
+        }
+        
+        var baseUrl = _configuration["Base_url"];
+
+        List<Appointment> appointmentsQuery;
+
+        if (time.Equals("past"))
+        {
+            appointmentsQuery = (await _appointmentRepository.GetAsync())
+                .Where(a => a.AppointmentType.DoctorId == doctorId && a.Date < DateTime.Now)
+                .OrderByDescending(a => a.Date).ToList();
+        }
+        else
+        {
+            if (time.Equals("future"))
+            {
+                appointmentsQuery = (await _appointmentRepository.GetAsync())
+                    .Where(a => a.AppointmentType.DoctorId == doctorId && a.Date >= DateTime.Now)
+                    .OrderBy(a => a.Date).ToList();
+            }
+            else
+            {
+                return BadRequest("Time parameter not set correctly!");
+            }
+        }
+
+        var appointments = appointmentsQuery
             .Select(a => new AppointmentGetAllDto
             {
                 Id = a.Id,

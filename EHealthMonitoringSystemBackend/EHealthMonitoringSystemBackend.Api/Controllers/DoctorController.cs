@@ -119,7 +119,7 @@ public class DoctorController : ControllerBase
             await _specializationRepository.GetAllByAsync(s =>
                 doctorSpecializationIds.Contains(s.Id)
             )
-        ).Select(s => new SpecializationAddDto() { Name = s.Name, Icon = s.Icon });
+        ).Select(s => new SpecializationGetDto() {Id = s.Id, Name = s.Name, Icon = s.Icon });
 
         doctorDto.Specializations = specializations;
 

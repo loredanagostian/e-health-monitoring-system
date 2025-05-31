@@ -17,12 +17,23 @@ public class AppointmentTypeRepository : IAppointmentTypeRepository
     
     public DbSet<AppointmentType> _dbSet { get; }
 
-    public async Task<AppointmentType> AddAsync(AppointmentType appointmentType)
+    public async Task<AppointmentType> AddUpdateAsync(AppointmentType appointmentType)
     {
-        var dbAppointmentType = (await _dbSet.AddAsync(appointmentType)).Entity;
-        await _dbContext.SaveChangesAsync();
+        var existing = await _dbSet.FirstOrDefaultAsync(a => a.Id.Equals(appointmentType.Id));
 
-        return dbAppointmentType;
+        if (existing is null)
+        {
+            var dbEntity = (await _dbSet.AddAsync(appointmentType)).Entity;
+            await _dbContext.SaveChangesAsync();
+            return dbEntity;
+        }
+
+        existing.Name = appointmentType.Name;
+        existing.Price = appointmentType.Price;
+        existing.DoctorId = appointmentType.DoctorId;
+
+        await _dbContext.SaveChangesAsync();
+        return existing;
     }
 
     public async Task<AppointmentType> GetOneAsync(Expression<Func<AppointmentType, bool>> predicate)
@@ -33,5 +44,19 @@ public class AppointmentTypeRepository : IAppointmentTypeRepository
     public async Task<IEnumerable<AppointmentType>> GetAllByAsync(Expression<Func<AppointmentType, bool>> predicate)
     {
         return await _dbContext.AppointmentTypes.Where(predicate).ToListAsync();
+    }
+
+    public async Task<AppointmentType> DeleteOneAsync(Expression<Func<AppointmentType, bool>> predicate)
+    {
+        var existing = await _dbContext.AppointmentTypes.FirstOrDefaultAsync(predicate);
+
+        if (existing is null)
+        {
+            return null;
+        }
+
+        _dbSet.Remove(existing);
+        await _dbContext.SaveChangesAsync();
+        return existing;
     }
 }

@@ -17,12 +17,22 @@ public class SpecializationRepository : ISpecializationRepository
     
     public DbSet<Specialization> _dbSet { get; }
 
-    public async Task<Specialization> AddAsync(Specialization specialization)
+    public async Task<Specialization> AddUpdateAsync(Specialization specialization)
     {
-        var dbSpecialization = (await _dbSet.AddAsync(specialization)).Entity;
-        await _dbContext.SaveChangesAsync();
+        var existing = await _dbSet.FirstOrDefaultAsync(a => a.Id.Equals(specialization.Id));
 
-        return dbSpecialization;
+        if (existing is null)
+        {
+            var dbEntity = (await _dbSet.AddAsync(specialization)).Entity;
+            await _dbContext.SaveChangesAsync();
+            return dbEntity;
+        }
+
+        existing.Name = specialization.Name;
+        existing.Icon = specialization.Icon;
+
+        await _dbContext.SaveChangesAsync();
+        return existing;
     }
 
     public async Task<IEnumerable<Specialization>> GetAllAsync()
@@ -38,5 +48,19 @@ public class SpecializationRepository : ISpecializationRepository
     public async Task<IEnumerable<Specialization>> GetAllByAsync(Expression<Func<Specialization, bool>> predicate)
     {
         return await _dbContext.Specializations.Where(predicate).ToListAsync();
+    }
+
+    public async Task<Specialization> DeleteOneAsync(Expression<Func<Specialization, bool>> predicate)
+    {
+        var existing = await _dbContext.Specializations.FirstOrDefaultAsync(predicate);
+
+        if (existing is null)
+        {
+            return null;
+        }
+
+        _dbSet.Remove(existing);
+        await _dbContext.SaveChangesAsync();
+        return existing;
     }
 }
