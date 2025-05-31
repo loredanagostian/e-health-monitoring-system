@@ -4,7 +4,6 @@ import {
   Stethoscope,
   Clock,
   Plus,
-  Settings,
   Home,
   LogOut
 } from "lucide-react";
@@ -43,21 +42,16 @@ const menuItems = [
     url: "/appointment-types",
     icon: Clock,
   },
-  {
-    title: "Schedule",
-    url: "/schedule",
-    icon: Plus,
-  },
+  // {
+  //   title: "Schedule",
+  //   url: "/schedule",
+  //   icon: Plus,
+  // },
   {
     title: "Profile",
     url: "/profile",
     icon: User,
-  },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
-  },
+  }
 ];
 
 export function DoctorSidebar() {

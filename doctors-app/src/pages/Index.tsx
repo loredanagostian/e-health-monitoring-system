@@ -1,7 +1,6 @@
 
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DoctorSidebar } from "@/components/DoctorSidebar";
-import { DashboardStats } from "@/components/DashboardStats";
 import { SpecializationManager } from "@/components/SpecializationManager";
 import { AppointmentTypeManager } from "@/components/AppointmentTypeManager";
 import { AppointmentManager } from "@/components/AppointmentManager";
@@ -21,8 +20,6 @@ const Index = () => {
                 <p className="text-slate-600">Manage your practice efficiently</p>
               </div>
             </div>
-
-            <DashboardStats />
 
             <Tabs defaultValue="appointments" className="space-y-6">
               <TabsList className="grid w-full grid-cols-3">

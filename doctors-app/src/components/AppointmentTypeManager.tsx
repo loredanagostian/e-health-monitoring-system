@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -11,46 +11,14 @@ import { toast } from "../hooks/use-toast";
 interface AppointmentType {
   id: string;
   name: string;
-  duration: number;
   price: number;
-  description: string;
   color: string;
 }
 
 export function AppointmentTypeManager() {
-  const [appointmentTypes, setAppointmentTypes] = useState<AppointmentType[]>([
-    {
-      id: "1",
-      name: "General Consultation",
-      duration: 30,
-      price: 150,
-      description: "Standard medical consultation",
-      color: "bg-blue-100 text-blue-800",
-    },
-    {
-      id: "2",
-      name: "Follow-up",
-      duration: 15,
-      price: 75,
-      description: "Follow-up appointment for existing patients",
-      color: "bg-green-100 text-green-800",
-    },
-    {
-      id: "3",
-      name: "Specialist Consultation",
-      duration: 45,
-      price: 250,
-      description: "Specialized medical consultation",
-      color: "bg-purple-100 text-purple-800",
-    },
-  ]);
-
-  const [formData, setFormData] = useState({
-    name: "",
-    duration: "",
-    price: "",
-    description: "",
-  });
+  const doctorId = "4d950ab0-9c18-43c2-9767-2639f67250b5"; // TODO: Replace the doctorId with the one from the JWT
+  const [appointmentTypes, setAppointmentTypes] = useState<AppointmentType[]>([]);
+  const [formData, setFormData] = useState({ name: "", price: "", description: "" });
 
   const colors = [
     "bg-blue-100 text-blue-800",
@@ -60,8 +28,42 @@ export function AppointmentTypeManager() {
     "bg-pink-100 text-pink-800",
   ];
 
-  const addAppointmentType = () => {
-    if (!formData.name.trim() || !formData.duration || !formData.price) {
+  useEffect(() => {
+    const fetchAppointmentTypes = async () => {
+      try {
+        const response = await fetch(`http://localhost:5200/api/AppointmentType/GetAppointmentsTypesByDoctor/${doctorId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            // "Authorization": `Bearer ${yourAccessToken}` // TODO: Use JWT
+          },
+        });
+        if (!response.ok) throw new Error("Failed to fetch appointment types");
+        const data = await response.json();
+
+        const typed: AppointmentType[] = data.map((item: any, idx: number) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          color: colors[idx % colors.length],
+        }));
+
+        setAppointmentTypes(typed);
+      } catch (error) {
+        console.error("Error fetching appointment types:", error);
+        toast({
+          title: "Error",
+          description: "Could not load appointment types.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchAppointmentTypes();
+  }, [doctorId]);
+
+  const addAppointmentType = async () => {
+    if (!formData.name.trim() || !formData.price) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -70,29 +72,81 @@ export function AppointmentTypeManager() {
       return;
     }
 
-    const newType: AppointmentType = {
-      id: Date.now().toString(),
-      name: formData.name,
-      duration: parseInt(formData.duration),
+    const payload = {
+      name: formData.name.trim(),
       price: parseFloat(formData.price),
-      description: formData.description,
-      color: colors[appointmentTypes.length % colors.length],
+      doctorId: "4d950ab0-9c18-43c2-9767-2639f67250b5" // TODO: Replace the doctorId with the one from the JWT
     };
 
-    setAppointmentTypes([...appointmentTypes, newType]);
-    setFormData({ name: "", duration: "", price: "", description: "" });
-    toast({
-      title: "Success",
-      description: "Appointment type added successfully",
-    });
+    try {
+      const response = await fetch("http://localhost:5200/api/AppointmentType/Add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // "Authorization": `Bearer ${yourAccessToken}` // TODO: Use JWT
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create appointment type");
+      }
+
+      const saved = await response.json();
+
+      console.log(saved);
+
+      const newType: AppointmentType = {
+        id: Date.now().toString(),
+        name: formData.name,
+        price: parseFloat(formData.price),
+        color: colors[appointmentTypes.length % colors.length],
+      };
+
+      setAppointmentTypes([...appointmentTypes, newType]);
+      setFormData({ name: "", price: "", description: "" });
+      toast({
+        title: "Success",
+        description: "Appointment type added successfully",
+      });
+    } catch (error) {
+      console.error("Error adding appointment type:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add appointment type. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const removeAppointmentType = (id: string) => {
-    setAppointmentTypes(appointmentTypes.filter(type => type.id !== id));
-    toast({
-      title: "Success",
-      description: "Appointment type removed successfully",
-    });
+  const removeAppointmentType = async (id: string) => {
+    try {
+      const response = await fetch(`http://localhost:5200/api/AppointmentType/Delete/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          // "Authorization": `Bearer ${yourAccessToken}` // TODO: Use JWT
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete appointment type");
+      }
+
+      setAppointmentTypes((prev) => prev.filter((type) => type.id !== id));
+
+      toast({
+        title: "Success",
+        description: "Appointment type removed successfully",
+      });
+    } catch (error) {
+      console.error("Error deleting appointment type:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete appointment type. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -110,31 +164,20 @@ export function AppointmentTypeManager() {
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
-          <div className="grid grid-cols-2 gap-2">
-            <Input
+          <Input
               type="number"
-              placeholder="Duration (min)"
-              value={formData.duration}
-              onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-            />
-            <Input
-              type="number"
-              step="0.01"
-              placeholder="Price ($)"
+              step="1"
+              placeholder="Price (RON)"
               value={formData.price}
               onChange={(e) => setFormData({ ...formData, price: e.target.value })}
             />
-          </div>
-          <Textarea
-            placeholder="Description (optional)"
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          />
-          <Button onClick={addAppointmentType} className="h-fit">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Type
-          </Button>
         </div>
+
+        <Button onClick={addAppointmentType} className="w-full">
+          <Plus className="h-4 w-4 mr-2" />
+          Add Type
+        </Button>
+
 
         <div className="space-y-3">
           {appointmentTypes.map((type) => (
@@ -147,18 +190,11 @@ export function AppointmentTypeManager() {
                   <Badge className={type.color}>{type.name}</Badge>
                   <div className="flex items-center gap-4 text-sm text-slate-600">
                     <span className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      {type.duration} min
-                    </span>
-                    <span className="flex items-center gap-1">
                       <DollarSign className="h-4 w-4" />
-                      ${type.price}
+                      {type.price} RON
                     </span>
                   </div>
                 </div>
-                {type.description && (
-                  <p className="text-sm text-slate-600">{type.description}</p>
-                )}
               </div>
               <Button
                 size="sm"

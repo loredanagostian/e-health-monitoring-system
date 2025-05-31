@@ -42,13 +42,14 @@ public class AppointmentTypeController : ControllerBase
         return Ok(
             new AppointmentTypePostDto
             {
+                Id = dbAppointmentType.Id,
                 Name = dbAppointmentType.Name,
                 Price = dbAppointmentType.Price,
                 DoctorId = dbAppointmentType.DoctorId,
             }
         );
     }
-    
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(string id)
     {
@@ -61,4 +62,25 @@ public class AppointmentTypeController : ControllerBase
 
         return Ok(deleted);
     }
+    
+    [HttpGet("{doctorId}")]
+    public async Task<IActionResult> GetAppointmentsTypesByDoctor(string doctorId)
+    {
+        var doctor = await _doctorRepository.GetOneAsync(d => d.Id == doctorId);
+        if (doctor is null)
+            return NotFound("Doctor not found!");
+
+        var dbAppointments = await _appointmentTypeRepository.GetManyAsync(a => a.DoctorId == doctorId);
+
+        var appointmentDtos = dbAppointments.Select(a => new AppointmentTypePostDto
+        {
+            Id = a.Id,
+            Name = a.Name,
+            Price = a.Price,
+            DoctorId = a.DoctorId,
+        });
+
+        return Ok(appointmentDtos);
+    }
+
 }

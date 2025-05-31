@@ -14,7 +14,7 @@ public class AppointmentTypeRepository : IAppointmentTypeRepository
         _dbContext = dbContext;
         _dbSet = _dbContext.Set<AppointmentType>();
     }
-    
+
     public DbSet<AppointmentType> _dbSet { get; }
 
     public async Task<AppointmentType> AddUpdateAsync(AppointmentType appointmentType)
@@ -58,5 +58,10 @@ public class AppointmentTypeRepository : IAppointmentTypeRepository
         _dbSet.Remove(existing);
         await _dbContext.SaveChangesAsync();
         return existing;
+    }
+    
+    public async Task<IEnumerable<AppointmentType>> GetManyAsync(Expression<Func<AppointmentType, bool>> predicate)
+    {
+        return await _dbContext.Set<AppointmentType>().Where(predicate).ToListAsync();
     }
 }
