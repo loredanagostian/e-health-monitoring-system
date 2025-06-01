@@ -60,61 +60,44 @@ class DoctorCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 5,
-                      vertical: 10,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          doctorName,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: ColorsHelper.mainDark,
-                            fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 10,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            doctorName,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: ColorsHelper.mainDark,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children:
-                              doctorSpecialization
-                                  .expand((spec) => spec.split('|'))
-                                  .map(
-                                    (spec) => Text(
-                                      spec.trim(),
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: ColorsHelper.darkGray,
-                                        fontWeight: FontWeight.normal,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children:
+                                doctorSpecialization
+                                    .expand((spec) => spec.split('|'))
+                                    .map(
+                                      (spec) => Text(
+                                        spec.trim(),
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: ColorsHelper.darkGray,
+                                          fontWeight: FontWeight.normal,
+                                        ),
                                       ),
-                                    ),
-                                  )
-                                  .toList(),
-                        ),
-                        Spacer(),
-                        ...detailsList,
-                      ],
-                    ),
-                  ),
-                  Spacer(),
-                  Visibility(
-                    visible: hasVisibleIcons,
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 10, right: 15),
-                        child: GestureDetector(
-                          // TODO: implement download
-                          onTap: () {},
-                          child: Icon(
-                            Icons.file_download_outlined,
-                            size: 24,
-                            color: ColorsHelper.mainDark,
+                                    )
+                                    .toList(),
                           ),
-                        ),
+                          Spacer(),
+                          ...detailsList,
+                        ],
                       ),
                     ),
                   ),

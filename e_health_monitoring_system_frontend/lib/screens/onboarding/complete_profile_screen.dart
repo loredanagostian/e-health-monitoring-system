@@ -11,10 +11,10 @@ import 'package:e_health_monitoring_system_frontend/screens/onboarding/onboardin
 import 'package:e_health_monitoring_system_frontend/services/patient_service.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
+import 'package:e_health_monitoring_system_frontend/widgets/custom_opacity_button_with_border_color.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_textfield.dart';
 import 'package:flutter/material.dart';
 
-// TODO: this should be a proper form and provide validation
 class PatientProfileForm extends StatefulWidget {
   final List<Widget> Function(
     BuildContext,
@@ -25,10 +25,12 @@ class PatientProfileForm extends StatefulWidget {
   )
   builder;
   final String appBarTitle;
+  final bool implyLeading;
   const PatientProfileForm({
     super.key,
     required this.appBarTitle,
     required this.builder,
+    this.implyLeading = false,
   });
 
   @override
@@ -36,15 +38,49 @@ class PatientProfileForm extends StatefulWidget {
 }
 
 class _PatientProfileFormState extends State<PatientProfileForm> {
+  late TextEditingController firstNameController;
+  late TextEditingController lastNameController;
+  late TextEditingController phoneNumberController;
+  late TextEditingController cnpController;
+
+  @override
+  void initState() {
+    super.initState();
+    firstNameController = TextEditingController();
+    lastNameController = TextEditingController();
+    phoneNumberController = TextEditingController();
+    cnpController = TextEditingController();
+    _loadProfileDataIfAvailable();
+  }
+
+  Future<void> _loadProfileDataIfAvailable() async {
+    final profile = await PatientService().getPatientProfile();
+    if (profile != null) {
+      setState(() {
+        firstNameController.text = profile.firstName;
+        lastNameController.text = profile.lastName;
+        phoneNumberController.text = profile.phoneNumber;
+        cnpController.text = profile.cnp;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    firstNameController.dispose();
+    lastNameController.dispose();
+    phoneNumberController.dispose();
+    cnpController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    var firstNameController = TextEditingController();
-    var lastNameController = TextEditingController();
-    var phoneNumberController = TextEditingController();
-    var cnpController = TextEditingController();
-
     return Scaffold(
-      appBar: CustomAppbar(appBarTitle: widget.appBarTitle),
+      appBar: CustomAppbar(
+        appBarTitle: widget.appBarTitle,
+        implyLeading: widget.implyLeading,
+      ),
       body: SingleChildScrollView(
         child: SafeArea(
           child: Padding(
@@ -91,6 +127,7 @@ class CompleteProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return PatientProfileForm(
       appBarTitle: StringsHelper.completeProfile,
+      implyLeading: false,
       builder:
           (
             ctx,
@@ -147,6 +184,7 @@ class UpdateProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return PatientProfileForm(
       appBarTitle: StringsHelper.updateProfile,
+      implyLeading: true,
       builder:
           (
             ctx,
@@ -160,7 +198,6 @@ class UpdateProfileScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: CustomButton(
                 text: StringsHelper.update,
-                // icon: Icons.arrow_forward_ios,
                 onPressed: () async {
                   try {
                     var profile = PatientProfile(
@@ -188,8 +225,8 @@ class UpdateProfileScreen extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.all(10),
-              child: CustomButton(
-                text: "Log out",
+              child: CustomOpacityButtonWithBorderColor(
+                text: StringsHelper.logout,
                 backgroundColor: ColorsHelper.mainRed,
                 onPressed: () async {
                   await AuthManager().reset();

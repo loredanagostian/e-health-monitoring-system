@@ -33,4 +33,17 @@ class DoctorService {
       throw Exception('Failed to load doctors for specialization');
     }
   }
+
+  static Future<DoctorProfile> getDoctorById(String doctorId) async {
+    final response = await http.get(
+      Uri.parse('${AuthManager.endpoint}/Doctor/GetInfoById/$doctorId'),
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      return DoctorProfile.fromJson(data);
+    } else {
+      throw Exception('Failed to load doctor');
+    }
+  }
 }

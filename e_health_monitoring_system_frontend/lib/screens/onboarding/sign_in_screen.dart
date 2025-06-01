@@ -10,7 +10,6 @@ import 'package:e_health_monitoring_system_frontend/helpers/widgets_helper.dart'
 import 'package:e_health_monitoring_system_frontend/models/api_models/jwt_token.dart';
 import 'package:e_health_monitoring_system_frontend/models/patient_register.dart';
 import 'package:e_health_monitoring_system_frontend/screens/main_screen.dart';
-import 'package:e_health_monitoring_system_frontend/screens/onboarding/forgot_password_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/sign_up_screen.dart';
 import 'package:e_health_monitoring_system_frontend/services/register_service.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_button.dart';
@@ -61,29 +60,6 @@ class _SignInScreenState extends State<SignInScreen> {
                 CustomTextField(
                   textFieldType: TextFieldType.password,
                   controller: passwordController,
-                ),
-                GestureDetector(
-                  onTap:
-                      () => navigator.push(
-                        MaterialPageRoute(
-                          builder: (context) => ForgotPasswordScreen(),
-                        ),
-                      ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 17),
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        StringsHelper.forgotPassword,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: ColorsHelper.darkGray,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
                 ),
                 SizedBox(height: MediaQuery.sizeOf(context).height * 0.33),
                 Padding(

@@ -14,9 +14,11 @@ class CustomRowIconText extends StatelessWidget {
       children: [
         Icon(icon, size: 24, color: ColorsHelper.mediumGray),
         SizedBox(width: 5),
-        Text(
-          text,
-          style: TextStyle(color: ColorsHelper.mediumGray, fontSize: 14),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(color: ColorsHelper.mediumGray, fontSize: 14),
+          ),
         ),
       ],
     );

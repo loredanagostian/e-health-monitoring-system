@@ -9,8 +9,8 @@ class AuthManager {
   static final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
   static final SharedPreferencesAsync _prefs = SharedPreferencesAsync();
   // TODO: change this to your actual endpoint
-  static final String endpoint = "http://10.0.2.2:5200/api"; // emulator
-  // static final String endpoint = "http://192.168.100.128:5200/api"; // ip lore
+  // static final String endpoint = "http://10.0.2.2:5200/api"; // emulator
+  static final String endpoint = "http://192.168.100.130:5200/api"; // ip lore
 
   static JwtToken? _token;
 
