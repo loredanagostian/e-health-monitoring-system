@@ -17,6 +17,8 @@ interface AppointmentType {
 
 export function AppointmentTypeManager() {
   const doctorId = "4d950ab0-9c18-43c2-9767-2639f67250b5"; // TODO: Replace the doctorId with the one from the JWT
+  const baseUrl = "http://localhost:5200/api/";
+
   const [appointmentTypes, setAppointmentTypes] = useState<AppointmentType[]>([]);
   const [formData, setFormData] = useState({ name: "", price: "", description: "" });
 
@@ -31,7 +33,7 @@ export function AppointmentTypeManager() {
   useEffect(() => {
     const fetchAppointmentTypes = async () => {
       try {
-        const response = await fetch(`http://localhost:5200/api/AppointmentType/GetAppointmentsTypesByDoctor/${doctorId}`, {
+        const response = await fetch(`${baseUrl}AppointmentType/GetAppointmentsTypesByDoctor/${doctorId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -79,7 +81,7 @@ export function AppointmentTypeManager() {
     };
 
     try {
-      const response = await fetch("http://localhost:5200/api/AppointmentType/Add", {
+      const response = await fetch(`${baseUrl}AppointmentType/Add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -121,7 +123,7 @@ export function AppointmentTypeManager() {
 
   const removeAppointmentType = async (id: string) => {
     try {
-      const response = await fetch(`http://localhost:5200/api/AppointmentType/Delete/${id}`, {
+      const response = await fetch(`${baseUrl}AppointmentType/Delete/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -158,7 +160,7 @@ export function AppointmentTypeManager() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Input
             placeholder="Appointment type name"
             value={formData.name}
@@ -171,13 +173,13 @@ export function AppointmentTypeManager() {
               value={formData.price}
               onChange={(e) => setFormData({ ...formData, price: e.target.value })}
             />
+          <div className="flex gap-2">
+            <Button onClick={addAppointmentType} className="w-full">
+              <Plus className="h-4 w-4 mr-2" />
+              Add
+            </Button>
+          </div>
         </div>
-
-        <Button onClick={addAppointmentType} className="w-full">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Type
-        </Button>
-
 
         <div className="space-y-3">
           {appointmentTypes.map((type) => (

@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -19,34 +18,7 @@ interface Appointment {
 }
 
 export function AppointmentManager() {
-  const [appointments, setAppointments] = useState<Appointment[]>([
-    {
-      id: "1",
-      patientName: "John Smith",
-      type: "General Consultation",
-      date: "2024-05-31",
-      time: "09:00",
-      status: "upcoming",
-    },
-    {
-      id: "2",
-      patientName: "Sarah Johnson",
-      type: "Follow-up",
-      date: "2024-05-30",
-      time: "14:30",
-      status: "completed",
-      notes: "Patient showed improvement. Continue current medication.",
-    },
-    {
-      id: "3",
-      patientName: "Mike Davis",
-      type: "Specialist Consultation",
-      date: "2024-05-31",
-      time: "11:00",
-      status: "upcoming",
-    },
-  ]);
-
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editNotes, setEditNotes] = useState("");
   const [newAppointment, setNewAppointment] = useState({
@@ -55,6 +27,47 @@ export function AppointmentManager() {
     date: "",
     time: "",
   });
+
+  const doctorId = "4d950ab0-9c18-43c2-9767-2639f67250b5"; // Replace with actual doctor ID
+  const baseUrl = "http://localhost:5200/api"; // Replace with your API base URL
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const [futureRes, pastRes] = await Promise.all([
+          fetch(`${baseUrl}/Appointment/GetDoctorAppointments/${doctorId}?time=future`),
+          fetch(`${baseUrl}/Appointment/GetDoctorAppointments/${doctorId}?time=past`),
+        ]);
+
+        const futureData = await futureRes.json();
+        const pastData = await pastRes.json();
+
+        const format = (data: any[], status: "upcoming" | "completed"): Appointment[] =>
+          data.map((item) => {
+            const dateObj = new Date(item.date);
+            return {
+              id: item.id,
+              patientName: item.doctorName, // or item.patientName if available
+              type: item.appointmentType,
+              date: dateObj.toISOString().split("T")[0],
+              time: dateObj.toISOString().split("T")[1].slice(0, 5),
+              status,
+            };
+          });
+
+        setAppointments([...format(futureData, "upcoming"), ...format(pastData, "completed")]);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to load appointments.",
+          variant: "destructive",
+        });
+        console.error("Failed to fetch appointments:", error);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
 
   const updateAppointment = (id: string, updates: Partial<Appointment>) => {
     setAppointments(appointments.map(apt => 
@@ -114,49 +127,6 @@ export function AppointmentManager() {
 
   return (
     <div className="space-y-6">
-      {/* Add New Appointment */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Plus className="h-5 w-5" />
-            Schedule New Appointment
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Input
-              placeholder="Patient name"
-              value={newAppointment.patientName}
-              onChange={(e) => setNewAppointment({ ...newAppointment, patientName: e.target.value })}
-            />
-            <select
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-              value={newAppointment.type}
-              onChange={(e) => setNewAppointment({ ...newAppointment, type: e.target.value })}
-            >
-              <option>General Consultation</option>
-              <option>Follow-up</option>
-              <option>Specialist Consultation</option>
-            </select>
-            <Input
-              type="date"
-              value={newAppointment.date}
-              onChange={(e) => setNewAppointment({ ...newAppointment, date: e.target.value })}
-            />
-            <div className="flex gap-2">
-              <Input
-                type="time"
-                value={newAppointment.time}
-                onChange={(e) => setNewAppointment({ ...newAppointment, time: e.target.value })}
-              />
-              <Button onClick={addAppointment}>
-                Add
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Upcoming Appointments */}
       <Card>
         <CardHeader>
