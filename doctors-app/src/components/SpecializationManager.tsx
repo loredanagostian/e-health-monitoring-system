@@ -1,142 +1,136 @@
-import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Badge } from "../components/ui/badge";
-import { Plus, X, Edit2 } from "lucide-react";
-import { toast } from "../hooks/use-toast";
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Plus, X } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
+import { SpecializationDropdown } from "./SpecializationDropdown";
 
 interface Specialization {
   id: string;
   name: string;
+  category?: string;
 }
 
 export function SpecializationManager() {
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
-
-  const [newSpecialization, setNewSpecialization] = useState("");
+  const [selectedName, setSelectedName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const doctorId = localStorage.getItem("doctorId");
-  const token = localStorage.getItem("token");
 
-  const baseUrl = "http://localhost:5200/api";
+  // ✅ Reusable fetch function
+  const fetchSpecializations = async () => {
+    if (!doctorId) return;
 
-  useEffect(() => {
-    if (!doctorId || !token) return; // Wait for both to be available
+    try {
+      const response = await fetch(`/api/Specialization/GetSpecializationsByDoctor/${doctorId}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
 
-    const fetchSpecializations = async () => {
-      try {
-        const response = await fetch(`${baseUrl}/Specialization/GetSpecializationsByDoctor/${doctorId}`, {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
-        })
-        const data = await response.json();
+      if (!response.ok) throw new Error("Failed to fetch specializations");
 
-        // assuming the API returns [{ id, name, icon }]
-        const formatted = data.map((spec: any) => ({
-          id: spec.id,
-          name: spec.name,
-        }));
+      const data = await response.json();
 
-        setSpecializations(formatted);
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to load specializations",
-          variant: "destructive",
-        });
-      }
-    };
+      const seen = new Set<string>();
+      const filtered = data.filter((spec: any) => {
+        if (seen.has(spec.name)) return false;
+        seen.add(spec.name);
+        return true;
+      });
 
-    if (doctorId) {
-      fetchSpecializations();
-    }
-  }, [doctorId]);
+      const formatted: Specialization[] = filtered.map((spec: any) => ({
+        id: spec.id,
+        name: spec.name,
+        category: "", // No category from backend
+      }));
 
-  const addSpecialization = async () => {
-    if (!newSpecialization.trim()) {
+      setSpecializations(formatted);
+    } catch (err) {
+      console.error("Fetch error:", err);
       toast({
         title: "Error",
-        description: "Please provide a specialization name",
+        description: "Failed to load specializations from server",
+        variant: "destructive",
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchSpecializations();
+  }, []);
+
+  const removeSpecialization = async (id: string) => {
+    const doctorId = localStorage.getItem("doctorId");
+    if (!doctorId) return;
+
+    try {
+      const response = await fetch(`/api/Specialization/DeleteFromDoctor/${doctorId}/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!response.ok) throw new Error("Failed to delete specialization");
+
+      setSpecializations(prev => prev.filter(spec => spec.id !== id));
+
+      toast({
+        title: "Success",
+        description: "Specialization removed from doctor",
+      });
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast({
+        title: "Error",
+        description: "Could not remove specialization. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAddToDoctor = async () => {
+    if (!doctorId || !selectedName) {
+      toast({
+        title: "Error",
+        description: "Please select a specialization from the dropdown",
         variant: "destructive",
       });
       return;
     }
 
+    setIsLoading(true);
     try {
-      const response = await fetch(`${baseUrl}/Specialization/AddToDoctor`, {
+      const response = await fetch(`http://localhost:5200/api/Specialization/AddToDoctor`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
-          doctorId: doctorId,
-          specializationName: newSpecialization,
+          doctorId,
+          specializationName: selectedName,
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to add specialization");
-      }
-
-      const data = await response.json();
-
-      const newSpec: Specialization = {
-        id: Date.now().toString(), // You might want to use `data.specializationId` if returned
-        name: newSpecialization,
-      };
-
-      setSpecializations([...specializations, newSpec]);
-      setNewSpecialization("");
-      toast({
-        title: "Success",
-        description: "Specialization added successfully",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to add specialization",
-        variant: "destructive",
-      });
-      console.error(error);
-    }
-  };
-
-  const removeSpecialization = async (specializationId: string) => {
-    if (!doctorId || !token) return;
-
-    try {
-      const response = await fetch(
-        `${baseUrl}/Specialization/DeleteFromDoctor/${doctorId}/${specializationId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to delete specialization");
-      }
-
-      setSpecializations(prev =>
-        prev.filter(spec => spec.id !== specializationId)
-      );
+      if (!response.ok) throw new Error("Failed to add specialization");
 
       toast({
         title: "Success",
-        description: "Specialization removed successfully",
+        description: "Specialization added to doctor",
       });
+
+      setSelectedName("");
+
+      // ✅ Re-fetch updated list
+      await fetchSpecializations();
     } catch (error) {
+      console.error("Error:", error);
       toast({
         title: "Error",
-        description: (error as Error).message,
+        description: "Could not add specialization. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -148,22 +142,20 @@ export function SpecializationManager() {
           Manage Specializations
         </CardTitle>
       </CardHeader>
+
       <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Input
-            placeholder="Specialization name"
-            value={newSpecialization}
-            onChange={(e) => setNewSpecialization(e.target.value)}
-            className="md:col-span-2"
-          />
-          <div className="flex gap-2 md:col-span-1">
-            <Button onClick={addSpecialization} className="flex-1">
-              <Plus className="h-4 w-4 mr-2" />
-              Add
-            </Button>
+        {/* 🔹 Backend dropdown add */}
+        <div className="flex items-center gap-4">
+          <div className="flex-1">
+            <SpecializationDropdown value={selectedName} onChange={setSelectedName} />
           </div>
+          <Button disabled={!selectedName || isLoading} onClick={handleAddToDoctor}>
+            <Plus className="h-4 w-4 mr-2" />
+            {isLoading ? "Adding..." : "Add to Doctor"}
+          </Button>
         </div>
 
+        {/* 🔹 Existing list */}
         <div className="space-y-3">
           {specializations.map((spec) => (
             <div
@@ -173,6 +165,9 @@ export function SpecializationManager() {
               <div className="flex items-center gap-3">
                 <div>
                   <p className="font-medium text-slate-800">{spec.name}</p>
+                  {spec.category && (
+                    <p className="text-xs text-slate-500">{spec.category}</p>
+                  )}
                 </div>
               </div>
               <div className="flex gap-2">
