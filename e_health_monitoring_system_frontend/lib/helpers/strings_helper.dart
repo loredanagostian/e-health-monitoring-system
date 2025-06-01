@@ -122,4 +122,13 @@ class StringsHelper {
   /// General Strings
   static const String internalError =
       "Ooops! Something went wrong, please try again later.";
+
+  /// Appointment Details
+  static const String medicalHistory = "Medical history";
+  static const String diagnostic = "Diagnostic";
+  static const String recommendation = "Recommendation";
+  static const String attachedDouments = "Attached documents";
+
+  /// Pacient Profile
+  static const String logout = "Logout";
 }

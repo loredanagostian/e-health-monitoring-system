@@ -87,7 +87,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                         ),
                       ),
                     )
-                    : Placeholder(),
+                    : Container(),
           ),
     );
   }

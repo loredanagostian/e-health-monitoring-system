@@ -1,25 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/animated_dots_helper.dart';
 import 'package:e_health_monitoring_system_frontend/models/chat_message.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:e_health_monitoring_system_frontend/services/ai_chat_service.dart';
 
 class ChatSupportScreen extends StatefulWidget {
   final String userInitials;
-  const ChatSupportScreen({required this.userInitials, Key? key}) : super(key: key);
+  const ChatSupportScreen({required this.userInitials, super.key});
 
   @override
   State<ChatSupportScreen> createState() => _ChatSupportScreenState();
 }
 
-class _ChatSupportScreenState  extends State<ChatSupportScreen> {
+class _ChatSupportScreenState extends State<ChatSupportScreen> {
   final TextEditingController messageController = TextEditingController();
   final ScrollController scrollController = ScrollController();
   List<ChatMessage> chatMessages = [];
-  static final SharedPreferencesAsync _prefs = SharedPreferencesAsync();
   bool chatIsTyping = false;
 
   @override
@@ -29,12 +26,12 @@ class _ChatSupportScreenState  extends State<ChatSupportScreen> {
   }
 
   Future<void> loadConversation() async {
-  final messages = await AiChatService.getConversation();
+    final messages = await AiChatService.getConversation();
 
-  setState(() {
-    chatMessages = messages;
-  });
-}
+    setState(() {
+      chatMessages = messages;
+    });
+  }
 
   Widget _buildMessageList() {
     return ListView.builder(
@@ -47,74 +44,75 @@ class _ChatSupportScreenState  extends State<ChatSupportScreen> {
   }
 
   Widget _buildListItem(ChatMessage message) {
-  bool isMessageSentByCurrentUser = message.sender == SenderType.user;
+    bool isMessageSentByCurrentUser = message.sender == SenderType.user;
 
-  if (message.message == '...' && message.sender == SenderType.chatbot) {
-    return _buildTypingIndicator();
-  }
+    if (message.message == '...' && message.sender == SenderType.chatbot) {
+      return _buildTypingIndicator();
+    }
 
-  return Padding(
-    padding: EdgeInsets.only(bottom: 8.0),
-    child: Row(
-      mainAxisAlignment:
-          isMessageSentByCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        if (!isMessageSentByCurrentUser)
-          CircleAvatar(
-            backgroundImage: AssetImage('assets/images/chatbot_icon.png'),
-            radius: 25,
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        mainAxisAlignment:
+            isMessageSentByCurrentUser
+                ? MainAxisAlignment.end
+                : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          if (!isMessageSentByCurrentUser)
+            CircleAvatar(
+              backgroundImage: AssetImage('assets/images/chatbot_icon.png'),
+              radius: 25,
+            ),
+          if (!isMessageSentByCurrentUser) SizedBox(width: 8.0),
+          Flexible(
+            child: Container(
+              constraints: BoxConstraints(maxWidth: 250),
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color:
+                    isMessageSentByCurrentUser
+                        ? ColorsHelper.mediumPurple
+                        : ColorsHelper.mainPurple,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(25.0),
+                  topRight: Radius.circular(25.0),
+                  bottomLeft:
+                      isMessageSentByCurrentUser
+                          ? Radius.circular(25.0)
+                          : Radius.zero,
+                  bottomRight:
+                      isMessageSentByCurrentUser
+                          ? Radius.zero
+                          : Radius.circular(25.0),
+                ),
+              ),
+              child: Text(
+                message.message,
+                style: TextStyle(
+                  color: ColorsHelper.mainWhite.withAlpha(179), // 0.7 * 255
+                  fontFamily: 'Poppins',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                ),
+                softWrap: true,
+              ),
+            ),
           ),
-        if (!isMessageSentByCurrentUser)
-          SizedBox(width: 8.0),
-        Flexible(
-          child: Container(
-            constraints: BoxConstraints(
-              maxWidth: 250,
-            ),
-            padding: const EdgeInsets.all(16.0),
-            decoration: BoxDecoration(
-              color: isMessageSentByCurrentUser
-                  ? ColorsHelper.mediumPurple
-                  : ColorsHelper.mainPurple,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(25.0),
-                topRight: Radius.circular(25.0),
-                bottomLeft: isMessageSentByCurrentUser
-                    ? Radius.circular(25.0)
-                    : Radius.zero,
-                bottomRight: isMessageSentByCurrentUser
-                    ? Radius.zero
-                    : Radius.circular(25.0),
+          if (isMessageSentByCurrentUser) SizedBox(width: 8.0),
+          if (isMessageSentByCurrentUser)
+            CircleAvatar(
+              backgroundColor: ColorsHelper.mediumPurple,
+              radius: 25,
+              child: Text(
+                widget.userInitials,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: ColorsHelper.mainWhite,
+                ),
               ),
             ),
-            child: Text(
-              message.message,
-              style: TextStyle(
-                color: ColorsHelper.mainWhite.withAlpha(179), // 0.7 * 255
-                fontFamily: 'Poppins',
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-              ),
-              softWrap: true,
-            ),
-          ),
-        ),
-        if (isMessageSentByCurrentUser)
-          SizedBox(width: 8.0),
-        if (isMessageSentByCurrentUser)
-          CircleAvatar(
-            backgroundColor: ColorsHelper.mediumPurple,
-            radius: 25,
-            child: Text(
-              widget.userInitials,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: ColorsHelper.mainWhite,
-              ),
-            )
-          )
         ],
       ),
     );
@@ -125,26 +123,22 @@ class _ChatSupportScreenState  extends State<ChatSupportScreen> {
       controller: messageController,
       decoration: InputDecoration(
         isDense: true,
-        contentPadding: const EdgeInsets.fromLTRB(
-          16.0,
-          8.0,
-          16.0,
-          8.0,
-        ),
+        contentPadding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
         hintText: "Ask any question about the app",
         hintStyle: TextStyle(
-            color: ColorsHelper.darkGray,
-            fontFamily: 'Poppins',
-            fontSize: 16,
-            fontWeight: FontWeight.w400),
+          color: ColorsHelper.darkGray,
+          fontFamily: 'Poppins',
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+        ),
         fillColor: ColorsHelper.lightGray,
         filled: true,
-        suffixIcon:
-            IconButton(icon: Icon(Icons.send_outlined), onPressed: chatIsTyping ? null : _handleSendMessage),
-        suffixIconColor: ColorsHelper.mainDark,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(25.0),
+        suffixIcon: IconButton(
+          icon: Icon(Icons.send_outlined),
+          onPressed: chatIsTyping ? null : _handleSendMessage,
         ),
+        suffixIconColor: ColorsHelper.mainDark,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(25.0)),
         enabledBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: ColorsHelper.darkGray),
           borderRadius: BorderRadius.circular(25.0),
@@ -160,43 +154,44 @@ class _ChatSupportScreenState  extends State<ChatSupportScreen> {
   }
 
   void _handleSendMessage() async {
-  final messageText = messageController.text.trim();
-  if (messageText.isEmpty || chatIsTyping) return;
+    final messageText = messageController.text.trim();
+    if (messageText.isEmpty || chatIsTyping) return;
 
-  setState(() {
-    chatIsTyping = true;
+    setState(() {
+      chatIsTyping = true;
 
-    chatMessages.add(
-      ChatMessage(message: messageText, sender: SenderType.user),
-    );
-  });
+      chatMessages.add(
+        ChatMessage(message: messageText, sender: SenderType.user),
+      );
+    });
 
-  messageController.clear();
-  scrollToBottom();
+    messageController.clear();
+    scrollToBottom();
 
-  await Future.delayed(Duration(milliseconds: 1000));
+    await Future.delayed(Duration(milliseconds: 1000));
 
-  setState(() {
-    chatMessages.add(ChatMessage(message: '...', sender: SenderType.chatbot));
-  });
+    setState(() {
+      chatMessages.add(ChatMessage(message: '...', sender: SenderType.chatbot));
+    });
 
-  scrollToBottom();
+    scrollToBottom();
 
-  final response = await AiChatService.sendMessage(chatMessages);
+    final response = await AiChatService.sendMessage(chatMessages);
 
-  setState(() {
-    chatMessages.removeLast();
+    setState(() {
+      chatMessages.removeLast();
 
-    if (response != null) {
-      chatMessages.add(ChatMessage(message: response, sender: SenderType.chatbot));
-    }
+      if (response != null) {
+        chatMessages.add(
+          ChatMessage(message: response, sender: SenderType.chatbot),
+        );
+      }
 
-    chatIsTyping = false;
-  });
+      chatIsTyping = false;
+    });
 
-  scrollToBottom();
-}
-
+    scrollToBottom();
+  }
 
   void scrollToBottom() async {
     await Future.delayed(Duration(milliseconds: 100), () {
@@ -220,10 +215,7 @@ class _ChatSupportScreenState  extends State<ChatSupportScreen> {
           ),
           SizedBox(width: 8.0),
           Container(
-            constraints: BoxConstraints(
-              maxWidth: 100,
-              minHeight: 40,
-            ),
+            constraints: BoxConstraints(maxWidth: 100, minHeight: 40),
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
               color: ColorsHelper.mainPurple,
@@ -239,9 +231,6 @@ class _ChatSupportScreenState  extends State<ChatSupportScreen> {
       ),
     );
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -271,9 +260,9 @@ class _ChatSupportScreenState  extends State<ChatSupportScreen> {
                 child: _buildMessageInput(),
               ),
             ],
-          )
-        )
-      )
+          ),
+        ),
+      ),
     );
   }
 }

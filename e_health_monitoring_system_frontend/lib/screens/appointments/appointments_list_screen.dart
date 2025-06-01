@@ -28,32 +28,35 @@ class AppointmentsListScreen extends StatelessWidget {
               children:
                   appointments
                       .map(
-                        (ap) => DoctorCard(
-                          doctorName: ap.doctorName,
-                          doctorSpecialization: [], // TODO
-                          doctorPhotoPath: ap.doctorPicture,
-                          detailsList: [
-                            CustomRowIconText(
-                              icon: Icons.history,
-                              text:
-                                  "${DateHelper.formatDate(ap.date)} ${DateHelper.formatTime(ap.date)}",
-                            ),
-                            CustomRowIconText(
-                              icon: Icons.medical_information_outlined,
-                              text: ap.appointmentType,
-                            ),
-                          ],
-                          hasVisibleIcons: false,
-                          onPressed:
-                              () => navigator.push(
-                                MaterialPageRoute(
-                                  builder:
-                                      (_) => AppointmentDetailsScreen(
-                                        title: title,
-                                        appointmentId: ap.id,
-                                      ),
-                                ),
+                        (ap) => Padding(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: DoctorCard(
+                            doctorName: ap.doctorName,
+                            doctorSpecialization: [],
+                            doctorPhotoPath: ap.doctorPicture,
+                            detailsList: [
+                              CustomRowIconText(
+                                icon: Icons.history,
+                                text:
+                                    "${DateHelper.formatDate(ap.date)} ${DateHelper.formatTime(ap.date)}",
                               ),
+                              CustomRowIconText(
+                                icon: Icons.medical_information_outlined,
+                                text: ap.appointmentType,
+                              ),
+                            ],
+                            hasVisibleIcons: false,
+                            onPressed:
+                                () => navigator.push(
+                                  MaterialPageRoute(
+                                    builder:
+                                        (_) => AppointmentDetailsScreen(
+                                          title: title,
+                                          appointmentId: ap.id,
+                                        ),
+                                  ),
+                                ),
+                          ),
                         ),
                       )
                       .toList(),

@@ -1,14 +1,17 @@
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/date_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/image_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
 import 'package:e_health_monitoring_system_frontend/models/api_models/patient_profile.dart';
 import 'package:e_health_monitoring_system_frontend/models/api_models/upcoming_appointment_dto.dart';
+import 'package:e_health_monitoring_system_frontend/screens/appointments/doctor_profile_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/appointments/upcoming_appointment_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/appointments/appointments_list_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/complete_profile_screen.dart';
 import 'package:e_health_monitoring_system_frontend/services/appointment_service.dart';
+import 'package:e_health_monitoring_system_frontend/services/doctor_service.dart';
 import 'package:e_health_monitoring_system_frontend/services/patient_service.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/book_now_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_row_icon_string.dart';
@@ -73,8 +76,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               getUpcomingAppointments(),
               SizedBox(height: 30),
               getRecentVisits(),
-              SizedBox(height: 30),
-              getMedicalReports(),
+              // SizedBox(height: 30),
+              // getMedicalReports(),
             ],
           ),
         ),
@@ -115,14 +118,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       MaterialPageRoute(
                         builder:
                             (_) => Scaffold(
-                              body: SafeArea(
-                                child: Stack(
-                                  children: [
-                                    UpdateProfileScreen(),
-                                    BackButton(),
-                                  ],
-                                ),
-                              ),
+                              body: SafeArea(child: UpdateProfileScreen()),
                             ),
                       ),
                     )
@@ -260,31 +256,56 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     .map(
                       (ap) => Padding(
                         padding: const EdgeInsets.only(right: 15),
-                        child: DoctorCard(
-                          doctorName: ap.doctorName,
-                          doctorSpecialization: [], // TODO
-                          doctorPhotoPath: ap.doctorPicture,
-                          detailsList: [
-                            CustomRowIconText(
-                              icon: Icons.history,
-                              text:
-                                  "${DateHelper.formatDate(ap.date)} ${DateHelper.formatTime(ap.date)}",
-                            ),
-                            BookNowButton(onPressed: () {}),
-                          ],
-                          width: 340,
-                          hasVisibleIcons: true,
-                          onPressed: () {
-                            navigator.push(
-                              MaterialPageRoute(
-                                builder:
-                                    (_) => AppointmentDetailsScreen(
-                                      appointmentId: ap.id,
-                                      title: StringsHelper.recentVisit,
-                                    ),
+                        child: SizedBox(
+                          height: 120,
+                          child: DoctorCard(
+                            doctorName: ap.doctorName,
+                            doctorSpecialization: [],
+                            doctorPhotoPath:
+                                ap.doctorPicture.isNotEmpty
+                                    ? ImageHelper.fixImageUrl(ap.doctorPicture)
+                                    : "/assets/images/mockup_doctor.png",
+                            detailsList: [
+                              CustomRowIconText(
+                                icon: Icons.history,
+                                text:
+                                    "${DateHelper.formatDate(ap.date)} ${DateHelper.formatTime(ap.date)}",
                               ),
-                            );
-                          },
+                              SizedBox(
+                                width: 120,
+                                child: BookNowButton(
+                                  onPressed: () async {
+                                    final doctorInfo =
+                                        await DoctorService.getDoctorById(
+                                          ap.doctorId,
+                                        );
+
+                                    navigator.push(
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) => DoctorProfileScreen(
+                                              doctor: doctorInfo,
+                                            ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                            width: 340,
+                            hasVisibleIcons: true,
+                            onPressed: () {
+                              navigator.push(
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) => AppointmentDetailsScreen(
+                                        appointmentId: ap.id,
+                                        title: StringsHelper.recentVisit,
+                                      ),
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
                     )

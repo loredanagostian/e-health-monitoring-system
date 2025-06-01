@@ -242,16 +242,11 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                                   doc.specializations.isNotEmpty
                                       ? doc.specializations
                                       : ["N/A"],
-                              detailsList: [
-                                BookNowButton(
-                                  onPressed: () {
-                                    // Implement booking logic
-                                  },
-                                ),
-                              ],
+                              detailsList: [],
                               doctorPhotoPath: ImageHelper.fixImageUrl(
                                 doc.picture,
                               ),
+                              hasVisibleIcons: true,
                               onPressed:
                                   () => navigator.push(
                                     MaterialPageRoute(

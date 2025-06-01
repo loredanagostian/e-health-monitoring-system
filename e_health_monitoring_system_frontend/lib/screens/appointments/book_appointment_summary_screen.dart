@@ -58,8 +58,7 @@ class BookAppointmentSummaryScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Icon(
                                     Icons.calendar_month_outlined,
@@ -79,8 +78,7 @@ class BookAppointmentSummaryScreen extends StatelessWidget {
                               ),
                               SizedBox(height: 5),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Icon(
                                     Icons.schedule_outlined,
