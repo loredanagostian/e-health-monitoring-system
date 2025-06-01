@@ -6,7 +6,7 @@ namespace EHealthMonitoringSystemBackend.Core.Models;
 public class Doctor
 {
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [ForeignKey("User")]
     public string Id { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }

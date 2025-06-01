@@ -7,8 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Stethoscope } from "lucide-react";
 import { toast } from "../hooks/use-toast";
+import { useAuth } from "../components/AuthProvider";
 
 const SignUp = () => {
+  const { register } = useAuth();
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -31,25 +34,8 @@ const SignUp = () => {
       alert("Passwords don't match");
       return;
     }
-    if (formData.email && formData.password) {
-      const response = await fetch('/api/DoctorRegister/SignUpDoctor', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ "email": formData.email, "passwd": formData.password })
-      });
-      const result = await response.json();
-      if (!response.ok) {
-        toast({
-          title: "Error",
-          description: result.msg,
-          variant: "destructive",
-        });
-      } else {
-        navigate("/signin");
-      }
-    }
+    
+    await register(formData.email, formData.password);
   };
 
   return (
@@ -66,30 +52,6 @@ const SignUp = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
-                <Input
-                  id="firstName"
-                  name="firstName"
-                  placeholder="John"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input
-                  id="lastName"
-                  name="lastName"
-                  placeholder="Doe"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input

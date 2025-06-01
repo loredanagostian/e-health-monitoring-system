@@ -18,6 +18,8 @@ interface Appointment {
 }
 
 export function AppointmentManager() {
+  const doctorId = localStorage.getItem("doctorId");
+  const token = localStorage.getItem("token");
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editNotes, setEditNotes] = useState("");
@@ -28,26 +30,42 @@ export function AppointmentManager() {
     time: "",
   });
 
-  const doctorId = "4d950ab0-9c18-43c2-9767-2639f67250b5"; // Replace with actual doctor ID
   const baseUrl = "http://localhost:5200/api"; // Replace with your API base URL
 
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
         const [futureRes, pastRes] = await Promise.all([
-          fetch(`${baseUrl}/Appointment/GetDoctorAppointments/${doctorId}?time=future`),
-          fetch(`${baseUrl}/Appointment/GetDoctorAppointments/${doctorId}?time=past`),
+          fetch(`${baseUrl}/Appointment/GetDoctorAppointments/${doctorId}?time=future`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`,
+            },
+            credentials: "include",
+          }),
+          fetch(`${baseUrl}/Appointment/GetDoctorAppointments/${doctorId}?time=past`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`,
+            },
+            credentials: "include",
+          }),
         ]);
 
         const futureData = await futureRes.json();
+        console.log("Future appointments data:", futureData);
+      
         const pastData = await pastRes.json();
+        console.log("Past appointments data:", pastData);
 
         const format = (data: any[], status: "upcoming" | "completed"): Appointment[] =>
           data.map((item) => {
             const dateObj = new Date(item.date);
             return {
               id: item.id,
-              patientName: item.doctorName, // or item.patientName if available
+              patientName: item.userName,
               type: item.appointmentType,
               date: dateObj.toISOString().split("T")[0],
               time: dateObj.toISOString().split("T")[1].slice(0, 5),
