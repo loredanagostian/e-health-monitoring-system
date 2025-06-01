@@ -135,6 +135,21 @@ public class DoctorController : ControllerBase
         return Ok(doctorDtos);
     }
 
+    [HttpGet("{doctorId}")]
+    public async Task<IActionResult> GetInfoById(string doctorId)
+    {
+        var doctor = await _doctorRepository.GetOneAsync(d => d.Id == doctorId);
+
+        if (doctor is null)
+        {
+            return BadRequest("Doctor not found!");
+        }
+
+        var doctorDto = await _getDoctorDto(doctor);
+
+        return Ok(doctorDto);
+    }
+
     private async Task<DoctorDto> _getDoctorDto(Doctor doctor)
     {
         var baseUrl = _configuration["Base_url"];
