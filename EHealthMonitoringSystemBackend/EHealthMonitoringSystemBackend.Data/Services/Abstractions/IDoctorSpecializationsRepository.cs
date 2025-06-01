@@ -7,4 +7,5 @@ public interface IDoctorSpecializationsRepository
 {
     Task<DoctorSpecialization> AddSpecializationToDoctorAsync(string doctorId, string specializationId);
     Task<IEnumerable<DoctorSpecialization>> GetAllByAsync(Expression<Func<DoctorSpecialization, bool>> predicate);
+    Task<DoctorSpecialization> DeleteOneAsync(Expression<Func<DoctorSpecialization, bool>> predicate);
 }
