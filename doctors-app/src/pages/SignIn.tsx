@@ -6,18 +6,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Stethoscope } from "lucide-react";
+import { toast } from "../hooks/use-toast";
+import { useAuth } from "@/components/AuthProvider";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { login, isLoading, error } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simple authentication - in a real app, this would call an API
     if (email && password) {
-      localStorage.setItem("isAuthenticated", "true");
-      navigate("/");
+      await login(email, password);
+      navigate("/register-profile");
     }
   };
 

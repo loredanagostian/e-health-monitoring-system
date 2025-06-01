@@ -1,5 +1,6 @@
 {
   "name": "doctors-app",
+  "proxy": "http://localhost:5200",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

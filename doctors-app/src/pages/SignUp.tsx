@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Stethoscope } from "lucide-react";
+import { toast } from "../hooks/use-toast";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -24,16 +25,30 @@ const SignUp = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords don't match");
       return;
     }
-    // Simple registration - in a real app, this would call an API
     if (formData.email && formData.password) {
-      localStorage.setItem("isAuthenticated", "true");
-      navigate("/");
+      const response = await fetch('/api/DoctorRegister/SignUpDoctor', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ "email": formData.email, "passwd": formData.password })
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        toast({
+          title: "Error",
+          description: result.msg,
+          variant: "destructive",
+        });
+      } else {
+        navigate("/signin");
+      }
     }
   };
 

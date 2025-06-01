@@ -30,7 +30,8 @@ public class AppointmentController : ControllerBase
         IAppointmentFileRepository appointmentFileRepository,
         IConfiguration configuration,
         IAppointmentTypeRepository appointmentTypeRepository,
-        IDoctorRepository doctorRepository)
+        IDoctorRepository doctorRepository
+    )
     {
         _appointmentRepository = appointmentRepository;
         _jwtManager = jwtManager;
@@ -189,7 +190,7 @@ public class AppointmentController : ControllerBase
 
         return Ok(appointments);
     }
-    
+
     [HttpGet("{doctorId}")]
     public async Task<IActionResult> GetDoctorAppointments(string doctorId, [FromQuery] string time)
     {
@@ -198,7 +199,7 @@ public class AppointmentController : ControllerBase
         {
             return BadRequest("Doctor not found!");
         }
-        
+
         var baseUrl = _configuration["Base_url"];
 
         List<Appointment> appointmentsQuery;
@@ -207,7 +208,8 @@ public class AppointmentController : ControllerBase
         {
             appointmentsQuery = (await _appointmentRepository.GetAsync())
                 .Where(a => a.AppointmentType.DoctorId == doctorId && a.Date < DateTime.Now)
-                .OrderByDescending(a => a.Date).ToList();
+                .OrderByDescending(a => a.Date)
+                .ToList();
         }
         else
         {
@@ -215,7 +217,8 @@ public class AppointmentController : ControllerBase
             {
                 appointmentsQuery = (await _appointmentRepository.GetAsync())
                     .Where(a => a.AppointmentType.DoctorId == doctorId && a.Date >= DateTime.Now)
-                    .OrderBy(a => a.Date).ToList();
+                    .OrderBy(a => a.Date)
+                    .ToList();
             }
             else
             {
@@ -223,15 +226,14 @@ public class AppointmentController : ControllerBase
             }
         }
 
-        var appointments = appointmentsQuery
-            .Select(a => new AppointmentGetAllDto
-            {
-                Id = a.Id,
-                Date = a.Date,
-                AppointmentType = a.AppointmentType.Name,
-                DoctorName = a.AppointmentType.Doctor.Name,
-                DoctorPicture = a.AppointmentType.Doctor.Picture.Path.Replace("../", baseUrl),
-            });
+        var appointments = appointmentsQuery.Select(a => new AppointmentGetAllDto
+        {
+            Id = a.Id,
+            Date = a.Date,
+            AppointmentType = a.AppointmentType.Name,
+            DoctorName = a.AppointmentType.Doctor.Name,
+            DoctorPicture = a.AppointmentType.Doctor.Picture.Path.Replace("../", baseUrl),
+        });
 
         return Ok(appointments);
     }

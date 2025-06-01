@@ -14,6 +14,8 @@ import Profile from "./pages/Profile";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import NotFound from "./pages/NotFound";
+import { AuthProvider } from "./components/AuthProvider";
+import RegisterProfile from "./pages/RegisterProfile";
 
 const queryClient = new QueryClient();
 
@@ -23,17 +25,20 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-          <Route path="/appointments" element={<ProtectedRoute><Appointments /></ProtectedRoute>} />
-          <Route path="/specializations" element={<ProtectedRoute><Specializations /></ProtectedRoute>} />
-          <Route path="/appointment-types" element={<ProtectedRoute><AppointmentTypes /></ProtectedRoute>} />
-          {/* <Route path="/schedule" element={<ProtectedRoute><Schedule /></ProtectedRoute>} /> */}
-          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+            <Route path="/appointments" element={<ProtectedRoute><Appointments /></ProtectedRoute>} />
+            <Route path="/specializations" element={<ProtectedRoute><Specializations /></ProtectedRoute>} />
+            <Route path="/appointment-types" element={<ProtectedRoute><AppointmentTypes /></ProtectedRoute>} />
+            {/* <Route path="/schedule" element={<ProtectedRoute><Schedule /></ProtectedRoute>} /> */}
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/register-profile" element={<ProtectedRoute><RegisterProfile /></ProtectedRoute>} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

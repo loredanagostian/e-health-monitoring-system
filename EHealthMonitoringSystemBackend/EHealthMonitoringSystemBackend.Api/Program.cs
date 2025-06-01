@@ -13,12 +13,14 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.ConfigureAppConfiguration((builderContext, config) =>
-{
-    config
-        .AddJsonFile("secrets/appsettings.secrets.json", optional: true)
-        .AddEnvironmentVariables();
-});
+builder.WebHost.ConfigureAppConfiguration(
+    (builderContext, config) =>
+    {
+        config
+            .AddJsonFile("secrets/appsettings.secrets.json", optional: true)
+            .AddEnvironmentVariables();
+    }
+);
 builder.Services.AddHttpClient();
 
 var services = builder.Services;
@@ -82,6 +84,7 @@ services
         options.Password.RequireUppercase = false;
     })
     .AddEntityFrameworkStores<AppDbContext>()
+    .AddRoles<IdentityRole>()
     .AddDefaultTokenProviders();
 
 services
@@ -179,12 +182,14 @@ if (!Directory.Exists(contentDir))
 
 // app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(contentDir),
-    RequestPath = "/content",
-    ServeUnknownFileTypes = true
-});
+app.UseStaticFiles(
+    new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(contentDir),
+        RequestPath = "/content",
+        ServeUnknownFileTypes = true,
+    }
+);
 app.UseRouting();
 app.UseCors("EHealthMonitoringSystemPolicy");
 app.UseAuthentication();

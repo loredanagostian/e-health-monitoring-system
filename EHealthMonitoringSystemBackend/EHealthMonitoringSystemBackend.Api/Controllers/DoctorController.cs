@@ -1,7 +1,9 @@
 using EHealthMonitoringSystemBackend.Api.Dtos;
+using EHealthMonitoringSystemBackend.Api.Models;
 using EHealthMonitoringSystemBackend.Api.Services.Abstractions;
 using EHealthMonitoringSystemBackend.Core.Models;
 using EHealthMonitoringSystemBackend.Data.Services.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EHealthMonitoringSystemBackend.Api.Controllers;
@@ -16,14 +18,18 @@ public class DoctorController : ControllerBase
     private readonly IAppointmentTypeRepository _appointmentTypeRepository;
     private readonly IUploadManager _uploadManager;
     private readonly IConfiguration _configuration;
+    private readonly ILogger<DoctorController> _logger;
+    private readonly IJWTManager _jwtManager;
 
     public DoctorController(
+        ILogger<DoctorController> logger,
         IDoctorRepository doctorRepository,
         ISpecializationRepository specializationRepository,
         IDoctorSpecializationsRepository doctorSpecializationsRepository,
         IAppointmentTypeRepository appointmentTypeRepository,
         IUploadManager uploadManager,
-        IConfiguration configuration
+        IConfiguration configuration,
+        IJWTManager jwtManager
     )
     {
         _doctorRepository = doctorRepository;
@@ -32,11 +38,40 @@ public class DoctorController : ControllerBase
         _appointmentTypeRepository = appointmentTypeRepository;
         _uploadManager = uploadManager;
         _configuration = configuration;
+        _logger = logger;
+        _jwtManager = jwtManager;
     }
 
     [HttpPost]
+    // [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Add([FromForm] DoctorPostDto doctorPost, IFormFile file)
     {
+        // TODO: better checking, automatic auth ?
+        string? accessToken = null;
+        if (Request.Cookies.ContainsKey("access-token"))
+        {
+            accessToken = Request.Cookies["access-token"];
+        }
+
+        string? refreshToken = null;
+        if (Request.Cookies.ContainsKey("refresh-token"))
+        {
+            refreshToken = Request.Cookies["refresh-token"];
+        }
+
+        var token = new Token { AccessToken = accessToken, RefreshToken = refreshToken };
+        if (token.AccessToken is null)
+        {
+            return Unauthorized(new { msg = "Invalid JWT token." });
+        }
+
+        var principal = _jwtManager.GetPrincipalFromToken(token.AccessToken);
+        var userId = principal.Identity?.Name;
+        if (userId is null)
+        {
+            return Unauthorized(new { msg = "User id not registered." });
+        }
+
         var appFile = await _uploadManager.Upload(file);
 
         if (appFile is null)
@@ -44,6 +79,7 @@ public class DoctorController : ControllerBase
 
         var doctor = new Doctor
         {
+            Id = userId,
             Name = doctorPost.Name,
             Description = doctorPost.Description,
             PictureId = appFile.Id,
@@ -119,7 +155,12 @@ public class DoctorController : ControllerBase
             await _specializationRepository.GetAllByAsync(s =>
                 doctorSpecializationIds.Contains(s.Id)
             )
-        ).Select(s => new SpecializationGetDto() {Id = s.Id, Name = s.Name, Icon = s.Icon });
+        ).Select(s => new SpecializationGetDto()
+        {
+            Id = s.Id,
+            Name = s.Name,
+            Icon = s.Icon,
+        });
 
         doctorDto.Specializations = specializations;
 

@@ -30,7 +30,9 @@ public class JWTManager(IConfiguration configuration) : IJWTManager
         var tokenKey = Convert.FromBase64String(_configuration["JWT:Key"]!);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity([new Claim(ClaimTypes.Name, userId)]),
+            Subject = new ClaimsIdentity(
+                [new Claim(ClaimTypes.Name, userId), new Claim(ClaimTypes.Role, "Admin")]
+            ),
             Expires = DateTime.Now.AddMinutes(15),
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(tokenKey),
