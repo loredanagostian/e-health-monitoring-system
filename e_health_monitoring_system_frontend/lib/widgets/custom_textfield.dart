@@ -10,6 +10,7 @@ enum TextFieldType {
   lastName,
   phoneNumber,
   cnp,
+  medicalHistory,
 }
 
 class CustomTextField extends StatefulWidget {
@@ -103,6 +104,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
         return StringsHelper.enterCnp;
       case TextFieldType.phoneNumber:
         return StringsHelper.enterPhoneNumber;
+      case TextFieldType.medicalHistory:
+        return "Here you can complete your medical history.";
     }
   }
 
@@ -119,6 +122,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
         return TextInputType.number;
       case TextFieldType.phoneNumber:
         return TextInputType.phone;
+      case TextFieldType.medicalHistory:
+        return TextInputType.multiline;
     }
   }
 
@@ -136,6 +141,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
         return Icons.assignment_ind_outlined;
       case TextFieldType.phoneNumber:
         return Icons.phone_outlined;
+      case TextFieldType.medicalHistory:
+        return Icons.medical_information_outlined;
     }
   }
 

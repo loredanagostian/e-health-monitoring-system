@@ -120,4 +120,25 @@ class AppointmentService {
       return [];
     }
   }
+
+  static Future<http.StreamedResponse> updateAppointment(
+    String appointmentId,
+    String medicalHistory,
+  ) async {
+    var token = await _manager.jwtToken;
+
+    var request = http.MultipartRequest(
+      'PATCH',
+      Uri.parse("${AuthManager.endpoint}/Appointment/Update"),
+    );
+
+    request.headers['Authorization'] = 'Bearer ${token?.accessToken}';
+
+    request.fields['Id'] = appointmentId;
+    request.fields['MedicalHistory'] = medicalHistory;
+    request.fields['Diagnostic'] = '';
+    request.fields['Recommendation'] = '';
+
+    return await request.send();
+  }
 }

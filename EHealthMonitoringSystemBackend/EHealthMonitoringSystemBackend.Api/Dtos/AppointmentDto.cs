@@ -24,6 +24,7 @@ public class AppointmentGetAllDto
     public string DoctorName { get; set; }
     public string DoctorPicture { get; set; }
     public string DoctorId { get; set; }
+    public string MedicalHistory { get; set; }
 }
 
 public class AppointmentGetOneDto

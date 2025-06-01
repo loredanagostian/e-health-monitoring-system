@@ -6,6 +6,7 @@ class AppointmentDto {
   final String doctorName;
   final String doctorPicture;
   final String doctorId;
+  final String medicalHistory;
 
   AppointmentDto({
     required this.id,
@@ -15,6 +16,7 @@ class AppointmentDto {
     required this.appointmentType,
     required this.doctorPicture,
     required this.doctorId,
+    required this.medicalHistory,
   });
 
   factory AppointmentDto.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class AppointmentDto {
       doctorName: json['doctorName'] as String,
       doctorPicture: json['doctorPicture'] as String,
       doctorId: json['doctorId'] as String? ?? "",
+      medicalHistory: json['medicalHistory'] as String? ?? "",
     );
   }
 }

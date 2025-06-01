@@ -21,7 +21,6 @@ class MainApp extends StatelessWidget {
       ),
       navigatorKey: navigatorKey,
       scaffoldMessengerKey: rootScaffoldMessengerKey,
-      // TODO: if user is logged in diplay HomeScreen, otherwise Onboarding
       home: Scaffold(body: SafeArea(child: MainScreen())),
     );
   }

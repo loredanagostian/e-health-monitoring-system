@@ -1,17 +1,18 @@
 import 'package:e_health_monitoring_system_frontend/helpers/date_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/models/api_models/upcoming_appointment_dto.dart';
-import 'package:e_health_monitoring_system_frontend/screens/appointments/upcoming_appointment_screen.dart';
+import 'package:e_health_monitoring_system_frontend/screens/appointments/appointment_details_screen.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_row_icon_string.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/doctor_card.dart';
 import 'package:flutter/material.dart';
 
 class AppointmentsListScreen extends StatelessWidget {
-  final String title;
+  final bool isUpcoming;
   final List<AppointmentDto> appointments;
   const AppointmentsListScreen({
-    required this.title,
+    required this.isUpcoming,
     required this.appointments,
     super.key,
   });
@@ -19,7 +20,13 @@ class AppointmentsListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(appBarTitle: title, implyLeading: true),
+      appBar: CustomAppbar(
+        appBarTitle:
+            isUpcoming
+                ? StringsHelper.upcomingAppointment
+                : StringsHelper.recentVisit,
+        implyLeading: true,
+      ),
       body: SingleChildScrollView(
         child: SafeArea(
           child: Padding(
@@ -45,14 +52,15 @@ class AppointmentsListScreen extends StatelessWidget {
                                 text: ap.appointmentType,
                               ),
                             ],
-                            hasVisibleIcons: false,
+                            hasVisibleIcons: true,
                             onPressed:
                                 () => navigator.push(
                                   MaterialPageRoute(
                                     builder:
                                         (_) => AppointmentDetailsScreen(
-                                          title: title,
+                                          isUpcoming: isUpcoming,
                                           appointmentId: ap.id,
+                                          medicalHistory: ap.medicalHistory,
                                         ),
                                   ),
                                 ),

@@ -7,7 +7,7 @@ import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
 import 'package:e_health_monitoring_system_frontend/models/api_models/patient_profile.dart';
 import 'package:e_health_monitoring_system_frontend/models/api_models/upcoming_appointment_dto.dart';
 import 'package:e_health_monitoring_system_frontend/screens/appointments/doctor_profile_screen.dart';
-import 'package:e_health_monitoring_system_frontend/screens/appointments/upcoming_appointment_screen.dart';
+import 'package:e_health_monitoring_system_frontend/screens/appointments/appointment_details_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/appointments/appointments_list_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/complete_profile_screen.dart';
 import 'package:e_health_monitoring_system_frontend/services/appointment_service.dart';
@@ -16,6 +16,7 @@ import 'package:e_health_monitoring_system_frontend/services/patient_service.dar
 import 'package:e_health_monitoring_system_frontend/widgets/book_now_button.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_row_icon_string.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/doctor_card.dart';
+import 'package:e_health_monitoring_system_frontend/widgets/health_tip_carousel.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/medical_report.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/upcoming_appointment.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/info_tag.dart';
@@ -76,8 +77,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               getUpcomingAppointments(),
               SizedBox(height: 30),
               getRecentVisits(),
-              // SizedBox(height: 30),
+              SizedBox(height: 30),
               // getMedicalReports(),
+              getHealthTips(),
             ],
           ),
         ),
@@ -169,7 +171,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 MaterialPageRoute(
                   builder:
                       (_) => AppointmentsListScreen(
-                        title: StringsHelper.upcomingAppointments,
+                        isUpcoming: true,
                         appointments: _upcomingAppointments,
                       ),
                 ),
@@ -199,6 +201,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         child: UpcomingAppointment(
                           doctorName: appointment.doctorName,
                           appointmentName: appointment.appointmentType,
+                          doctorPhotoPath:
+                              appointment.doctorPicture.isNotEmpty
+                                  ? ImageHelper.fixImageUrl(
+                                    appointment.doctorPicture,
+                                  )
+                                  : "/assets/images/mockup_doctor.png",
                           date: DateHelper.formatDate(appointment.date),
                           time: DateHelper.formatTime(appointment.date),
                           onTap:
@@ -207,8 +215,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   builder:
                                       (_) => AppointmentDetailsScreen(
                                         appointmentId: appointment.id,
-                                        title:
-                                            StringsHelper.upcomingAppointment,
+                                        isUpcoming: true,
+                                        medicalHistory:
+                                            appointment.medicalHistory,
                                       ),
                                 ),
                               ),
@@ -232,7 +241,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               MaterialPageRoute(
                 builder:
                     (_) => AppointmentsListScreen(
-                      title: StringsHelper.recentVisits,
+                      isUpcoming: false,
                       appointments: _recentVisits,
                     ),
               ),
@@ -300,7 +309,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   builder:
                                       (_) => AppointmentDetailsScreen(
                                         appointmentId: ap.id,
-                                        title: StringsHelper.recentVisit,
+                                        isUpcoming: false,
+                                        medicalHistory: "",
                                       ),
                                 ),
                               );
@@ -333,6 +343,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ],
           ),
         ),
+      ],
+    );
+  }
+
+  Widget getHealthTips() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        getSectionTitle(StringsHelper.healthTips),
+        SizedBox(height: 20),
+        HealthTipsCarousel(),
       ],
     );
   }

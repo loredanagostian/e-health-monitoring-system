@@ -72,12 +72,23 @@ class StringsHelper {
   static const String recentVisits = "Recent Visits";
   static const String recentVisit = "Recent Visit";
   static const String bookNow = "Book now";
+  static const String bookAgain = "Book again";
   static const String medicalReports = "Medical Reports";
   static const String examinations = "Examinations";
   static const String analysis = "Analysis";
   static const String support = "Support";
   static const String home = "Home";
   static const String appointments = "Appoinments";
+  static const String healthTips = "Health Tips";
+  static const String exerciseRegularly = "Exercise Regularly";
+  static const String exerciseRegularlyMessage =
+      "Aim for at least 30 minutes of moderate exercise 5 days a week for better health.";
+  static const String stayHydrated = "Stay Hydrated";
+  static const String stayHydratedMessage =
+      "Drink at least 8 glasses of water daily to maintain optimal health and energy levels.";
+  static const String eatBalancedMeals = "Eat Balanced Meals";
+  static const String eatBalancedMealsMessage =
+      "Include a variety of fruits, vegetables, lean proteins, and whole grains in your diet for overall well-being.";
 
   /// Analysis Reports
   static const String analysisReports = "Analysis Reports";
@@ -122,12 +133,15 @@ class StringsHelper {
   /// General Strings
   static const String internalError =
       "Ooops! Something went wrong, please try again later.";
+  static const String success = "Success";
 
   /// Appointment Details
   static const String medicalHistory = "Medical history";
   static const String diagnostic = "Diagnostic";
   static const String recommendation = "Recommendation";
   static const String attachedDouments = "Attached documents";
+  static const String appointmentDetails = "Appointment details";
+  static const String enterMedicalHistory = "Enter your medical history";
 
   /// Pacient Profile
   static const String logout = "Logout";

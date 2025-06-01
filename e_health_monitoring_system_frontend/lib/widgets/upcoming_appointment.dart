@@ -6,6 +6,7 @@ class UpcomingAppointment extends StatelessWidget {
   final String appointmentName;
   final String date;
   final String time;
+  final String doctorPhotoPath;
   final void Function() onTap;
   const UpcomingAppointment({
     super.key,
@@ -14,6 +15,7 @@ class UpcomingAppointment extends StatelessWidget {
     required this.date,
     required this.time,
     required this.onTap,
+    this.doctorPhotoPath = 'assets/images/mockup_doctor.png',
   });
 
   @override
@@ -33,10 +35,29 @@ class UpcomingAppointment extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircleAvatar(
-                  radius: 25,
-                  backgroundImage: AssetImage(
-                    'assets/images/mockup_doctor.png',
+                ClipOval(
+                  child: Image.network(
+                    doctorPhotoPath,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                    errorBuilder:
+                        (context, error, stackTrace) => Image.asset(
+                          'assets/images/mockup_doctor.png',
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        ),
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      );
+                    },
                   ),
                 ),
                 SizedBox(width: 10),
