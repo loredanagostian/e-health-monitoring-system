@@ -16,14 +16,25 @@ export function AuthProvider({ children }) {
                 credentials: 'include',
             });
 
+            console.log("Response status:", response.status);
+
+            const contentType = response.headers.get('content-type');
+            console.log("Content-Type:", contentType);
+
             if (response.ok) {
                 const userData = await response.json();
+                console.log("Received userData:", userData);        
+                localStorage.setItem("doctorId", parseJwt(userData.token).unique_name);
+                localStorage.setItem("token", userData.token);
                 setUser(userData);
                 setError(null);
             } else {
+                const text = await response.text();
+                console.warn("Failed to fetch user. Response:", text);
                 setUser(null);
             }
         } catch (err) {
+            console.error("Error while fetching user:", err);
             setUser(null);
         } finally {
             setIsLoading(false);
@@ -48,11 +59,16 @@ export function AuthProvider({ children }) {
                 throw new Error(errorData.message || 'Login failed');
             }
 
+            const data = await response.json();
+            console.log('Token from response:', data.token);
+
             await fetchUser();
+            localStorage.setItem("isAuthenticated", "true");
             navigate('/');
         } catch (err) {
             setError(err.message);
             setUser(null);
+            localStorage.setItem("isAuthenticated", "false");
         } finally {
             setIsLoading(false);
         }
@@ -90,23 +106,19 @@ export function AuthProvider({ children }) {
         }
     }, [logout]);
 
-    // Initialize auth state
     useEffect(() => {
-        const initializeAuth = async () => {
-            await fetchUser();
+        fetchUser();
+    }, []);
 
-            // Set up token refresh timer
-            const refreshInterval = setInterval(async () => {
-                if (user) {
-                    await refreshTokens();
-                }
-            }, 14 * 60 * 1000); // Refresh every 14 minutes
+    useEffect(() => {
+        if (!user) return;
 
-            return () => clearInterval(refreshInterval);
-        };
+        const refreshInterval = setInterval(async () => {
+            await refreshTokens();
+        }, 14 * 60 * 1000); // every 14 minutes
 
-        initializeAuth();
-    }, [fetchUser, refreshTokens, user]);
+        return () => clearInterval(refreshInterval);
+    }, [user]);
 
     // Wrapper for authenticated fetch
     const authFetch = async (url, options = {}) => {
@@ -132,6 +144,35 @@ export function AuthProvider({ children }) {
         return response;
     };
 
+    const register = async (email, password) => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetch('/api/DoctorRegister/SignUpDoctor', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, passwd: password }),
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                const result = await response.json();
+                throw new Error(result.message || 'Registration failed');
+            }
+
+            await fetchUser();
+            localStorage.setItem("isAuthenticated", "true");
+            navigate("/register-profile");
+        } catch (err) {
+            setError(err.message);
+            localStorage.setItem("isAuthenticated", "false");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+
     // Context value
     const value = {
         user,
@@ -139,6 +180,7 @@ export function AuthProvider({ children }) {
         error,
         login,
         logout,
+        register,
         authFetch,
     };
 
@@ -155,4 +197,22 @@ export function useAuth() {
         throw new Error('useAuth must be used within an AuthProvider');
     }
     return context;
+}
+
+export function parseJwt(token) {
+  if (!token) return null;
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + c.charCodeAt(0).toString(16).padStart(2, '0'))
+        .join('')
+    );
+
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
 }

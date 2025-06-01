@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using EHealthMonitoringSystemBackend.Api.Dtos;
 using EHealthMonitoringSystemBackend.Core.Models;
 using EHealthMonitoringSystemBackend.Data.Services.Abstractions;
@@ -35,6 +36,29 @@ public class SpecializationController : ControllerBase
         return Ok(specializations);
     }
 
+    [HttpGet("{doctorId}")]
+    public async Task<IActionResult> GetSpecializationsByDoctor(string doctorId)
+    {
+        var doctor = await _doctorRepository.GetOneAsync(d => d.Id == doctorId);
+        if (doctor is null)
+            return NotFound("Doctor not found!");
+
+        var doctorSpecializations = await _doctorSpecializationsRepository.GetAllByAsync(ds => ds.DoctorId == doctorId);
+
+        var specializations = doctorSpecializations
+            .Select(ds => ds.Specialization)
+            .Where(s => s != null)
+            .Select(s => new SpecializationGetDto
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Icon = s.Icon
+            });
+
+        return Ok(specializations);
+    }
+
+
     [HttpPost]
     public async Task<IActionResult> Add([FromBody] SpecializationAddDto dto)
     {
@@ -55,14 +79,14 @@ public class SpecializationController : ControllerBase
         var existingDoctor = await _doctorRepository.GetOneAsync(d => d.Id == dto.DoctorId);
         if (existingDoctor is null) return NotFound("Doctor not found!");
 
-        var existingSpecialization = await _specializationRepository.GetOneAsync(s => s.Id == dto.SpecializationId);
-        if (existingSpecialization is null) return NotFound("Specialization not found!");
+        var specialization = await _specializationRepository.GetOneAsync(s => s.Name == dto.SpecializationName);
+        if (specialization is null) return NotFound("Specialization not found!");
 
         var dbDoctorSpecialization =
-            await _doctorSpecializationsRepository.AddSpecializationToDoctorAsync(dto.DoctorId, dto.SpecializationId);
+            await _doctorSpecializationsRepository.AddSpecializationToDoctorAsync(dto.DoctorId, specialization.Id);
 
         return Ok(new DoctorSpecializationDto
-            {DoctorId = dbDoctorSpecialization.DoctorId, SpecializationId = dbDoctorSpecialization.SpecializationId});
+            {DoctorId = dbDoctorSpecialization.DoctorId, SpecializationName = specialization.Id});
     }
 
     [HttpDelete("{id}")]
@@ -80,6 +104,24 @@ public class SpecializationController : ControllerBase
             Id = deleted.Id,
             Icon = deleted.Icon,
             Name = deleted.Name
+        });
+    }
+
+    [HttpDelete("{doctorId}/{specializationId}")]
+    public async Task<IActionResult> DeleteFromDoctor(string doctorId, string specializationId)
+    {
+        var deleted = await _doctorSpecializationsRepository
+            .DeleteOneAsync(s => s.DoctorId == doctorId && s.SpecializationId == specializationId);
+
+        if (deleted is null)
+        {
+            return BadRequest("Specialization not found!");
+        }
+
+        return Ok(new DoctorSpecializationDto
+        {
+            DoctorId = deleted.DoctorId,
+            SpecializationName = deleted.SpecializationId
         });
     }
     

@@ -16,7 +16,7 @@ interface AppointmentType {
 }
 
 export function AppointmentTypeManager() {
-  const doctorId = "4d950ab0-9c18-43c2-9767-2639f67250b5"; // TODO: Replace the doctorId with the one from the JWT
+  const doctorId = localStorage.getItem("doctorId");
   const baseUrl = "http://localhost:5200/api/";
 
   const [appointmentTypes, setAppointmentTypes] = useState<AppointmentType[]>([]);
@@ -37,8 +37,8 @@ export function AppointmentTypeManager() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            // "Authorization": `Bearer ${yourAccessToken}` // TODO: Use JWT
           },
+          credentials: "include",
         });
         if (!response.ok) throw new Error("Failed to fetch appointment types");
         const data = await response.json();
@@ -77,7 +77,7 @@ export function AppointmentTypeManager() {
     const payload = {
       name: formData.name.trim(),
       price: parseFloat(formData.price),
-      doctorId: "4d950ab0-9c18-43c2-9767-2639f67250b5" // TODO: Replace the doctorId with the one from the JWT
+      doctorId: doctorId
     };
 
     try {
@@ -85,8 +85,8 @@ export function AppointmentTypeManager() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // "Authorization": `Bearer ${yourAccessToken}` // TODO: Use JWT
         },
+        credentials: "include",
         body: JSON.stringify(payload),
       });
 
@@ -127,8 +127,8 @@ export function AppointmentTypeManager() {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          // "Authorization": `Bearer ${yourAccessToken}` // TODO: Use JWT
         },
+        credentials: "include",
       });
 
       if (!response.ok) {

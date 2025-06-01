@@ -66,9 +66,6 @@ public class ChatController : ControllerBase
             return Unauthorized("User is not authenticated.");
         }
 
-        Console.WriteLine("userId = ");
-        Console.WriteLine(userId);
-
         var client = _clientFactory.CreateClient();
         client.DefaultRequestHeaders.Authorization =
             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", API_KEY);

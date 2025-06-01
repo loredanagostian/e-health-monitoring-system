@@ -5,6 +5,7 @@ using EHealthMonitoringSystemBackend.Data.Services.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace EHealthMonitoringSystemBackend.Api.Controllers;
 
@@ -228,6 +229,23 @@ public class AppointmentController : ControllerBase
             }
         }
 
+        var userIds = appointmentsQuery.Select(a => a.UserId).Distinct().ToList();
+
+        var usersWithProfiles = await _userManger.Users
+            .Where(u => userIds.Contains(u.Id))
+            .Select(u => new
+            {
+                u.Id,
+                FirstName = u.PatientProfile.FirstName,
+                LastName = u.PatientProfile.LastName
+            })
+            .ToListAsync();
+
+        var userIdToName = usersWithProfiles.ToDictionary(
+            u => u.Id,
+            u => $"{u.FirstName} {u.LastName}"
+        );
+
         var appointments = appointmentsQuery.Select(a => new AppointmentGetAllDto
         {
             Id = a.Id,
@@ -235,6 +253,7 @@ public class AppointmentController : ControllerBase
             AppointmentType = a.AppointmentType.Name,
             DoctorName = a.AppointmentType.Doctor.Name,
             DoctorPicture = a.AppointmentType.Doctor.Picture.Path.Replace("../", baseUrl),
+            UserName = userIdToName[a.UserId]
         });
 
         return Ok(appointments);

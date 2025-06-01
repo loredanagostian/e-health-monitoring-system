@@ -19,7 +19,6 @@ const SignIn = () => {
     e.preventDefault();
     if (email && password) {
       await login(email, password);
-      navigate("/register-profile");
     }
   };
 

@@ -18,6 +18,11 @@ interface Appointment {
 }
 
 export function AppointmentManager() {
+  const doctorId = localStorage.getItem("doctorId");
+  const token = localStorage.getItem("token");
+
+  console.log("token = ", token);
+
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editNotes, setEditNotes] = useState("");
@@ -28,16 +33,31 @@ export function AppointmentManager() {
     time: "",
   });
 
-  const doctorId = "4d950ab0-9c18-43c2-9767-2639f67250b5"; // Replace with actual doctor ID
-  const baseUrl = "http://localhost:5200/api"; // Replace with your API base URL
+  const baseUrl = "http://localhost:5200/api";
 
   useEffect(() => {
+    if (!doctorId || !token) return; // Wait for both to be available
+
     const fetchAppointments = async () => {
       try {
         const [futureRes, pastRes] = await Promise.all([
-          fetch(`${baseUrl}/Appointment/GetDoctorAppointments/${doctorId}?time=future`),
-          fetch(`${baseUrl}/Appointment/GetDoctorAppointments/${doctorId}?time=past`),
+          fetch(`${baseUrl}/Appointment/GetDoctorAppointments/${doctorId}?time=future`, {
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`,
+            },
+          }),
+          fetch(`${baseUrl}/Appointment/GetDoctorAppointments/${doctorId}?time=past`, {
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`,
+            },
+          }),
         ]);
+
+        if (!futureRes.ok || !pastRes.ok) {
+          throw new Error("Unauthorized or failed to fetch");
+        }
 
         const futureData = await futureRes.json();
         const pastData = await pastRes.json();
@@ -47,7 +67,7 @@ export function AppointmentManager() {
             const dateObj = new Date(item.date);
             return {
               id: item.id,
-              patientName: item.doctorName, // or item.patientName if available
+              patientName: item.userName,
               type: item.appointmentType,
               date: dateObj.toISOString().split("T")[0],
               time: dateObj.toISOString().split("T")[1].slice(0, 5),
@@ -67,7 +87,7 @@ export function AppointmentManager() {
     };
 
     fetchAppointments();
-  }, []);
+  }, [doctorId, token]);
 
   const updateAppointment = (id: string, updates: Partial<Appointment>) => {
     setAppointments(appointments.map(apt => 
@@ -76,30 +96,6 @@ export function AppointmentManager() {
     toast({
       title: "Success",
       description: "Appointment updated successfully",
-    });
-  };
-
-  const addAppointment = () => {
-    if (!newAppointment.patientName || !newAppointment.date || !newAppointment.time) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const appointment: Appointment = {
-      id: Date.now().toString(),
-      ...newAppointment,
-      status: "upcoming",
-    };
-
-    setAppointments([...appointments, appointment]);
-    setNewAppointment({ patientName: "", type: "General Consultation", date: "", time: "" });
-    toast({
-      title: "Success",
-      description: "Appointment scheduled successfully",
     });
   };
 

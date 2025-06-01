@@ -14,7 +14,7 @@ public class DoctorSpecializationRepository : IDoctorSpecializationsRepository
         _dbContext = dbContext;
         _dbSet = _dbContext.Set<DoctorSpecialization>();
     }
-    
+
     public DbSet<DoctorSpecialization> _dbSet { get; }
 
     public async Task<DoctorSpecialization> AddSpecializationToDoctorAsync(string doctorId, string specializationId)
@@ -27,12 +27,29 @@ public class DoctorSpecializationRepository : IDoctorSpecializationsRepository
 
         var dbDoctorSpecialization = (await _dbSet.AddAsync(doctorSpecialization)).Entity;
         await _dbContext.SaveChangesAsync();
-        
+
         return dbDoctorSpecialization;
     }
 
     public async Task<IEnumerable<DoctorSpecialization>> GetAllByAsync(Expression<Func<DoctorSpecialization, bool>> predicate)
     {
-        return await _dbContext.DoctorSpecializations.Where(predicate).ToListAsync();
+        return await _dbContext.DoctorSpecializations
+            .Include(ds => ds.Specialization)
+            .Where(predicate)
+            .ToListAsync();
+    }
+    
+    public async Task<DoctorSpecialization> DeleteOneAsync(Expression<Func<DoctorSpecialization, bool>> predicate)
+    {
+        var existing = await _dbContext.DoctorSpecializations.FirstOrDefaultAsync(predicate);
+
+        if (existing is null)
+        {
+            return null;
+        }
+
+        _dbSet.Remove(existing);
+        await _dbContext.SaveChangesAsync();
+        return existing;
     }
 }

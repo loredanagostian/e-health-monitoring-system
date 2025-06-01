@@ -69,7 +69,7 @@ services.AddCors(options =>
         "EHealthMonitoringSystemPolicy",
         builder =>
         {
-            builder.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader();
+            builder.WithOrigins("http://localhost:3000").AllowCredentials().AllowAnyMethod().AllowAnyHeader();
         }
     );
 });

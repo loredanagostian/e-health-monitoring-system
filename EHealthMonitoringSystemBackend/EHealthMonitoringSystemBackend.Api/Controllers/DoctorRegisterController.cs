@@ -74,7 +74,43 @@ public class DoctorRegisterController(
 
         _logger.LogInformation("Created new user");
 
-        return CreatedAtAction(nameof(SignUpDoctor), new { userId });
+        var token = _jwtManager.GenerateToken(newUser.Id);
+
+        await _tokenRepository.DeleteRefreshToken(newUser);
+        await _tokenRepository.SetRefreshToken(
+            newUser,
+            new UserRefreshToken { RefreshToken = token.RefreshToken }
+        );
+
+        // Access token (short-lived)
+        Response.Cookies.Append(
+            "access-token",
+            token.AccessToken!,
+            new CookieOptions
+            {
+                HttpOnly = false,
+                Secure = false, // In production
+                SameSite = SameSiteMode.Unspecified,
+                Path = "/api", // Restrict path
+                Expires = DateTimeOffset.UtcNow.AddMinutes(15),
+            }
+        );
+
+        // Refresh token (long-lived)
+        Response.Cookies.Append(
+            "refresh-token",
+            token.RefreshToken!,
+            new CookieOptions
+            {
+                HttpOnly = false,
+                Secure = false, // In production
+                SameSite = SameSiteMode.Unspecified,
+                Path = "/api", // Restrict path
+                Expires = DateTimeOffset.UtcNow.AddDays(15),
+            }
+        );
+
+        return StatusCode(StatusCodes.Status200OK, new { token });
     }
 
     private async Task SendConfirmationEmail(User newUser)
@@ -314,20 +350,20 @@ public class DoctorRegisterController(
     }
 
     [HttpGet]
-    public async Task<IActionResult> Temp()
+public async Task<IActionResult> Temp()
+{
+    string? jwtToken = null;
+    if (Request.Cookies.ContainsKey("access-token"))
     {
-        string? jwtToken = null;
-        if (Request.Cookies.ContainsKey("access-token"))
-        {
-            jwtToken = Request.Cookies["access-token"];
-        }
-
-        if (jwtToken is null)
-        {
-            return Unauthorized("Missing JWT Token.");
-        }
-        _logger.LogCritical(jwtToken);
-
-        return Ok(jwtToken);
+        jwtToken = Request.Cookies["access-token"];
     }
+
+    if (jwtToken is null)
+    {
+        return Unauthorized("Missing JWT Token.");
+    }
+
+    return Ok(new { token = jwtToken });
+}
+
 }
