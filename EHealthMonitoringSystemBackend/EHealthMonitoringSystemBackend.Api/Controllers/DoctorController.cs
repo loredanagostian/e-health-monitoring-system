@@ -46,32 +46,6 @@ public class DoctorController : ControllerBase
     // [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Add([FromForm] DoctorPostDto doctorPost, IFormFile file)
     {
-        // TODO: better checking, automatic auth ?
-        string? accessToken = null;
-        if (Request.Cookies.ContainsKey("access-token"))
-        {
-            accessToken = Request.Cookies["access-token"];
-        }
-
-        string? refreshToken = null;
-        if (Request.Cookies.ContainsKey("refresh-token"))
-        {
-            refreshToken = Request.Cookies["refresh-token"];
-        }
-
-        var token = new Token { AccessToken = accessToken, RefreshToken = refreshToken };
-        if (token.AccessToken is null)
-        {
-            return Unauthorized(new { msg = "Invalid JWT token." });
-        }
-
-        var principal = _jwtManager.GetPrincipalFromToken(token.AccessToken);
-        var userId = principal.Identity?.Name;
-        if (userId is null)
-        {
-            return Unauthorized(new { msg = "User id not registered." });
-        }
-
         var appFile = await _uploadManager.Upload(file);
 
         if (appFile is null)
@@ -79,7 +53,7 @@ public class DoctorController : ControllerBase
 
         var doctor = new Doctor
         {
-            Id = userId,
+            Id = doctorPost.Id,
             Name = doctorPost.Name,
             Description = doctorPost.Description,
             PictureId = appFile.Id,

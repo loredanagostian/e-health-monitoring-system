@@ -18,7 +18,6 @@ export function SpecializationManager() {
 
   const doctorId = localStorage.getItem("doctorId");
 
-  // ✅ Reusable fetch function
   const fetchSpecializations = async () => {
     if (!doctorId) return;
 

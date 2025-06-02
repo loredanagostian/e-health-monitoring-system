@@ -42,21 +42,30 @@ export const SpecializationDropdown = ({ value, onChange }: Props) => {
     fetchSpecializations();
   }, []);
 
+  // Find the ID corresponding to the selected specialization name
+  const selectedSpec = specializations.find((s) => s.name === value);
+
   return (
     <select
-        value={value}
-        onChange={(e) => {
-            const selected = specializations.find(s => s.id === e.target.value);
-            if (selected) onChange(selected.name);
-        }}
-        className="w-full px-4 pr-10 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+      value={selectedSpec?.id || ""}
+      onChange={(e) => {
+        const selectedId = e.target.value;
+        const selected = specializations.find((s) => s.id === selectedId);
+        if (selected) {
+          onChange(selected.name);
+        } else {
+          // When default option is selected
+          onChange("");
+        }
+      }}
+      className="w-full px-4 pr-10 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
     >
-        <option value="">-- Select Specialization --</option>
-        {specializations.map((spec) => (
-            <option key={spec.id} value={spec.id}>
-            {spec.name}
-            </option>
-        ))}
+      <option value="">-- Select Specialization --</option>
+      {specializations.map((spec) => (
+        <option key={spec.id} value={spec.id}>
+          {spec.name}
+        </option>
+      ))}
     </select>
   );
 };
