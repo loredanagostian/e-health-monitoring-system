@@ -10,7 +10,6 @@ using Microsoft.EntityFrameworkCore;
 namespace EHealthMonitoringSystemBackend.Api.Controllers;
 
 [ApiController]
-[Authorize]
 [Route("api/[controller]/[action]")]
 public class AppointmentController : ControllerBase
 {

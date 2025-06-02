@@ -13,7 +13,6 @@ namespace EHealthMonitoringSystemBackend.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]")]
-[Authorize]
 public class PatientController(
     UserManager<User> userManger,
     ILogger<PatientRegister> logger,
