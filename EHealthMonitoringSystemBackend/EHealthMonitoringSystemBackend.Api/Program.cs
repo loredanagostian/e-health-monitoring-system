@@ -63,13 +63,13 @@ services.AddSwaggerGen(options =>
     );
 });
 
-services.AddCors(options =>
+builder.Services.AddCors(options =>
 {
     options.AddPolicy(
-        "EHealthMonitoringSystemPolicy",
-        builder =>
+        "AllowAll",
+        policy =>
         {
-            builder.WithOrigins("http://localhost:3000").AllowCredentials().AllowAnyMethod().AllowAnyHeader();
+            policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
         }
     );
 });
@@ -191,7 +191,7 @@ app.UseStaticFiles(
     }
 );
 app.UseRouting();
-app.UseCors("EHealthMonitoringSystemPolicy");
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
