@@ -170,8 +170,31 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                               child: CustomOpacityButtonWithBorderColor(
                                 text: StringsHelper.cancel,
                                 backgroundColor: ColorsHelper.mainRed,
-                                // TODO: implement
-                                onPressed: () {},
+                                onPressed:
+                                    () => AppointmentService.cancelAppointment(
+                                      widget.appointmentId,
+                                    ).then((response) async {
+                                      if (response.statusCode == 200) {
+                                        WidgetsHelper.showCustomSnackBar(
+                                          message: StringsHelper.success,
+                                          backgroundColor: Colors.green,
+                                        );
+
+                                        navigator.pushAndRemoveUntil(
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) => MainScreen(
+                                                  bottomNavigatorIndex: 1,
+                                                ),
+                                          ),
+                                          (route) => false,
+                                        );
+                                      } else {
+                                        WidgetsHelper.showCustomSnackBar(
+                                          message: StringsHelper.internalError,
+                                        );
+                                      }
+                                    }),
                               ),
                             ),
                             Visibility(

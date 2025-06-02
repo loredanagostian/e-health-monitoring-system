@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Dialog,
@@ -47,18 +46,48 @@ export function AppointmentDialog({
   const isUpcoming = appointment.status === "upcoming";
   const isPast = appointment.status === "completed";
 
-  const handleMarkComplete = () => {
-    onUpdateAppointment(appointment.id, {
-      status: "completed",
-      diagnostic,
-      recommendations,
-    });
-    onClose();
+  const handleSave = async () => {
+    const formData = new FormData();
+    formData.append("Id", appointment.id);
+    formData.append("MedicalHistory", appointment.medicalHistory || "");
+    formData.append("Diagnostic", diagnostic);
+    formData.append("Recommendation", recommendations);
+
+    try {
+      const response = await fetch("/api/Appointment/Update", {
+        method: "PATCH",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update appointment");
+      }
+
+      onUpdateAppointment(appointment.id, {
+        diagnostic,
+        recommendations,
+      });
+      onClose();
+    } catch (error) {
+      console.error("Update error:", error);
+    }
   };
 
-  const handleCancel = () => {
-    onUpdateAppointment(appointment.id, { status: "cancelled" });
-    onClose();
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`/api/Appointment/Delete/${appointment.id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete appointment");
+      }
+
+      onUpdateAppointment(appointment.id, { status: "cancelled" }); // Or remove it from state
+      onClose();
+    } catch (error) {
+      console.error("Delete error:", error);
+    }
   };
 
   return (
@@ -80,10 +109,10 @@ export function AppointmentDialog({
             </div>
             <div>
               <Label className="text-sm font-medium text-slate-700">Reason to Visit</Label>
-              <Input 
-                value={appointment.reasonToVisit || appointment.type} 
-                readOnly 
-                className="bg-slate-50" 
+              <Input
+                value={appointment.reasonToVisit || appointment.type}
+                readOnly
+                className="bg-slate-50"
               />
             </div>
           </div>
@@ -115,66 +144,48 @@ export function AppointmentDialog({
             />
           </div>
 
-          {/* Diagnostic - Doctor's section */}
-          <div>
-            <Label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-              <Stethoscope className="h-4 w-4" />
-              Diagnostic (Doctor's Assessment)
-            </Label>
-            {isUpcoming ? (
+          {/* Diagnostic (only for completed appointments) */}
+          {isPast && (
+            <div>
+              <Label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                <Stethoscope className="h-4 w-4" />
+                Diagnostic (Doctor's Assessment)
+              </Label>
               <Textarea
                 placeholder="Enter your diagnostic assessment..."
                 value={diagnostic}
                 onChange={(e) => setDiagnostic(e.target.value)}
                 className="min-h-[100px]"
               />
-            ) : (
-              <Textarea
-                value={appointment.diagnostic || "No diagnostic provided."}
-                readOnly
-                className="bg-slate-50 min-h-[100px]"
-              />
-            )}
-          </div>
+            </div>
+          )}
 
-          {/* Recommendations - Doctor's section */}
-          <div>
-            <Label className="text-sm font-medium text-slate-700">
-              Recommendations (Doctor's Notes)
-            </Label>
-            {isUpcoming ? (
+          {/* Recommendations (only for completed appointments) */}
+          {isPast && (
+            <div>
+              <Label className="text-sm font-medium text-slate-700">
+                Recommendations (Doctor's Notes)
+              </Label>
               <Textarea
                 placeholder="Enter your recommendations and treatment plan..."
                 value={recommendations}
                 onChange={(e) => setRecommendations(e.target.value)}
                 className="min-h-[100px]"
               />
-            ) : (
-              <Textarea
-                value={appointment.recommendations || appointment.notes || "No recommendations provided."}
-                readOnly
-                className="bg-slate-50 min-h-[100px]"
-              />
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-3 pt-4 border-t">
+            {isPast && (
+              <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
+                Save
+              </Button>
+            )}
             {isUpcoming && (
-              <>
-                <Button
-                  onClick={handleMarkComplete}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  Mark as Completed
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={handleCancel}
-                >
-                  Cancel Appointment
-                </Button>
-              </>
+              <Button variant="destructive" onClick={handleDelete}>
+                Cancel Appointment
+              </Button>
             )}
             <Button variant="outline" onClick={onClose}>
               Close

@@ -29,7 +29,8 @@ class AppointmentDetails {
       appointmentType: json['appointmentType'] as String,
       doctorName: json['doctorName'] as String,
       doctorPicture: json['doctorPicture'] as String? ?? "",
-      medicalHistory: json['medicalHistory'] as String? ?? "",
+      medicalHistory:
+          json['medicalHistory'] as String? ?? "No medical history provided",
       diagnostic: json['diagnostic'] as String? ?? "",
       recommendation: json['recommendation'] as String? ?? "",
     );

@@ -10,4 +10,5 @@ public interface IAppointmentRepository
     Task<Appointment> GetByIdAsync(string id);
     Task<IEnumerable<Appointment>> GetAsync();
     Task<IEnumerable<Appointment>> GetAsync(Expression<Func<Appointment, bool>> predicate);
+    Task<Appointment> DeleteOneAsync(Expression<Func<Appointment, bool>> predicate);
 }
