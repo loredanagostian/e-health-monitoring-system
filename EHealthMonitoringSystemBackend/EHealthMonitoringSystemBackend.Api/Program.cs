@@ -63,13 +63,13 @@ services.AddSwaggerGen(options =>
     );
 });
 
-builder.Services.AddCors(options =>
+services.AddCors(options =>
 {
     options.AddPolicy(
         "AllowAll",
         policy =>
         {
-            policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+            policy.AllowCredentials().AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
         }
     );
 });
