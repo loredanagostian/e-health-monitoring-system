@@ -124,15 +124,12 @@ public class DoctorRegisterController(
             protocol: Request.Scheme
         );
 
-        var baseUrl = configuration["Base_url"];
-        // TODO: !!!temp until hosted, requests from android use 10.0.0.2 ip
-        callbackUrl = $"{baseUrl}api/DoctorRegister/ConfirmEmail?userId={newUser.Id}&code={code}";
         _logger.LogInformation(callbackUrl);
-        // await _emailSender.SendEmailAsync(
-        //     newDoctor.Email,
-        //     "Confirm your email",
-        //     $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl!)}'>clicking here</a>."
-        // );
+        await _emailSender.SendEmailAsync(
+            newUser.Email!,
+            "Confirm your email",
+            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl!)}'>clicking here</a>."
+        );
     }
 
     [HttpPost]
@@ -350,20 +347,19 @@ public class DoctorRegisterController(
     }
 
     [HttpGet]
-public async Task<IActionResult> Temp()
-{
-    string? jwtToken = null;
-    if (Request.Cookies.ContainsKey("access-token"))
+    public async Task<IActionResult> Temp()
     {
-        jwtToken = Request.Cookies["access-token"];
+        string? jwtToken = null;
+        if (Request.Cookies.ContainsKey("access-token"))
+        {
+            jwtToken = Request.Cookies["access-token"];
+        }
+
+        if (jwtToken is null)
+        {
+            return Unauthorized("Missing JWT Token.");
+        }
+
+        return Ok(new { token = jwtToken });
     }
-
-    if (jwtToken is null)
-    {
-        return Unauthorized("Missing JWT Token.");
-    }
-
-    return Ok(new { token = jwtToken });
-}
-
 }
