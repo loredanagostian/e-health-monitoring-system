@@ -79,12 +79,8 @@ public class RegisterController(
     {
         var code = await _userManger.GenerateEmailConfirmationTokenAsync(newUser);
         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-        var callbackUrl = Url.Action(
-            "ConfirmEmail",
-            "Register",
-            new { userId = newUser.Id, code },
-            protocol: Request.Scheme
-        );
+
+        var callbackUrl = $"http://localhost:3000/confirm-email?userId={newUser.Id}&code={code}";
 
         _logger.LogInformation(callbackUrl);
         await _emailSender.SendEmailAsync(
