@@ -42,13 +42,48 @@ public class ChatController : ControllerBase
         "\n- To **book an appointment**:" +
         "\n1. Go to the \"Appointments\" screen (button at the bottom of the screen)" +
         "\n2. Search for a specialty or doctor" +
-        "\n3. Select a date and time" +
+        "\n3. Select the doctor for which you want to book the appointment" +
+        "\n4. Select a time and date for the appointment" +
+        "\n5. Select the appointment type" +
 
-        "\n\n- To **view upcoming appointments**, **recent visits**, or **medical reports**:" +
-        "\n- Use the \"Home\" screen (button at the bottom of the screen)" +
+        "\n\n- To **view upcoming appointments**:" +
+        "\n1. Go to the \"Home\" screen (button at the bottom of the screen)" +
+        "\n2. You will see your upcoming appointments" +
+        "\n3. To view all appointments press the \"View All\" button" +
+
+        "\n\n- To **view upcoming appointments**:" +
+        "\n1. Go to the \"Home\" screen (button at the bottom of the screen)" +
+        "\n2. You will see your upcoming appointments" +
+        "\n3. To view all appointments press the \"View All\" button" +
+
+        "\n\n- To **add medical history to an appointment**:" +
+        "\n1. Go to the \"Home\" screen (button at the bottom of the screen)" +
+        "\n2. You will see a section with your upcoming appointments" +
+        "\n3. Select the appointment for which you want to update the medical history" +
+        "\n4. Add the medical history and press the \"Update\" button" +
+
+        "\n\n- To **view recent appointments**:" +
+        "\n1. Go to the \"Home\" screen (button at the bottom of the screen)" +
+        "\n2. You will see a section with your recent appointments" +
+        "\n3. To view all appointments press the \"View All\" button" +
+
+        "\n\n- To **view a recent appointments details**:" +
+        "\n1. Go to the \"Home\" screen (button at the bottom of the screen)" +
+        "\n2. You will see a section with your recent appointments" +
+        "\n3. Select the appointment for which you want to check the details" +
+        "\n4. You will see the details completed by the doctor for the given appointment" +
 
         "\n\n- To **cancel an appointment**:" +
-        "\n- Select the appointment and press the \"Cancel\" button";
+        "\n1. Go to the \"Home\" screen (button at the bottom of the screen)" +
+        "\n2. You will see a section with your upcoming appointments" +
+        "\n3. Select the appointment that you want to cancel" +
+        "\n4. Press the \"Cancel\" button" +
+
+        "\n\n- To **update your profile**:" +
+        "\n1. Go to the \"Home\" screen (button at the bottom of the screen)" +
+        "\n2. Tap the user icon on the top left of your screen" +
+        "\n3. Update the info for the user" +
+        "\n4. Press the \"Update\" button";
 
     public ChatController(IHttpClientFactory clientFactory, IConfiguration config, AppDbContext dbContext)
     {
