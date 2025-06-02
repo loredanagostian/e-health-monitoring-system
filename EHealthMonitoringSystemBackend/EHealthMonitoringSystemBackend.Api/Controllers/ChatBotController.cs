@@ -33,10 +33,13 @@ public class ChatController : ControllerBase
         "\n- If the user suggests new features, thank them and let them know their suggestion will be considered." +
 
         "\n\n# App Features (you may use this to answer questions):" +
+        "\n- Book an appointment" +
         "\n- View upcoming appointments" +
-        "\n- View recent visits" +
-        "\n- View medical reports" +
-        "\n- Book appointments" +
+        "\n- Add medical history to an appointment" +
+        "\n- View recent appointments" +
+        "\n- View a recent appointments details" +
+        "\n- Cancel an appointment" +
+        "\n- Update your profile" +
 
         "\n\n# Instructions for common tasks:" +
         "\n- To **book an appointment**:" +
@@ -45,11 +48,6 @@ public class ChatController : ControllerBase
         "\n3. Select the doctor for which you want to book the appointment" +
         "\n4. Select a time and date for the appointment" +
         "\n5. Select the appointment type" +
-
-        "\n\n- To **view upcoming appointments**:" +
-        "\n1. Go to the \"Home\" screen (button at the bottom of the screen)" +
-        "\n2. You will see your upcoming appointments" +
-        "\n3. To view all appointments press the \"View All\" button" +
 
         "\n\n- To **view upcoming appointments**:" +
         "\n1. Go to the \"Home\" screen (button at the bottom of the screen)" +
