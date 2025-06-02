@@ -5,6 +5,7 @@ import { Badge } from "../components/ui/badge";
 import { Calendar, Clock, User, FileText, Edit2, Plus } from "lucide-react";
 import { toast } from "../hooks/use-toast";
 import { AppointmentDialog } from "./AppointmentDialog";
+import { useAuth } from "./AuthProvider";
 
 interface Appointment {
   id: string;
@@ -28,8 +29,8 @@ export function AppointmentManager() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const { authFetch } = useAuth();
 
-  const baseUrl = "/api";
 
   useEffect(() => {
     if (!doctorId || !token) return; // Wait for both to be available
@@ -37,18 +38,8 @@ export function AppointmentManager() {
     const fetchAppointments = async () => {
       try {
         const [futureRes, pastRes] = await Promise.all([
-          fetch(`${baseUrl}/Appointment/GetDoctorAppointments/${doctorId}?time=future`, {
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`,
-            },
-          }),
-          fetch(`${baseUrl}/Appointment/GetDoctorAppointments/${doctorId}?time=past`, {
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`,
-            },
-          }),
+          authFetch(`/api/Appointment/GetDoctorAppointments/${doctorId}?time=future`),
+          authFetch(`/api/Appointment/GetDoctorAppointments/${doctorId}?time=past`),
         ]);
 
         if (!futureRes.ok || !pastRes.ok) {
