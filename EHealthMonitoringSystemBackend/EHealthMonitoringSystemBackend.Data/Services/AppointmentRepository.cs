@@ -68,4 +68,18 @@ public class AppointmentRepository : IAppointmentRepository
     {
         return await _dbContext.Appointments.Where(predicate).ToListAsync();
     }
+
+    public async Task<Appointment> DeleteOneAsync(Expression<Func<Appointment, bool>> predicate)
+    {
+        var existing = await _dbContext.Appointments.FirstOrDefaultAsync(predicate);
+
+        if (existing is null)
+        {
+            return null;
+        }
+
+        _dbSet.Remove(existing);
+        await _dbContext.SaveChangesAsync();
+        return existing;
+    }
 }

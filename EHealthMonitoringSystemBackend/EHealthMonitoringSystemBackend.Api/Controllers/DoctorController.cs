@@ -133,7 +133,7 @@ public class DoctorController : ControllerBase
             Id = doctor.Id,
             Name = doctor.Name,
             Description = doctor.Description,
-            Picture = doctor.Picture.Path.Replace("../", baseUrl),
+            Picture = doctor.Picture.Path.Replace("../", baseUrl).Replace("./", baseUrl),
         };
 
         var doctorSpecializationIds = (
