@@ -90,7 +90,7 @@ public class DoctorRegisterController(
             {
                 HttpOnly = false,
                 Secure = false, // In production
-                SameSite = SameSiteMode.Unspecified,
+                SameSite = SameSiteMode.None,
                 Path = "/api", // Restrict path
                 Expires = DateTimeOffset.UtcNow.AddMinutes(15),
             }
@@ -104,7 +104,7 @@ public class DoctorRegisterController(
             {
                 HttpOnly = false,
                 Secure = false, // In production
-                SameSite = SameSiteMode.Unspecified,
+                SameSite = SameSiteMode.None,
                 Path = "/api", // Restrict path
                 Expires = DateTimeOffset.UtcNow.AddDays(15),
             }
@@ -191,7 +191,7 @@ public class DoctorRegisterController(
             {
                 HttpOnly = false,
                 Secure = false, // In production
-                SameSite = SameSiteMode.Unspecified,
+                SameSite = SameSiteMode.None,
                 Path = "/api", // Restrict path
                 Expires = DateTimeOffset.UtcNow.AddMinutes(15),
             }
@@ -205,7 +205,7 @@ public class DoctorRegisterController(
             {
                 HttpOnly = false,
                 Secure = false, // In production
-                SameSite = SameSiteMode.Unspecified,
+                SameSite = SameSiteMode.None,
                 Path = "/api", // Restrict path
                 Expires = DateTimeOffset.UtcNow.AddDays(15),
             }
