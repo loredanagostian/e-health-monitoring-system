@@ -104,12 +104,6 @@ public class AppointmentController : ControllerBase
             return BadRequest("Appointment not found!");
         }
 
-        var user = await _getUser();
-        if (user is null)
-        {
-            return Unauthorized();
-        }
-
         var appointmentFiles = new List<AppointmentFile>();
         foreach (var file in files)
         {
@@ -158,7 +152,7 @@ public class AppointmentController : ControllerBase
                 Date = a.Date,
                 AppointmentType = a.AppointmentType.Name,
                 DoctorName = a.AppointmentType.Doctor.Name,
-                DoctorPicture = a.AppointmentType.Doctor.Picture.Path.Replace("../", baseUrl),
+                DoctorPicture = a.AppointmentType.Doctor.Picture.Path.Replace("../", baseUrl).Replace("./", baseUrl),
                 DoctorId = a.AppointmentType.DoctorId,
             });
 
@@ -186,7 +180,7 @@ public class AppointmentController : ControllerBase
                 Date = a.Date,
                 AppointmentType = a.AppointmentType.Name,
                 DoctorName = a.AppointmentType.Doctor.Name,
-                DoctorPicture = a.AppointmentType.Doctor.Picture.Path.Replace("../", baseUrl),
+                DoctorPicture = a.AppointmentType.Doctor.Picture.Path.Replace("../", baseUrl).Replace("./", baseUrl),
                 MedicalHistory = a.MedicalHistory ?? string.Empty,
             });
 
@@ -251,7 +245,7 @@ public class AppointmentController : ControllerBase
             Date = a.Date,
             AppointmentType = a.AppointmentType.Name,
             DoctorName = a.AppointmentType.Doctor.Name,
-            DoctorPicture = a.AppointmentType.Doctor.Picture.Path.Replace("../", baseUrl),
+            DoctorPicture = a.AppointmentType.Doctor.Picture.Path.Replace("../", baseUrl).Replace("./", baseUrl),
             UserName = userIdToName[a.UserId],
             MedicalHistory = a.MedicalHistory
         });
@@ -338,5 +332,18 @@ public class AppointmentController : ControllerBase
         }
 
         return Ok(new { timeSlots });
+    }
+    
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        var deleted = await _appointmentRepository.DeleteOneAsync(s => s.Id == id);
+
+        if (deleted is null)
+        {
+            return BadRequest("Appointment not found!");
+        }
+
+        return Ok(deleted);
     }
 }

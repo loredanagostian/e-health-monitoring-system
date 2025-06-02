@@ -57,7 +57,7 @@ public class AppointmentTypeController : ControllerBase
 
         if (deleted is null)
         {
-            return BadRequest("Specialization not found!");
+            return BadRequest("AppointmentType not found!");
         }
 
         return Ok(deleted);
