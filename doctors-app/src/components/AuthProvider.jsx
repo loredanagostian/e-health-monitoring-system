@@ -62,8 +62,12 @@ export function AuthProvider({ children }) {
             const data = await response.json();
             console.log('Token from response:', data.token);
 
-            await fetchUser();
             localStorage.setItem("isAuthenticated", "true");
+            const jwtData = parseJwt(data.token.accessToken);
+            localStorage.setItem("doctorId", jwtData.unique_name);
+            localStorage.setItem("token", data.token);
+
+            // await fetchUser();
             navigate('/');
         } catch (err) {
             setError(err.message);
@@ -162,7 +166,12 @@ export function AuthProvider({ children }) {
             }
 
             await fetchUser();
+            const data = await response.json();
+            console.log('Token from response:', data.token);
             localStorage.setItem("isAuthenticated", "true");
+            const jwtData = parseJwt(data.token.accessToken);
+            localStorage.setItem("doctorId", jwtData.unique_name);
+            localStorage.setItem("token", data.token);
             navigate("/register-profile");
         } catch (err) {
             setError(err.message);
