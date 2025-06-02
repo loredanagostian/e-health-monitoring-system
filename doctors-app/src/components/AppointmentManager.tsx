@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Textarea } from "../components/ui/textarea";
 import { Badge } from "../components/ui/badge";
 import { Calendar, Clock, User, FileText, Edit2, Plus } from "lucide-react";
 import { toast } from "../hooks/use-toast";
+import { AppointmentDialog } from "./AppointmentDialog";
 
 interface Appointment {
   id: string;
@@ -14,7 +13,10 @@ interface Appointment {
   date: string;
   time: string;
   status: "upcoming" | "completed" | "cancelled";
-  notes?: string;
+  reasonToVisit?: string;
+  medicalHistory?: string;
+  diagnostic?: string;
+  recommendations?: string;
 }
 
 export function AppointmentManager() {
@@ -24,14 +26,8 @@ export function AppointmentManager() {
   console.log("token = ", token);
 
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editNotes, setEditNotes] = useState("");
-  const [newAppointment, setNewAppointment] = useState({
-    patientName: "",
-    type: "General Consultation",
-    date: "",
-    time: "",
-  });
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   const baseUrl = "http://localhost:5200/api";
 
@@ -72,6 +68,7 @@ export function AppointmentManager() {
               date: dateObj.toISOString().split("T")[0],
               time: dateObj.toISOString().split("T")[1].slice(0, 5),
               status,
+              medicalHistory: item.medicalHistory || "",
             };
           });
 
@@ -89,6 +86,11 @@ export function AppointmentManager() {
     fetchAppointments();
   }, [doctorId, token]);
 
+  const handleAppointmentClick = (appointment: Appointment) => {
+    setSelectedAppointment(appointment);
+    setIsDialogOpen(true);
+  };
+
   const updateAppointment = (id: string, updates: Partial<Appointment>) => {
     setAppointments(appointments.map(apt => 
       apt.id === id ? { ...apt, ...updates } : apt
@@ -97,12 +99,6 @@ export function AppointmentManager() {
       title: "Success",
       description: "Appointment updated successfully",
     });
-  };
-
-  const saveNotes = (id: string) => {
-    updateAppointment(id, { notes: editNotes });
-    setEditingId(null);
-    setEditNotes("");
   };
 
   const getStatusColor = (status: string) => {
@@ -136,7 +132,7 @@ export function AppointmentManager() {
             {upcomingAppointments.map((appointment) => (
               <div
                 key={appointment.id}
-                className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50"
+                className="flex items-center justify-between p-4 border rounded-lg"
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
@@ -160,19 +156,13 @@ export function AppointmentManager() {
                     </span>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    onClick={() => updateAppointment(appointment.id, { status: "completed" })}
-                  >
-                    Mark Complete
-                  </Button>
+                <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => updateAppointment(appointment.id, { status: "cancelled" })}
+                    onClick={() => handleAppointmentClick(appointment)}
                   >
-                    Cancel
+                    View Details
                   </Button>
                 </div>
               </div>
@@ -203,17 +193,15 @@ export function AppointmentManager() {
                       {appointment.status}
                     </Badge>
                   </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      setEditingId(appointment.id);
-                      setEditNotes(appointment.notes || "");
-                    }}
-                  >
-                    <Edit2 className="h-4 w-4 mr-2" />
-                    Add/Edit Notes
-                  </Button>
+                  <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleAppointmentClick(appointment)}
+                      >
+                      View Details
+                    </Button>
+                  </div>
                 </div>
                 
                 <div className="flex items-center gap-4 text-sm text-slate-600 mb-3">
@@ -230,35 +218,21 @@ export function AppointmentManager() {
                     {appointment.time}
                   </span>
                 </div>
-
-                {editingId === appointment.id ? (
-                  <div className="space-y-3">
-                    <Textarea
-                      placeholder="Add notes about this appointment..."
-                      value={editNotes}
-                      onChange={(e) => setEditNotes(e.target.value)}
-                    />
-                    <div className="flex gap-2">
-                      <Button onClick={() => saveNotes(appointment.id)}>
-                        Save Notes
-                      </Button>
-                      <Button variant="outline" onClick={() => setEditingId(null)}>
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  appointment.notes && (
-                    <div className="bg-slate-50 p-3 rounded-md">
-                      <p className="text-sm text-slate-700">{appointment.notes}</p>
-                    </div>
-                  )
-                )}
               </div>
             ))}
           </div>
         </CardContent>
       </Card>
+
+      <AppointmentDialog
+        appointment={selectedAppointment}
+        isOpen={isDialogOpen}
+        onClose={() => {
+          setIsDialogOpen(false);
+          setSelectedAppointment(null);
+        }}
+        onUpdateAppointment={updateAppointment}
+      />
     </div>
   );
 }
