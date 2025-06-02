@@ -66,10 +66,10 @@ services.AddSwaggerGen(options =>
 services.AddCors(options =>
 {
     options.AddPolicy(
-        "AllowAll",
-        policy =>
+        "EHealthMonitoringSystemPolicy",
+        builder =>
         {
-            policy.AllowCredentials().AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+            builder.WithOrigins("http://localhost:3000").AllowCredentials().AllowAnyMethod().AllowAnyHeader();
         }
     );
 });
@@ -191,7 +191,7 @@ app.UseStaticFiles(
     }
 );
 app.UseRouting();
-app.UseCors("AllowAll");
+app.UseCors("EHealthMonitoringSystemPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
