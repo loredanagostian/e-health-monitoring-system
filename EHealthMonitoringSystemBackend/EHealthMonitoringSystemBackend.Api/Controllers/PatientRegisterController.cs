@@ -66,6 +66,9 @@ public class RegisterController(
             );
             return StatusCode(StatusCodes.Status500InternalServerError, new { msg = MSG_501 });
         }
+        
+        newUser.EmailConfirmed = true;
+        await _userManger.UpdateAsync(newUser);
 
         var userId = await _userManger.GetUserIdAsync(newUser);
         await SendConfirmationEmail(newUser);

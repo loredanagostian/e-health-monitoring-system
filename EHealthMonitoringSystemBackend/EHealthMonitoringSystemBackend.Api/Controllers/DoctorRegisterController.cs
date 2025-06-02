@@ -69,6 +69,9 @@ public class DoctorRegisterController(
             return StatusCode(StatusCodes.Status500InternalServerError, new { msg = MSG_501 });
         }
 
+        newUser.EmailConfirmed = true;
+        await _userManger.UpdateAsync(newUser);
+
         var userId = await _userManger.GetUserIdAsync(newUser);
         await SendConfirmationEmail(newUser);
 
@@ -339,22 +342,5 @@ public class DoctorRegisterController(
         );
 
         return Ok(new { token = newToken });
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> Temp()
-    {
-        string? jwtToken = null;
-        if (Request.Cookies.ContainsKey("access-token"))
-        {
-            jwtToken = Request.Cookies["access-token"];
-        }
-
-        if (jwtToken is null)
-        {
-            return Unauthorized("Missing JWT Token.");
-        }
-
-        return Ok(new { token = jwtToken });
     }
 }
