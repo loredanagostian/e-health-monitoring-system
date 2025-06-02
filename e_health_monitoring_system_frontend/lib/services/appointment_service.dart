@@ -141,4 +141,14 @@ class AppointmentService {
 
     return await request.send();
   }
+
+  static Future<http.Response> cancelAppointment(String appointmentId) async {
+    return http
+        .delete(
+          Uri.parse(
+            "${AuthManager.endpoint}/Appointment/Delete/$appointmentId",
+          ),
+        )
+        .timeout(Duration(seconds: 10));
+  }
 }

@@ -248,12 +248,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             );
           },
           StringsHelper.recentVisits,
-          isViewAllButtonVisible: true,
+          isViewAllButtonVisible: _recentVisits.isNotEmpty,
         ),
         _isLoadingRecentVisits
             ? Padding(
               padding: const EdgeInsets.only(left: 25),
               child: CircularProgressIndicator(),
+            )
+            : _recentVisits.isEmpty
+            ? Padding(
+              padding: const EdgeInsets.only(left: 25),
+              child: Text("No recent appointments"),
             )
             : SizedBox(height: 20),
         SingleChildScrollView(
