@@ -29,7 +29,7 @@ export function AppointmentManager() {
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  const baseUrl = "http://localhost:5200/api";
+  const baseUrl = "http://ehealth.edicz.com/api";
 
   useEffect(() => {
     if (!doctorId || !token) return; // Wait for both to be available

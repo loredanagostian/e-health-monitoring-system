@@ -15,13 +15,11 @@ class RegisterService {
   const RegisterService._init();
 
   Future<http.Response> signUpPatient(PatientRegister patient) async {
-    return http
-        .post(
-          headers: {"Content-Type": "application/json"},
-          Uri.parse("${AuthManager.endpoint}/Register/SignUpPatient"),
-          body: patient.toJson(),
-        )
-        .timeout(Duration(seconds: 10));
+    return http.post(
+      headers: {"Content-Type": "application/json"},
+      Uri.parse("${AuthManager.endpoint}/Register/SignUpPatient"),
+      body: patient.toJson(),
+    );
   }
 
   Future<http.Response> singInPatient(PatientRegister patient) async {

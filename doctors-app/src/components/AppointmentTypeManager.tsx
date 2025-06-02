@@ -16,7 +16,7 @@ interface AppointmentType {
 
 export function AppointmentTypeManager() {
   const doctorId = localStorage.getItem("doctorId");
-  const baseUrl = "http://localhost:5200/api/";
+  const baseUrl = "http://ehealth.edicz.com/api/";
 
   const [appointmentTypes, setAppointmentTypes] = useState<AppointmentType[]>([]);
   const [formData, setFormData] = useState({ name: "", price: "", description: "" });

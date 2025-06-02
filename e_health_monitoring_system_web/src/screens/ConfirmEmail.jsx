@@ -14,7 +14,7 @@ const ConfirmEmail = () => {
   useEffect(() => {
     const confirmEmail = async () => {
       try {
-        const response = await fetch(`http://localhost:5200/api/Register/ConfirmEmail?userId=${userId}&code=${code}`, {
+        const response = await fetch(`http://ehealth.edicz.com/api/Register/ConfirmEmail?userId=${userId}&code=${code}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json"

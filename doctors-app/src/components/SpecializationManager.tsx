@@ -101,7 +101,7 @@ export function SpecializationManager() {
 
     setIsLoading(true);
     try {
-      const response = await fetch(`http://localhost:5200/api/Specialization/AddToDoctor`, {
+      const response = await fetch(`http://ehealth.edicz.com/api/Specialization/AddToDoctor`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
