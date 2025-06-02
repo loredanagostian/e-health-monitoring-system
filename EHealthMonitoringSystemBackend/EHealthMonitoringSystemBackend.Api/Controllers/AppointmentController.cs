@@ -253,7 +253,8 @@ public class AppointmentController : ControllerBase
             AppointmentType = a.AppointmentType.Name,
             DoctorName = a.AppointmentType.Doctor.Name,
             DoctorPicture = a.AppointmentType.Doctor.Picture.Path.Replace("../", baseUrl),
-            UserName = userIdToName[a.UserId]
+            UserName = userIdToName[a.UserId],
+            MedicalHistory = a.MedicalHistory
         });
 
         return Ok(appointments);

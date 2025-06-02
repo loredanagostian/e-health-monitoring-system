@@ -29,7 +29,7 @@ export function AppointmentManager() {
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  const baseUrl = "http://ehealth.edicz.com/api";
+  const baseUrl = "/api";
 
   useEffect(() => {
     if (!doctorId || !token) return; // Wait for both to be available
@@ -92,7 +92,7 @@ export function AppointmentManager() {
   };
 
   const updateAppointment = (id: string, updates: Partial<Appointment>) => {
-    setAppointments(appointments.map(apt => 
+    setAppointments(appointments.map(apt =>
       apt.id === id ? { ...apt, ...updates } : apt
     ));
     toast({
@@ -198,12 +198,12 @@ export function AppointmentManager() {
                       size="sm"
                       variant="outline"
                       onClick={() => handleAppointmentClick(appointment)}
-                      >
+                    >
                       View Details
                     </Button>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-4 text-sm text-slate-600 mb-3">
                   <span className="flex items-center gap-1">
                     <User className="h-4 w-4" />
