@@ -47,11 +47,11 @@ const menuItems = [
   //   url: "/schedule",
   //   icon: Plus,
   // },
-  {
-    title: "Profile",
-    url: "/profile",
-    icon: User,
-  }
+  // {
+  //   title: "Profile",
+  //   url: "/profile",
+  //   icon: User,
+  // }
 ];
 
 export function DoctorSidebar() {

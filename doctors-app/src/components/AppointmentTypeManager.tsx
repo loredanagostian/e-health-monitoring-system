@@ -1,12 +1,11 @@
 
-import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Textarea } from "../components/ui/textarea";
-import { Badge } from "../components/ui/badge";
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { Plus, X, Clock, DollarSign } from "lucide-react";
-import { toast } from "../hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 interface AppointmentType {
   id: string;
@@ -188,12 +187,11 @@ export function AppointmentTypeManager() {
               className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50"
             >
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
+                <div className="flex items-center gap-3">
                   <Badge className={type.color}>{type.name}</Badge>
                   <div className="flex items-center gap-4 text-sm text-slate-600">
                     <span className="flex items-center gap-1">
-                      <DollarSign className="h-4 w-4" />
-                      {type.price} RON
+                      {type.price} LEI
                     </span>
                   </div>
                 </div>
