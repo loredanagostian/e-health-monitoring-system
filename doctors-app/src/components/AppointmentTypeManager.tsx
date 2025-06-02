@@ -16,7 +16,7 @@ interface AppointmentType {
 
 export function AppointmentTypeManager() {
   const doctorId = localStorage.getItem("doctorId");
-  const baseUrl = "http://ehealth.edicz.com/api/";
+  const baseUrl = "https://ehealth.edicz.com/api/";
 
   const [appointmentTypes, setAppointmentTypes] = useState<AppointmentType[]>([]);
   const [formData, setFormData] = useState({ name: "", price: "", description: "" });
@@ -166,12 +166,12 @@ export function AppointmentTypeManager() {
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
           <Input
-              type="number"
-              step="1"
-              placeholder="Price (RON)"
-              value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-            />
+            type="number"
+            step="1"
+            placeholder="Price (RON)"
+            value={formData.price}
+            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+          />
           <div className="flex gap-2">
             <Button onClick={addAppointmentType} className="w-full">
               <Plus className="h-4 w-4 mr-2" />

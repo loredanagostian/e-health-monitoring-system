@@ -23,7 +23,7 @@ export function AuthProvider({ children }) {
 
             if (response.ok) {
                 const userData = await response.json();
-                console.log("Received userData:", userData);        
+                console.log("Received userData:", userData);
                 localStorage.setItem("doctorId", parseJwt(userData.token).unique_name);
                 localStorage.setItem("token", userData.token);
                 setUser(userData);
@@ -56,7 +56,7 @@ export function AuthProvider({ children }) {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Login failed');
+                throw new Error(errorData.msg || 'Login failed');
             }
 
             const data = await response.json();
@@ -200,19 +200,19 @@ export function useAuth() {
 }
 
 export function parseJwt(token) {
-  if (!token) return null;
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + c.charCodeAt(0).toString(16).padStart(2, '0'))
-        .join('')
-    );
+    if (!token) return null;
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+            atob(base64)
+                .split('')
+                .map((c) => '%' + c.charCodeAt(0).toString(16).padStart(2, '0'))
+                .join('')
+        );
 
-    return JSON.parse(jsonPayload);
-  } catch {
-    return null;
-  }
+        return JSON.parse(jsonPayload);
+    } catch {
+        return null;
+    }
 }
