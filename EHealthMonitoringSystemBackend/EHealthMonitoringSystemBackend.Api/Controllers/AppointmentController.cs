@@ -104,12 +104,6 @@ public class AppointmentController : ControllerBase
             return BadRequest("Appointment not found!");
         }
 
-        var user = await _getUser();
-        if (user is null)
-        {
-            return Unauthorized();
-        }
-
         var appointmentFiles = new List<AppointmentFile>();
         foreach (var file in files)
         {

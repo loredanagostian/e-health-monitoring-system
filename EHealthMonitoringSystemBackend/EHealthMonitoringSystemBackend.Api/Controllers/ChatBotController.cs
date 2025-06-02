@@ -16,7 +16,7 @@ public class ChatController : ControllerBase
     private readonly IHttpClientFactory _clientFactory;
     private readonly AppDbContext _dbContext;
 
-    const String API_KEY = "api_key_placeholder";
+    const String API_KEY = "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";
     const String BASE_URL = "https://openrouter.ai/api/v1";
     const String CHAT_ENDPOINT = "/chat/completions";
     const double TEMPERATURE = 0.5;
