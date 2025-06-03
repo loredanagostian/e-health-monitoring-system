@@ -126,9 +126,7 @@ public class DoctorController : ControllerBase
     }
     
     [HttpPatch]
-    public async Task<IActionResult> Update(
-        [FromForm] DoctorPostDto dto,
-        [FromForm] List<IFormFile> pictures)
+    public async Task<IActionResult> Update([FromForm] DoctorPostDto dto, IFormFile picture)
     {
         var existingDoctor = await _doctorRepository.GetOneAsync(a =>
             a.Id == dto.Id
@@ -146,8 +144,6 @@ public class DoctorController : ControllerBase
             Description = dto.Description,
         };
 
-        var picture = pictures.FirstOrDefault();
-        
         if (picture is not null)
         {
             var dbPicture = await _uploadManager.Upload(picture);
