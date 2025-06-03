@@ -10,7 +10,7 @@ import Appointments from "./pages/Appointments";
 import Specializations from "./pages/Specializations";
 import AppointmentTypes from "./pages/AppointmentTypes";
 // import Schedule from "./pages/Schedule";
-// import Profile from "./pages/Profile";
+import Profile from "./pages/Profile";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import NotFound from "./pages/NotFound";
@@ -34,7 +34,7 @@ const App = () => (
             <Route path="/specializations" element={<ProtectedRoute><Specializations /></ProtectedRoute>} />
             <Route path="/appointment-types" element={<ProtectedRoute><AppointmentTypes /></ProtectedRoute>} />
             {/* <Route path="/schedule" element={<ProtectedRoute><Schedule /></ProtectedRoute>} /> */}
-            {/* <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} /> */}
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/register-profile" element={<ProtectedRoute><RegisterProfile /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>

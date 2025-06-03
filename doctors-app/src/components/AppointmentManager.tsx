@@ -52,12 +52,19 @@ export function AppointmentManager() {
         const format = (data: any[], status: "upcoming" | "completed"): Appointment[] =>
           data.map((item) => {
             const dateObj = new Date(item.date);
+            const formattedDate = dateObj.toLocaleDateString("en-CA");
+            const formattedTime = dateObj.toLocaleTimeString("en-GB", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                });
+
             return {
               id: item.id,
               patientName: item.userName,
               type: item.appointmentType,
-              date: dateObj.toISOString().split("T")[0],
-              time: dateObj.toISOString().split("T")[1].slice(0, 5),
+              date: formattedDate,
+              time: formattedTime,
               status,
               medicalHistory: item.medicalHistory || "",
             };

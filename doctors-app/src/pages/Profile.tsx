@@ -1,4 +1,4 @@
-
+import { useEffect, useState } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DoctorSidebar } from "@/components/DoctorSidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,9 +6,116 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { User, Mail, Phone, MapPin, Edit } from "lucide-react";
+import { User, Edit, X } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
+
+interface Specialization {
+  id: string;
+  name: string;
+}
+
+interface DoctorData {
+  id: string;
+  name: string;
+  description: string;
+  picture: string;
+  specializations: Specialization[];
+}
 
 const Profile = () => {
+  const [doctor, setDoctor] = useState<DoctorData | null>(null);
+  const [fullName, setFullName] = useState("");
+  const [description, setDescription] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const fetchDoctor = async () => {
+      const doctorId = localStorage.getItem("doctorId");
+      if (!doctorId) return;
+
+      try {
+        const response = await fetch(`/api/Doctor/GetInfoById/${doctorId}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch doctor info");
+
+        const data = await response.json();
+        setDoctor(data);
+        setFullName(data.name);
+        setDescription(data.description);
+      } catch (error) {
+        console.error("Fetch error:", error);
+        toast({
+          title: "Error",
+          description: "Could not load profile information.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchDoctor();
+  }, []);
+
+  useEffect(() => {
+    if (selectedFile) {
+      const url = URL.createObjectURL(selectedFile);
+      setPreviewUrl(url);
+      return () => URL.revokeObjectURL(url);
+    } else {
+      setPreviewUrl(null);
+    }
+  }, [selectedFile]);
+
+  const hasChanged =
+    doctor &&
+    (fullName.trim() !== doctor.name.trim() ||
+      description.trim() !== doctor.description.trim());
+
+   const handleUpdate = async () => {
+    if (!doctor) return;
+
+    const formData = new FormData();
+    formData.append("Id", doctor.id);
+    formData.append("Name", fullName);
+    formData.append("Description", description);
+    if (selectedFile) {
+      formData.append("picture", selectedFile);
+    }
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("/api/Doctor/Update", {
+        method: "PATCH",
+        body: formData,
+        credentials: "include",
+      });
+
+      if (!response.ok) throw new Error("Update failed");
+
+      const updatedDoctor = await response.json();
+      setDoctor(updatedDoctor);
+      setSelectedFile(null);
+      toast({
+        title: "Success",
+        description: "Profile updated successfully.",
+      });
+    } catch (error) {
+      console.error("Update error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-slate-50">
@@ -23,86 +130,91 @@ const Profile = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <Card className="lg:col-span-2">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5" />
-                    Personal Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium">First Name</label>
-                      <Input defaultValue="Dr. John" />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">Last Name</label>
-                      <Input defaultValue="Smith" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Email</label>
-                    <Input type="email" defaultValue="dr.john.smith@e-health-system.com" />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Phone</label>
-                    <Input type="tel" defaultValue="+1 (555) 123-4567" />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Address</label>
-                    <Textarea defaultValue="123 Medical Center Drive, Healthcare City, HC 12345" />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Bio</label>
-                    <Textarea 
-                      defaultValue="Experienced physician with over 15 years in internal medicine. Specialized in cardiology and preventive care."
-                      rows={4}
-                    />
-                  </div>
-                  <Button className="w-full">
-                    <Edit className="h-4 w-4 mr-2" />
-                    Update Profile
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <div className="space-y-6">
-                <Card>
+            {doctor && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <Card className="lg:col-span-2">
                   <CardHeader>
-                    <CardTitle>Quick Info</CardTitle>
+                    <div className="flex justify-center">
+                      <img
+                        src={previewUrl || doctor.picture}
+                        alt="Doctor profile"
+                        className="w-32 h-32 rounded-full object-cover border"
+                      />
+                    </div>
+                    <CardTitle className="flex items-center gap-2">
+                      <User className="h-5 w-5" />
+                      Personal Information
+                    </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Mail className="h-4 w-4 text-slate-500" />
-                      <span>dr.john.smith@e-health-system.com</span>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 gap-4">
+                      <div className="md:col-span-2">
+                        <label className="text-sm font-medium">Full Displayed Name</label>
+                        <Input
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                        />
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Phone className="h-4 w-4 text-slate-500" />
-                      <span>+1 (555) 123-4567</span>
+                    <div>
+                        <label className="text-sm font-medium">Change Profile Picture</label>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) setSelectedFile(file);
+                            }}
+                          />
+                          {selectedFile && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              onClick={() => setSelectedFile(null)}
+                              title="Remove file"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    <div>
+                      <label className="text-sm font-medium">Description</label>
+                      <Textarea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={4}
+                      />
                     </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <MapPin className="h-4 w-4 text-slate-500" />
-                      <span>Healthcare City, HC</span>
-                    </div>
+                    <Button
+                      className="w-full"
+                      onClick={handleUpdate}
+                      disabled={!hasChanged && !selectedFile || isSubmitting}
+                    >
+                      <Edit className="h-4 w-4 mr-2" />
+                      {isSubmitting ? "Updating..." : "Update Profile"}
+                    </Button>
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Specializations</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge>Cardiology</Badge>
-                      <Badge>Internal Medicine</Badge>
-                      <Badge>Preventive Care</Badge>
-                    </div>
-                  </CardContent>
-                </Card>
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Specializations</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-wrap gap-2">
+                        {doctor.specializations.map((spec) => (
+                          <Badge key={spec.id}>{spec.name}</Badge>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </main>
       </div>
