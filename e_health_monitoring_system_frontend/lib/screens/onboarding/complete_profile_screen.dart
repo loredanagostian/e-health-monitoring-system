@@ -26,11 +26,13 @@ class PatientProfileForm extends StatefulWidget {
   builder;
   final String appBarTitle;
   final bool implyLeading;
+  final bool isCompleteProfile;
   const PatientProfileForm({
     super.key,
     required this.appBarTitle,
     required this.builder,
     this.implyLeading = false,
+    this.isCompleteProfile = true,
   });
 
   @override
@@ -50,7 +52,10 @@ class _PatientProfileFormState extends State<PatientProfileForm> {
     lastNameController = TextEditingController();
     phoneNumberController = TextEditingController();
     cnpController = TextEditingController();
-    _loadProfileDataIfAvailable();
+
+    if (!widget.isCompleteProfile) {
+      _loadProfileDataIfAvailable();
+    }
   }
 
   Future<void> _loadProfileDataIfAvailable() async {
@@ -185,6 +190,7 @@ class UpdateProfileScreen extends StatelessWidget {
     return PatientProfileForm(
       appBarTitle: StringsHelper.updateProfile,
       implyLeading: true,
+      isCompleteProfile: false,
       builder:
           (
             ctx,
