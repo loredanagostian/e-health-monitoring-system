@@ -17,12 +17,29 @@ public class DoctorRepository : IDoctorRepository
     
     public DbSet<Doctor> _dbSet { get; }
 
-    public async Task<Doctor> AddAsync(Doctor doctor)
+    public async Task<Doctor> AddUpdateAsync(Doctor doctor)
     {
-        var dbDoctor = (await _dbSet.AddAsync(doctor)).Entity;
-        await _dbContext.SaveChangesAsync();
+        var existing = await _dbSet
+            .Include(d => d.Picture)
+            .FirstOrDefaultAsync(a => a.Id.Equals(doctor.Id));
 
-        return dbDoctor;
+        if (existing is null)
+        {
+            var dbEntity = (await _dbSet.AddAsync(doctor)).Entity;
+            await _dbContext.SaveChangesAsync();
+            return dbEntity;
+        }
+
+        existing.Name = doctor.Name;
+        existing.Description = doctor.Description;
+
+        if (doctor.PictureId is not null)
+        {
+            existing.PictureId = doctor.PictureId;
+        }
+
+        await _dbContext.SaveChangesAsync();
+        return existing;
     }
 
     public async Task<IEnumerable<Doctor>> GetAllAsync()

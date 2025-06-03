@@ -1,3 +1,4 @@
+using System.Xml;
 using EHealthMonitoringSystemBackend.Api.Dtos;
 using EHealthMonitoringSystemBackend.Api.Models;
 using EHealthMonitoringSystemBackend.Api.Services.Abstractions;
@@ -59,7 +60,7 @@ public class DoctorController : ControllerBase
             PictureId = appFile.Id,
         };
 
-        var dbDoctor = await _doctorRepository.AddAsync(doctor);
+        var dbDoctor = await _doctorRepository.AddUpdateAsync(doctor);
 
         return Ok(
             new DoctorDto
@@ -122,6 +123,45 @@ public class DoctorController : ControllerBase
         var doctorDto = await _getDoctorDto(doctor);
 
         return Ok(doctorDto);
+    }
+    
+    [HttpPatch]
+    public async Task<IActionResult> Update(
+        [FromForm] DoctorPostDto dto,
+        [FromForm] List<IFormFile> pictures)
+    {
+        var existingDoctor = await _doctorRepository.GetOneAsync(a =>
+            a.Id == dto.Id
+        );
+        
+        if (existingDoctor is null)
+        {
+            return BadRequest("Doctor not found!");
+        }
+        
+        var doctor = new Doctor
+        {
+            Id = dto.Id,
+            Name = dto.Name,
+            Description = dto.Description,
+        };
+
+        var picture = pictures.FirstOrDefault();
+        
+        if (picture is not null)
+        {
+            var dbPicture = await _uploadManager.Upload(picture);
+        
+            if (dbPicture is null)
+            {
+                return BadRequest("File upload failed");
+            }
+
+            doctor.PictureId = dbPicture.Id;
+        }
+
+        var dbDoctor = await _doctorRepository.AddUpdateAsync(doctor);
+        return Ok(await _getDoctorDto(dbDoctor));
     }
 
     private async Task<DoctorDto> _getDoctorDto(Doctor doctor)
