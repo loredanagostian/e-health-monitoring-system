@@ -2,6 +2,10 @@ import 'package:e_health_monitoring_system_frontend/helpers/auth_manager.dart';
 import 'package:e_health_monitoring_system_frontend/models/api_models/patient_profile.dart';
 import 'package:http/http.dart' as http;
 
+class MissingProfileException implements Exception {}
+
+class InvalidAccount implements Exception {}
+
 // TODO: make singleton
 class PatientService {
   static final AuthManager _manager = AuthManager();
@@ -40,8 +44,11 @@ class PatientService {
     if (response.statusCode == 200) {
       return PatientProfile.fromJson(response.body);
     } else {
-      print("Failed to fetch patient profile: ${response.body}");
-      return null;
+      if (response.statusCode == 400) {
+        throw MissingProfileException();
+      }
+
+      throw InvalidAccount();
     }
   }
 

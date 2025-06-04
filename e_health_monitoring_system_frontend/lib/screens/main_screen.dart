@@ -1,8 +1,11 @@
+import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/widgets_helper.dart';
 import 'package:e_health_monitoring_system_frontend/models/api_models/patient_profile.dart';
 import 'package:e_health_monitoring_system_frontend/screens/appointments/appointments_screen.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/auth_manager.dart';
 import 'package:e_health_monitoring_system_frontend/screens/home_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/ai_chat_support_screen.dart';
+import 'package:e_health_monitoring_system_frontend/screens/onboarding/complete_profile_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/sign_in_screen.dart';
 import 'package:e_health_monitoring_system_frontend/services/patient_service.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_bottom_tab_navigator.dart';
@@ -21,7 +24,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   Widget _getBody(int index, PatientProfile profile) {
     switch (index) {
       case 0:
-        return ChatSupportScreen(userInitials: "${profile.firstName[0]}${profile.lastName[0]}".toUpperCase());
+        return ChatSupportScreen(
+          userInitials:
+              "${profile.firstName[0]}${profile.lastName[0]}".toUpperCase(),
+        );
       case 1:
         return HomeScreen(patientProfile: profile);
       case 2:
@@ -34,7 +40,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   Future<PatientProfile?> _getPatientProfile() async {
     var manager = AuthManager();
     if (await manager.isLoggedIn()) {
-      return await PatientService().getPatientProfile();
+      var profile = await PatientService().getPatientProfile();
+      return profile;
     }
 
     return null;
@@ -59,7 +66,15 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       future: _getPatientProfile(),
       // TODO: transition is too fast should show spinner until check is done
       builder: (context, data) {
-        if (!data.hasData || data.data == null) {
+        if (data.hasError) {
+          if (data.error is MissingProfileException) {
+            return CompleteProfileScreen();
+          }
+          WidgetsHelper.showCustomSnackBar(
+            message: StringsHelper.internalError,
+          );
+          return SignInScreen();
+        } else if (!data.hasData) {
           return SignInScreen();
         } else {
           return Scaffold(
