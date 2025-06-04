@@ -273,7 +273,7 @@ public class AppointmentController : ControllerBase
                 DoctorPicture = appointment.AppointmentType.Doctor.Picture.Path.Replace(
                     "../",
                     baseUrl
-                ),
+                ).Replace("./",baseUrl),
                 MedicalHistory = appointment.MedicalHistory,
                 Diagnostic = appointment.Diagnostic,
                 Recommendation = appointment.Recommendation,
