@@ -1,6 +1,7 @@
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/date_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/global_helper.dart';
+import 'package:e_health_monitoring_system_frontend/helpers/image_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/styles_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/widgets_helper.dart';
@@ -87,7 +88,12 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                                   text: snapshot.data!.appointmentType,
                                 ),
                               ],
-                              doctorPhotoPath: snapshot.data!.doctorPicture,
+                              doctorPhotoPath:
+                                  snapshot.data!.doctorPicture.isNotEmpty
+                                      ? ImageHelper.fixImageUrl(
+                                        snapshot.data!.doctorPicture,
+                                      )
+                                      : "/assets/images/mockup_doctor.png",
                             ),
                             SizedBox(height: 20),
                             getReasonToVisit(snapshot.data!.appointmentType),

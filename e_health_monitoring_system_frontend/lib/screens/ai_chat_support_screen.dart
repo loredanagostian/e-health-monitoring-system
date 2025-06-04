@@ -1,3 +1,5 @@
+import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
+import 'package:e_health_monitoring_system_frontend/widgets/custom_appbar.dart';
 import 'package:flutter/material.dart';
 
 import 'package:e_health_monitoring_system_frontend/helpers/colors_helper.dart';
@@ -235,19 +237,9 @@ class _ChatSupportScreenState extends State<ChatSupportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: ColorsHelper.mainWhite,
-        elevation: 0,
-        titleSpacing: 0.0,
-        centerTitle: true,
-        title: Text(
-          "Chatbot Support",
-          style: TextStyle(
-            fontSize: 30,
-            fontWeight: FontWeight.bold,
-            color: ColorsHelper.mainDark,
-          ),
-        ),
+      appBar: CustomAppbar(
+        appBarTitle: StringsHelper.chatbotSupport,
+        implyLeading: false,
       ),
       body: SafeArea(
         child: Padding(

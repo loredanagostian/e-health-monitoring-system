@@ -23,8 +23,8 @@ class AppointmentsListScreen extends StatelessWidget {
       appBar: CustomAppbar(
         appBarTitle:
             isUpcoming
-                ? StringsHelper.upcomingAppointment
-                : StringsHelper.recentVisit,
+                ? StringsHelper.upcomingAppointments
+                : StringsHelper.recentVisits,
         implyLeading: true,
       ),
       body: SingleChildScrollView(

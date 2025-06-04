@@ -52,12 +52,8 @@ export function AppointmentManager() {
         const format = (data: any[], status: "upcoming" | "completed"): Appointment[] =>
           data.map((item) => {
             const dateObj = new Date(item.date);
-            const formattedDate = dateObj.toLocaleDateString("en-CA");
-            const formattedTime = dateObj.toLocaleTimeString("en-GB", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: false,
-                });
+            const formattedDate = dateObj.toUTCString().slice(0, 16);
+            const formattedTime = dateObj.toUTCString().slice(16, 22);
 
             return {
               id: item.id,

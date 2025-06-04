@@ -83,7 +83,7 @@ class _BookAppointmentFinalDetailsScreenState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Icon(
                               Icons.calendar_month_outlined,
@@ -103,7 +103,7 @@ class _BookAppointmentFinalDetailsScreenState
                         ),
                         SizedBox(height: 5),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Icon(
                               Icons.schedule_outlined,

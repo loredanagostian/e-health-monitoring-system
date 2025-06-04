@@ -1,3 +1,4 @@
+import 'package:e_health_monitoring_system_frontend/helpers/assets_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/strings_helper.dart';
 import 'package:e_health_monitoring_system_frontend/helpers/widgets_helper.dart';
 import 'package:e_health_monitoring_system_frontend/models/api_models/patient_profile.dart';
@@ -11,6 +12,7 @@ import 'package:e_health_monitoring_system_frontend/services/patient_service.dar
 import 'package:e_health_monitoring_system_frontend/widgets/custom_bottom_tab_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lottie/lottie.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   final int? bottomNavigatorIndex;
@@ -64,18 +66,21 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     int selectedIndex = ref.watch(bottomNavigatorIndex);
     return FutureBuilder(
       future: _getPatientProfile(),
-      // TODO: transition is too fast should show spinner until check is done
       builder: (context, data) {
         if (data.hasError) {
           if (data.error is MissingProfileException) {
             return CompleteProfileScreen();
           }
+
           WidgetsHelper.showCustomSnackBar(
             message: StringsHelper.internalError,
           );
+
           return SignInScreen();
         } else if (!data.hasData) {
-          return SignInScreen();
+          return Center(
+            child: Lottie.asset(AssetsHelper.loadingSpinner, width: 80),
+          );
         } else {
           return Scaffold(
             extendBody: true,

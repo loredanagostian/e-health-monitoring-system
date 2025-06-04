@@ -65,6 +65,7 @@ class StringsHelper {
   static const String emailSentSuccessfully = "Email sent successfully";
 
   /// Home Screen
+  static const String chatbotSupport = "Chatbot Support";
   static const String hi = "Hi";
   static const String viewAll = "View all";
   static const String upcomingAppointments = "Upcoming Appointments";

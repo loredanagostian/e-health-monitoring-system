@@ -157,10 +157,12 @@ class CompleteProfileScreen extends StatelessWidget {
                     );
                     var resp = await _service.completeProfile(profile);
                     if (resp.statusCode == 200) {
-                      navigator.pushReplacement(
+                      navigator.pushAndRemoveUntil(
                         MaterialPageRoute(
-                          builder: (context) => const MainScreen(),
+                          builder:
+                              (context) => MainScreen(bottomNavigatorIndex: 1),
                         ),
+                        (route) => false,
                       );
                     } else {
                       WidgetsHelper.showCustomSnackBar(
