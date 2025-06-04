@@ -40,9 +40,10 @@ class AuthManager {
   }
 
   Future<void> reset() async {
-    await _secureStorage.delete(key: "accessToken");
+    await _secureStorage.delete(key: "accessToken", aOptions: AndroidOptions());
     await _secureStorage.delete(key: "refreshToken");
     await _prefs.setBool("isLoggedIn", false);
+    _token = null;
   }
 
   Future<JwtToken?> _loadToken() async {
