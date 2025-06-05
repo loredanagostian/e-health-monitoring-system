@@ -6,7 +6,7 @@ import 'package:e_health_monitoring_system_frontend/screens/appointments/appoint
 import 'package:e_health_monitoring_system_frontend/helpers/auth_manager.dart';
 import 'package:e_health_monitoring_system_frontend/screens/home_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/ai_chat_support_screen.dart';
-import 'package:e_health_monitoring_system_frontend/screens/onboarding/complete_profile_screen.dart';
+import 'package:e_health_monitoring_system_frontend/screens/onboarding/onboarding_screen.dart';
 import 'package:e_health_monitoring_system_frontend/screens/onboarding/sign_in_screen.dart';
 import 'package:e_health_monitoring_system_frontend/services/patient_service.dart';
 import 'package:e_health_monitoring_system_frontend/widgets/custom_bottom_tab_navigator.dart';
@@ -67,9 +67,15 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     return FutureBuilder(
       future: _getPatientProfile(),
       builder: (context, data) {
+        if (data.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: Lottie.asset(AssetsHelper.loadingSpinner, width: 80),
+          );
+        }
+
         if (data.hasError) {
           if (data.error is MissingProfileException) {
-            return CompleteProfileScreen();
+            return OnboardingScreen();
           }
 
           WidgetsHelper.showCustomSnackBar(
@@ -78,9 +84,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
           return SignInScreen();
         } else if (!data.hasData) {
-          return Center(
-            child: Lottie.asset(AssetsHelper.loadingSpinner, width: 80),
-          );
+          return OnboardingScreen();
         } else {
           return Scaffold(
             extendBody: true,
